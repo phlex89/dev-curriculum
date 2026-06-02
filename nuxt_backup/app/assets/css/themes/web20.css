@@ -1,0 +1,57 @@
+/* Web 2.0 / Bootstrap Theme */
+html.theme-web20 {
+  --bg-color: #f5f5f5;
+  --text-color: #333333;
+  --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  line-height: 1.42857143;
+}
+
+html.theme-web20 a {
+  color: #337ab7;
+  text-decoration: none;
+}
+
+html.theme-web20 a:hover {
+  text-decoration: underline;
+  color: #23527c;
+}
+
+html.theme-web20 .glass-card {
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+}
+
+html.theme-web20 h1, html.theme-web20 h2, html.theme-web20 h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: inherit;
+}
+
+html.theme-web20 h2 {
+  border-bottom: 1px solid #eeeeee;
+  padding-bottom: 9px;
+}
+
+html.theme-web20 .pill {
+  display: inline-block;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #337ab7;
+  margin: 0.25rem;
+}

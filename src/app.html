@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="text-scale" content="scale" />
+
+		<!-- SEO -->
+		<meta
+			name="description"
+			content="CV interattivo di Stefano Tedeschi, Senior Frontend Engineer. Lo stesso curriculum attraverso sei ere della UI/UX: Terminale Unix, Windows XP, Skeuomorfismo, Brutalismo, Modern Flat e il Futuro 3D."
+		/>
+		<meta name="author" content="Stefano Tedeschi" />
+		<meta name="theme-color" content="#4f46e5" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:locale" content="it_IT" />
+		<meta property="og:title" content="Stefano Tedeschi — CV · Time-Machine Resume" />
+		<meta
+			property="og:description"
+			content="Un curriculum che attraversa le ere della UI/UX: Terminale Unix, Windows XP, Skeuomorfismo, Brutalismo, Modern Flat e il Futuro 3D."
+		/>
+		<meta property="og:image" content="/og-image.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:url" content="https://www.protechstudio.it" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Stefano Tedeschi — CV · Time-Machine Resume" />
+		<meta
+			name="twitter:description"
+			content="Un curriculum che attraversa le ere della UI/UX: Terminale Unix, Windows XP, Skeuomorfismo, Brutalismo, Modern Flat e il Futuro 3D."
+		/>
+		<meta name="twitter:image" content="/og-image.png" />
+
+		<!-- Structured data (Person) -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Stefano Tedeschi",
+				"jobTitle": "Senior Frontend Engineer",
+				"url": "https://www.protechstudio.it",
+				"sameAs": ["https://www.linkedin.com/in/stefano-tedeschi-developer/"],
+				"address": { "@type": "PostalAddress", "addressLocality": "Torino", "addressCountry": "IT" },
+				"knowsAbout": ["Vue", "React", "TypeScript", "Frontend Architecture", "Design Systems"]
+			}
+		</script>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;800&family=JetBrains+Mono:wght@400;500;700&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
+			rel="stylesheet"
+		/>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

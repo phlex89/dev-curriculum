@@ -1,0 +1,51 @@
+/* Windows XP Theme */
+html.theme-winxp {
+  --bg-color: #3a6ea5;
+  --text-color: #000000;
+  --font-family: Tahoma, 'Segoe UI', sans-serif;
+  
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  line-height: 1.5;
+}
+
+html.theme-winxp a {
+  color: #0000ff;
+  text-decoration: underline;
+}
+
+html.theme-winxp .glass-card {
+  background: #ece9d8;
+  border: 1px solid #0055ea;
+  border-radius: 3px 3px 0 0;
+  padding: 0;
+  margin-bottom: 2rem;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+html.theme-winxp .glass-card > *:not(h2) {
+  padding: 0 1rem;
+}
+
+html.theme-winxp .glass-card > *:last-child {
+  padding-bottom: 1rem;
+}
+
+html.theme-winxp h2 {
+  background: linear-gradient(to right, #0058e6 0%, #3a93ff 100%);
+  color: white;
+  margin: 0 0 1rem 0;
+  padding: 0.2rem 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+html.theme-winxp .pill {
+  background: #ffffff;
+  border: 2px outset #ffffff;
+  padding: 2px 6px;
+  display: inline-block;
+  margin: 0.25rem;
+  font-size: 0.85rem;
+}

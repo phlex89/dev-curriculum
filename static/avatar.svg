@@ -1,0 +1,64 @@
+<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Avatar illustrato">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="55%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6c9a6"/>
+      <stop offset="100%" stop-color="#eab28a"/>
+    </linearGradient>
+    <clipPath id="circle"><circle cx="120" cy="120" r="120"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#circle)">
+    <!-- backdrop -->
+    <rect width="240" height="240" fill="url(#bg)"/>
+    <circle cx="120" cy="118" r="92" fill="rgba(255,255,255,0.08)"/>
+    <circle cx="120" cy="124" r="70" fill="rgba(255,255,255,0.07)"/>
+
+    <!-- shoulders / shirt -->
+    <path d="M40 240 C40 196 76 168 120 168 C164 168 200 196 200 240 Z" fill="url(#shirt)"/>
+    <path d="M120 168 C108 178 132 178 120 168 Z" fill="#0b1220"/>
+    <!-- collar -->
+    <path d="M104 172 L120 188 L136 172 L130 168 L120 176 L110 168 Z" fill="#334155"/>
+
+    <!-- neck -->
+    <path d="M106 150 L106 172 Q120 184 134 172 L134 150 Z" fill="#e0a079"/>
+
+    <!-- head -->
+    <ellipse cx="120" cy="118" rx="46" ry="50" fill="url(#skin)"/>
+    <!-- ears -->
+    <circle cx="74" cy="120" r="9" fill="#e3a87f"/>
+    <circle cx="166" cy="120" r="9" fill="#e3a87f"/>
+
+    <!-- hair -->
+    <path d="M73 116 C68 70 100 56 120 56 C140 56 173 70 167 116 C165 100 158 92 150 90 C152 80 146 74 138 74 C150 86 140 96 126 92 C108 87 92 86 84 100 C80 106 76 110 73 116 Z" fill="#2b2b35"/>
+    <path d="M73 116 C70 96 78 84 88 80 C80 92 80 104 80 112 Z" fill="#22222c"/>
+
+    <!-- eyebrows -->
+    <path d="M96 106 Q104 101 112 105" fill="none" stroke="#3a3a44" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M128 105 Q136 101 144 106" fill="none" stroke="#3a3a44" stroke-width="3.2" stroke-linecap="round"/>
+
+    <!-- glasses -->
+    <g fill="none" stroke="#2b2b35" stroke-width="3">
+      <rect x="90" y="110" width="26" height="20" rx="7"/>
+      <rect x="124" y="110" width="26" height="20" rx="7"/>
+      <line x1="116" y1="119" x2="124" y2="119"/>
+      <line x1="90" y1="116" x2="80" y2="114"/>
+      <line x1="150" y1="116" x2="160" y2="114"/>
+    </g>
+    <!-- eyes -->
+    <circle cx="103" cy="120" r="3.4" fill="#2b2b35"/>
+    <circle cx="137" cy="120" r="3.4" fill="#2b2b35"/>
+
+    <!-- nose + smile -->
+    <path d="M120 124 L116 136 Q120 139 124 136" fill="none" stroke="#d9966e" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M106 146 Q120 158 134 146" fill="none" stroke="#b06a4a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

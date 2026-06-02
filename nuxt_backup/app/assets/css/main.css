@@ -1,0 +1,27 @@
+@import './themes/modern.css';
+@import './themes/winxp.css';
+@import './themes/terminal.css';
+@import './themes/web20.css';
+
+/* Base structural CSS */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Layout utilities used across all themes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Default semantic styles to be overridden by themes */
+header, main, section, footer {
+  display: block;
+}

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1200px; height: 630px; overflow: hidden; }
+      .card { position: relative; width: 1200px; height: 630px; display: flex; font-family: 'Inter', sans-serif; }
+
+      .slice { position: relative; width: 300px; height: 630px; overflow: hidden; }
+
+      /* tiny era label, bottom-left of each slice */
+      .era-tag {
+        position: absolute; left: 22px; bottom: 150px; z-index: 5;
+        font-size: 15px; font-weight: 600; letter-spacing: 0.06em;
+        display: flex; flex-direction: column; gap: 2px;
+      }
+      .era-tag .yr { font-size: 12px; opacity: 0.7; letter-spacing: 0.18em; text-transform: uppercase; }
+
+      /* ---- 1. Terminal ---- */
+      .s-term {
+        background:
+          radial-gradient(rgba(51,255,102,0.10) 1px, transparent 1.4px),
+          radial-gradient(circle at 50% 0%, rgba(51,255,102,0.10), transparent 70%),
+          #050505;
+        background-size: 22px 22px, 100% 100%;
+        color: #33ff66;
+        font-family: 'JetBrains Mono', monospace;
+        text-shadow: 0 0 6px rgba(51,255,102,0.55);
+        padding: 34px 22px;
+      }
+      .s-term .scan { position: absolute; inset: 0; background: linear-gradient(rgba(255,255,255,0) 50%, rgba(0,0,0,0.22) 50%); background-size: 100% 4px; pointer-events: none; }
+      .s-term .line { font-size: 13.5px; line-height: 1.9; white-space: nowrap; }
+      .s-term .muted { color: #9db8ff; }
+      .s-term .blk { display: inline-block; width: 9px; height: 16px; background: #33ff66; vertical-align: -3px; box-shadow: 0 0 6px rgba(51,255,102,0.8); }
+      .s-term .era-tag { color: #33ff66; }
+
+      /* ---- 2. Windows XP ---- */
+      .s-xp {
+        background: linear-gradient(180deg, #4d90d9 0%, #6fb0e6 38%, #6db33f 64%, #4f8f2f 100%);
+        font-family: Tahoma, 'Segoe UI', sans-serif;
+      }
+      .s-xp .win {
+        position: absolute; top: 92px; left: 28px; width: 244px;
+        background: #ece9d8; border: 3px solid #0058e6; border-radius: 8px 8px 0 0;
+        box-shadow: 2px 4px 14px rgba(0,0,0,0.45); overflow: hidden;
+      }
+      .s-xp .tbar {
+        height: 30px; background: linear-gradient(to right, #003db3, #2561e1);
+        color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 6px;
+        font-weight: 700; font-size: 13px; text-shadow: 1px 1px 1px #000;
+      }
+      .s-xp .tbar .btns { display: flex; gap: 3px; }
+      .s-xp .tbar .b { width: 18px; height: 18px; border: 1px solid rgba(255,255,255,0.8); border-radius: 3px; }
+      .s-xp .tbar .b.c { background: linear-gradient(#f08a70,#c5391f); }
+      .s-xp .tbar .b.m { background: linear-gradient(#5a8cf0,#1f54c6); }
+      .s-xp .body { background: #fff; margin: 5px; border: 1px solid #7f9db9; padding: 12px; color: #000; }
+      .s-xp .body h4 { color: #0058e6; font-size: 14px; margin-bottom: 6px; }
+      .s-xp .body p { font-size: 11.5px; color: #333; line-height: 1.5; }
+      .s-xp .era-tag { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+
+      /* ---- 3. Modern Flat / Bento ---- */
+      .s-bento {
+        background-color: #ececf0;
+        background-image:
+          radial-gradient(circle at 18% 12%, #e3e6f5, transparent 55%),
+          radial-gradient(circle at 90% 90%, rgba(79,70,229,0.08), transparent 55%);
+        padding: 30px 22px; display: grid; gap: 12px;
+        grid-template-columns: 1fr 1fr; grid-template-rows: 96px 1fr 70px; align-content: start;
+      }
+      .s-bento .bx { background: #fff; border-radius: 18px; box-shadow: 0 6px 20px rgba(20,20,40,0.08); border: 1px solid rgba(20,20,40,0.06); padding: 16px; }
+      .s-bento .b-prof { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; }
+      .s-bento .ring { width: 56px; height: 56px; border-radius: 50%; padding: 3px; background: conic-gradient(from 220deg, #4f46e5, #8b5cf6, #ec4899, #f59e0b, #4f46e5); flex: none; }
+      .s-bento .ring i { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%; background: #fff; font-family: 'Space Grotesk'; font-weight: 700; font-size: 22px; color: #16161a; font-style: normal; }
+      .s-bento .b-prof b { font-family: 'Space Grotesk'; font-size: 16px; color: #16161a; display: block; }
+      .s-bento .b-prof span { font-size: 11px; color: #fff; background: #4f46e5; padding: 3px 10px; border-radius: 99px; display: inline-block; margin-top: 5px; }
+      .s-bento .b-tall { grid-row: 2 / 4; }
+      .s-bento .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #6e6e78; display: block; margin-bottom: 8px; }
+      .s-bento .chip { display: inline-block; font-family: 'Space Grotesk'; font-size: 11px; color: #16161a; }
+      .s-bento .soc { background: linear-gradient(140deg,#0a66c2,#0a4f96); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-weight: 700; }
+      .s-bento .era-tag { color: #16161a; bottom: 150px; }
+
+      /* ---- 4. Future 3D ---- */
+      .s-future {
+        background: radial-gradient(ellipse 90% 70% at 50% 38%, #1d0f43 0%, #0c0726 48%, #050313 100%), #050313;
+        font-family: 'Space Grotesk', sans-serif; overflow: hidden;
+      }
+      .s-future .stars { position: absolute; inset: 0; background-image:
+        radial-gradient(1.4px 1.4px at 40px 60px, #fff, transparent),
+        radial-gradient(1.2px 1.2px at 120px 180px, #9fd, transparent),
+        radial-gradient(1.6px 1.6px at 220px 100px, #fff, transparent),
+        radial-gradient(1.2px 1.2px at 80px 320px, #8cf, transparent),
+        radial-gradient(1.4px 1.4px at 250px 420px, #fff, transparent),
+        radial-gradient(1.2px 1.2px at 160px 520px, #9fd, transparent);
+        opacity: 0.85; }
+      .s-future .knot { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: 150px; height: 150px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(0,255,255,0.0) 38%, rgba(0,255,255,0.35) 46%, transparent 60%);
+        box-shadow: 0 0 60px rgba(0,255,255,0.4); }
+      .s-future .ring2 { position: absolute; top: 78px; left: 50%; transform: translateX(-50%) rotate(-18deg); width: 168px; height: 60px; border: 2px solid rgba(0,255,255,0.5); border-radius: 50%; box-shadow: 0 0 18px rgba(0,255,255,0.4); }
+      .s-future .glass {
+        position: absolute; top: 250px; left: 26px; right: 26px;
+        background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 18px; backdrop-filter: blur(8px); padding: 18px;
+        box-shadow: 0 0 30px rgba(0,255,255,0.12);
+      }
+      .s-future .glass h4 { font-family: 'Orbitron'; font-size: 15px; color: #fff; letter-spacing: 1px; margin-bottom: 8px; text-shadow: 0 0 10px rgba(0,255,255,0.6); }
+      .s-future .glass p { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+      .s-future .era-tag { color: #00ffff; font-family: 'Orbitron'; text-shadow: 0 0 10px rgba(0,255,255,0.6); }
+
+      /* divider seams between slices */
+      .seam { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.10); z-index: 6; }
+
+      /* ---- overlay: name + tagline (lower third) + timeline pill ---- */
+      .overlay {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 122px; z-index: 10;
+        background: linear-gradient(to top, rgba(6,6,12,0.92) 30%, rgba(6,6,12,0.0));
+        display: flex; align-items: flex-end; justify-content: space-between;
+        padding: 0 40px 26px;
+      }
+      .who h1 { font-family: 'Space Grotesk'; color: #fff; font-size: 34px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+      .who p { color: rgba(255,255,255,0.72); font-size: 16px; margin-top: 8px; }
+      .who .accent { color: #8b8cff; }
+
+      .tl {
+        display: flex; align-items: center; gap: 10px;
+        background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+        backdrop-filter: blur(10px); border-radius: 99px; padding: 9px 14px;
+      }
+      .tl .dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.45); }
+      .tl .dot.on { width: 13px; height: 13px; background: #8b8cff; box-shadow: 0 0 12px rgba(139,140,255,0.8); }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <!-- 1. Terminal -->
+      <div class="slice s-term">
+        <div class="scan"></div>
+        <div class="line">STEFANO OS v2.0.0 (tty1)</div>
+        <div class="line">$ cat about.txt</div>
+        <div class="line muted">Name: Stefano Tedeschi</div>
+        <div class="line muted">Role: Frontend Engineer</div>
+        <div class="line">$ ls esperienze/</div>
+        <div class="line muted">exp_0 exp_1 exp_2</div>
+        <div class="line">$ <span class="blk"></span></div>
+        <div class="era-tag"><span class="yr">1980s</span>Terminale Unix</div>
+      </div>
+
+      <!-- 2. Windows XP -->
+      <div class="slice s-xp">
+        <div class="win">
+          <div class="tbar"><span>📄 About Me</span><div class="btns"><div class="b m"></div><div class="b m"></div><div class="b c"></div></div></div>
+          <div class="body">
+            <h4>Stefano Tedeschi</h4>
+            <p>Senior Frontend Engineer<br />Torino, Italy<br /><br />10+ anni tra design system e architetture frontend scalabili.</p>
+          </div>
+        </div>
+        <div class="era-tag"><span class="yr">2001</span>Windows XP</div>
+      </div>
+
+      <!-- 3. Modern Flat / Bento -->
+      <div class="slice s-bento">
+        <div class="bx b-prof">
+          <div class="ring"><i>ST</i></div>
+          <div><b>Stefano T.</b><span>Frontend Engineer</span></div>
+        </div>
+        <div class="bx b-tall">
+          <span class="lbl">Core Stack</span>
+          <div class="chip">Vue • React •<br />TypeScript •<br />Design Systems •<br />Node • Vite</div>
+        </div>
+        <div class="bx"><span class="lbl">Exp</span><div class="chip">10+ yrs</div></div>
+        <div class="bx soc">in</div>
+        <div class="era-tag"><span class="yr">2015</span>Modern Flat</div>
+      </div>
+
+      <!-- 4. Future 3D -->
+      <div class="slice s-future">
+        <div class="stars"></div>
+        <div class="knot"></div>
+        <div class="ring2"></div>
+        <div class="glass">
+          <h4>STEFANO TEDESCHI</h4>
+          <p>Senior Frontend Engineer — architetture, WebGL & design system. Dal pixel al deploy.</p>
+        </div>
+        <div class="era-tag"><span class="yr">2026</span>Future 3D</div>
+      </div>
+
+      <div class="seam" style="left:300px"></div>
+      <div class="seam" style="left:600px"></div>
+      <div class="seam" style="left:900px"></div>
+
+      <!-- overlay -->
+      <div class="overlay">
+        <div class="who">
+          <h1>Stefano Tedeschi</h1>
+          <p>Un CV che attraversa le <span class="accent">ere della UI/UX</span></p>
+        </div>
+        <div class="tl">
+          <div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

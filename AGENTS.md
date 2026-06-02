@@ -3,7 +3,7 @@
 Questo documento descrive l'architettura, le tecnologie e le caratteristiche del progetto "Time-Machine Resume", un curriculum web interattivo sviluppato in SvelteKit che permette di navigare attraverso diverse "ere" dell'informatica, cambiando radicalmente l'interfaccia grafica.
 
 ## Concetto Centrale
-Il progetto si basa sull'idea di un curriculum vitae dinamico. L'utente (es. un recruiter) può visualizzare le stesse informazioni (estratte dal vero CV di Stefano Tedeschi) attraverso otto design completamente diversi, ognuno rappresentativo di un'epoca specifica della UI/UX, navigabili tramite una **Timeline** globale persistente.
+Il progetto si basa sull'idea di un curriculum vitae dinamico. L'utente (es. un recruiter) può visualizzare le stesse informazioni (estratte dal vero CV di Stefano Tedeschi) attraverso nove design completamente diversi, ognuno rappresentativo di un'epoca specifica della UI/UX, navigabili tramite una **Timeline** globale persistente.
 
 ## Struttura e Architettura
 L'applicazione è sviluppata utilizzando **SvelteKit 5** (Runes) e **TypeScript**. L'architettura prevede una netta separazione tra dati e presentazione:
@@ -13,7 +13,7 @@ L'applicazione è sviluppata utilizzando **SvelteKit 5** (Runes) e **TypeScript*
     -   **Deep-link per tema**: il tema attivo è sincronizzato con l'hash dell'URL (`#terminal`, `#pixel`, `#web1`, `#winxp`, `#skeuo`, `#brutalism`, `#bento`, `#threed`) tramite `history.replaceState`. Un deep-link in apertura ha la precedenza sulla preferenza salvata; i pulsanti avanti/indietro del browser (`hashchange`) cambiano era. Un recruiter può così condividere "la versione Windows XP".
 3.  **Orchestrazione (`src/routes/+page.svelte`)**: La pagina principale funge da router che monta a schermo il componente del tema selezionato. Il cambio di tema avviene con una **transizione cross-dissolve** morbida (`{#key}` + `fade`, in 450ms / out 300ms, layer assoluti sovrapposti, rispetta `prefers-reduced-motion`).
     -   **Transizione tematica direzionale**: sopra il cross-dissolve, un overlay calcola la direzione dal confronto degli indici in `ERA_ORDER` e riproduce un effetto coerente col concetto di macchina del tempo — un **glitch/scan CRT verde** andando indietro nel tempo, un **bloom luminoso** andando avanti. Disattivato con `prefers-reduced-motion`.
-    -   **Audio opt-in d'epoca (`src/lib/audio.ts`)**: muto di default, attivabile da un toggle 🔊 flottante in basso a sinistra (allineato alla Timeline e tematizzato per era). Al cambio era riproduce un breve segnale sintetizzato al volo con la Web Audio API (beep CRT per il Terminale, arpeggio chiptune "console power-on" per la Pixel Art, **handshake modem 56k dial-up** per il Web 1.0 (`modemHandshake`: dial tone → DTMF → screech del carrier via `noiseBurst`), chime d'avvio per XP, tri-tone caldo per lo Skeuomorfismo, buzzer ruvido dissonante per il Brutalismo, "pop" per Bento, drone sci-fi per il Futuro): nessun file audio da scaricare. Il Web 1.0 espone inoltre `web1Modem()` (richiamato dal click sul throbber Netscape). La Pixel Art espone inoltre cue chiptune in-tema (`pixelBlip`/`pixelDiscover`/`pixelFanfare` per l'apertura di una zona, la scoperta di una nuova e il `QUEST COMPLETE`; `pixelCoin`/`pixelBump`/`pixelSecret` per gli easter egg — moneta raccolta, urto contro un ostacolo, sblocco della zona segreta). La preferenza è persistita (`cv_audio`).
+    -   **Audio opt-in d'epoca (`src/lib/audio.ts`)**: muto di default, attivabile da un toggle 🔊 flottante in basso a sinistra (allineato alla Timeline e tematizzato per era). Al cambio era riproduce un breve segnale sintetizzato al volo con la Web Audio API (beep CRT per il Terminale, arpeggio chiptune "console power-on" per la Pixel Art, **handshake modem 56k dial-up** per il Web 1.0 (`modemHandshake`: dial tone → DTMF → screech del carrier via `noiseBurst`), chime d'avvio per XP, tri-tone caldo per lo Skeuomorfismo, **tap sine pulito a due note per il Material Design**, buzzer ruvido dissonante per il Brutalismo, "pop" per Bento, drone sci-fi per il Futuro): nessun file audio da scaricare. Il Web 1.0 espone inoltre `web1Modem()` (richiamato dal click sul throbber Netscape). La Pixel Art espone inoltre cue chiptune in-tema (`pixelBlip`/`pixelDiscover`/`pixelFanfare` per l'apertura di una zona, la scoperta di una nuova e il `QUEST COMPLETE`; `pixelCoin`/`pixelBump`/`pixelSecret` per gli easter egg — moneta raccolta, urto contro un ostacolo, sblocco della zona segreta). La preferenza è persistita (`cv_audio`).
 4.  **Temi (`src/lib/themes/`)**: Ogni era è un componente Svelte completamente isolato e indipendente, con la propria logica e il proprio stile CSS.
 5.  **Asset statici (`static/`)**: Contiene i wallpaper di Windows XP ("Bliss") in più risoluzioni (vedi sezione *Asset & Performance*).
 
@@ -30,6 +30,7 @@ Ogni era usa un font scelto in base al contesto storico/estetico, caricato da Go
 -   **Anton** → titoli display giganti del Brutalismo (nome, header sezioni, numeri).
 -   **Archivo** → corpo/sottotitoli del Brutalismo (grottesco industriale).
 -   **Space Mono** → meta-label, dati, ticker e tag del Brutalismo (più label Timeline in quell'era).
+-   **Roboto** → tutta la tipografia del Material Design (file variabile self-hostato latin-subset, `/static/fonts/roboto.woff2`), con la type-scale dell'era e label della Timeline in quell'era.
 -   **Web 1.0** usa font di **sistema** (Times New Roman per il corpo, Courier per i meta/counter, Arial per il chrome Netscape): **nessun webfont**, coerente con l'autenticità d'epoca scelta per XP/Skeuo.
 -   **Windows XP** usa **Tahoma/Segoe UI** di sistema (il font autentico dell'OS, nessun webfont).
 -   **Skeuomorfismo** usa font di **sistema** (Georgia/Palatino per i titoli incisi, Lucida Grande/Helvetica per il corpo): nessun webfont aggiuntivo, in linea con l'autenticità d'epoca scelta per XP.
@@ -38,7 +39,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ---
 
-## Le Otto "Ere" Implementate
+## Le Nove "Ere" Implementate
 
 ### 1. Terminale Unix (Anni '80-'90)
 **Componente:** `src/lib/themes/Terminal.svelte`
@@ -87,7 +88,17 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   Tipografia di sistema (Georgia per i titoli incisi, Lucida Grande/Helvetica per il corpo): **nessun webfont aggiuntivo**.
 -   Profondità sobria al passaggio del mouse riusando le action condivise `tilt`/`reveal` (entrambe rispettano `prefers-reduced-motion`).
 
-### 6. Brutalismo (2017-2020)
+### 6. Material Design / Flat (2014-2017)
+**Componente:** `src/lib/themes/Material.svelte`
+-   La "grande appiattita" tra Skeuomorfismo e Brutalismo: Google **Material Design** + iOS 7 cancellano texture e gradienti realistici. La profondità diventa un **sistema formale** — le ombre indicano l'**elevazione** (z-index), il movimento veicola significato. In `ERA_ORDER` è **tra `skeuo` e `brutalism`**, e racconta la reazione diretta allo skeuomorfismo che lo precede.
+-   **App bar estesa** in gradiente **indaco** (`#3f51b5`→`#303f9f`, elevazione 4dp) con avatar circolare, nome (Roboto Medium), ruolo, tagline, *place-chip* della località e **icon-button** di contatto; **tab strip sticky** (Profilo · Esperienza · Competenze · Studi · Contatti) con **ink-bar accent (`#ff4081`) scorrevole** e **scroll-spy** (IntersectionObserver): click → scroll fluido alla sezione, scroll → tab attiva sincronizzata.
+-   **Estetica:** contenuti su superficie `#fafafa` in **card flat bianche sollevate da ombre di elevazione** (token 2/4/6/8/12dp, che salgono a 8dp + `translateY` in hover). Esperienze con **avatar-monogramma** colorato (palette Material 500 a rotazione), period-chip, highlight con bullet a spunta accent e tech-chip; competenze in **chip tonali** (indaco chiaro); lingue come **LinearProgress determinato**; istruzione/certificazioni con icone *school*/*verified*. Tutti i contenuti da `cv-data.ts`.
+-   **FAB accent** circolare fisso (6dp→12dp in hover, azione primaria *mailto*) e **ripple** autentico (azione locale `ripple`: cerchio che si espande dal punto del tocco) su tab, icon-button, contatti e FAB.
+-   Tipografia **Roboto** self-hostata (file variabile latin-subset). Hash `#material`, label d'anno **"2014"**, icona 📐, cue audio `case 'material'` (tap sine D5→B5).
+-   **`prefers-reduced-motion`:** ripple soppresso, lift/scale e scroll fluido disattivati; le ombre di elevazione restano. **Mobile:** app bar centrata, tab strip scrollabile orizzontalmente, due-colonne impilate.
+-   **Differenziazione da Bento:** Material = superfici **piatte + elevazione a ombre + ripple + ink-bar + accento forte**; Bento = modulare/widget, vetro smerigliato, bento-grid stondata.
+
+### 7. Brutalismo (2017-2020)
 **Componente:** `src/lib/themes/Brutalism.svelte`
 -   Reazione cruda al minimalismo levigato: un CV "view-source" in stile **fanzine punk fotocopiata** incrociata con un terminale dati. Massima personalità, anti-design consapevole.
 -   **Estetica:** carta da giornale calda (griglia a puntini "newsprint") + inchiostro nero, **bordi neri da 4px**, **ombre dure offset** (`8px 8px 0`, senza blur), zero `border-radius`. Accenti **sgargianti che si scontrano** (acid, cobalto, rosso, lime, pink) ruotati su tag, numeri di sezione e bottoni di contatto.
@@ -96,7 +107,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **Micro-interazioni (sotto `prefers-reduced-motion`):** hover **tattili** che "schiacciano" l'ombra (translate netto, easing lineare), tag che **invertono** secco nero/carta, glitch ad aberrazione cromatica sul nome, `● location` lampeggiante. Audio: buzzer ruvido dissonante.
 -   *Nota cronologica:* collocato in `ERA_ORDER` **prima di Bento** (il Brutalismo 2017 precede l'esplosione del Bento 2021+).
 
-### 7. Modern Flat / Bento Box (2015-Oggi)
+### 8. Modern Flat / Bento Box (2015-Oggi)
 **Componente:** `src/lib/themes/BentoBox.svelte`
 -   Design basato sul layout asimmetrico "Bento Grid" tramite CSS Grid (con `grid-template-areas` per un layout bilanciato e senza buchi), molto in voga nei portafogli moderni (es. stile Apple).
 -   Tipografia curata (**Space Grotesk** per titoli/nomi, **Inter** per il corpo), label di sezione in maiuscoletto, avatar con anello a gradiente conico, ombre morbide a due livelli e palette indaco armonizzata.
@@ -104,7 +115,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   Banner a scorrimento infinito (Marquee CSS) per lo stack tecnologico.
 -   **Toggle Light/Dark Mode** come pulsante circolare compatto fisso in alto a destra. La preferenza è persistita (`cv_bento_dark`) e inizializzata da `prefers-color-scheme`; il passaggio usa una **View Transition circolare** (clip-path che si espande dal punto del bottone), con fallback morbido dove l'API non è supportata o con `prefers-reduced-motion`.
 
-### 8. Il Futuro - 3D & Glassmorphism (2026+)
+### 9. Il Futuro - 3D & Glassmorphism (2026+)
 **Componente:** `src/lib/themes/ThreeD.svelte`
 -   Tema sperimentale volto a mostrare skill avanzate e padronanza WebGL.
 -   Scena **Three.js** elaborata a piena pagina (canvas `fixed`, copre tutto a qualsiasi dimensione): **nebulosa di particelle** a 3 strati con dot luminosi rotondi (texture radiale generata su canvas, additive blending), un **torus knot** wireframe centrale rotante e pulsante, **anelli di energia** orbitanti e solidi (icosaedro/ottaedro) che ruotano e oscillano. Parallasse della camera legata al movimento del mouse.
@@ -120,7 +131,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ## Il Componente Timeline
 **Componente:** `src/lib/components/Timeline.svelte`
-La linea del tempo posizionata in basso (a forma di "pillola di vetro" espandibile) è l'elemento che unisce l'intero progetto. È progettato per essere reattivo e per iniettare CSS globale (`:global`) in base al tema selezionato, così da mimetizzarsi e rispettare i canoni visivi dell'era attiva: diventa un blocco nero e verde monospace nel Terminale, una dialog-box NES indaco con bordo bianco e nodo attivo rosso (font **Press Start 2P**) nella Pixel Art, una pillola **grigio-argento `#c0c0c0` con bevel `outset` (look Netscape/Win95)** e nodo attivo blu navy in Times nel Web 1.0, una barra opaca outset in Windows XP, una pillola in **metallo spazzolato** con nodo attivo "gel" blu nello Skeuomorfismo, un blocco squadrato a bordo nero spesso con nodo attivo acid-yellow e font **Space Mono** nel Brutalismo, una pillola con font **Space Grotesk** in Modern Flat e una versione neon con font **Orbitron** nel Futuro.
+La linea del tempo posizionata in basso (a forma di "pillola di vetro" espandibile) è l'elemento che unisce l'intero progetto. È progettato per essere reattivo e per iniettare CSS globale (`:global`) in base al tema selezionato, così da mimetizzarsi e rispettare i canoni visivi dell'era attiva: diventa un blocco nero e verde monospace nel Terminale, una dialog-box NES indaco con bordo bianco e nodo attivo rosso (font **Press Start 2P**) nella Pixel Art, una pillola **grigio-argento `#c0c0c0` con bevel `outset` (look Netscape/Win95)** e nodo attivo blu navy in Times nel Web 1.0, una barra opaca outset in Windows XP, una pillola in **metallo spazzolato** con nodo attivo "gel" blu nello Skeuomorfismo, una **superficie bianca flat sollevata da ombre di elevazione** con nodo attivo indaco, font **Roboto** e fill indaco→accent nel Material Design, un blocco squadrato a bordo nero spesso con nodo attivo acid-yellow e font **Space Mono** nel Brutalismo, una pillola con font **Space Grotesk** in Modern Flat e una versione neon con font **Orbitron** nel Futuro.
 
 ## Asset & Performance
 -   **Wallpaper XP**: in `static/wallpapers/` sono presenti 4 risoluzioni del "Bliss" originale (`bliss-1366x768`, `bliss-1920x1080`, `bliss-2560x1440`, `bliss-3840x2160`). La selezione avviene via media query (`min-width` + `min-resolution` per i display HiDPI/retina): viene scaricato **solo** il file che corrisponde al dispositivo.

@@ -12,6 +12,7 @@
     web1: 'Web 1.0 · 1996',
     winxp: 'Windows XP · 2001',
     skeuo: 'Skeuomorphism · 2010',
+    material: 'Material Design · 2014',
     brutalism: 'Brutalism · 2017',
     bento: 'Modern Flat · 2015',
     threed: 'Future 3D · 2026'
@@ -109,7 +110,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -325,6 +326,22 @@
   .audio-fab.theme-skeuo.on {
     background: linear-gradient(180deg, #7fd0ff, #2f8fe0);
     border-color: #1f6fc0;
+    color: #fff;
+  }
+
+  /* Material: flat white surface, crisp elevation shadow, indigo accent when on. */
+  .audio-fab.theme-material {
+    background: #fff;
+    border: none;
+    color: #5c6bc0;
+    box-shadow:
+      0 3px 5px -1px rgba(0, 0, 0, 0.2),
+      0 6px 10px 0 rgba(0, 0, 0, 0.14),
+      0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    backdrop-filter: none;
+  }
+  .audio-fab.theme-material.on {
+    background: #3f51b5;
     color: #fff;
   }
 

@@ -161,6 +161,13 @@ export function playEra(theme: Theme) {
       tone(c, master, { freq: 1174.66, type: 'sine', start: 0.12, dur: 0.32, gain: 0.05 });
       break;
     }
+    case 'material': {
+      // Clean, restrained Material "tap" — a crisp sine pop answered by a higher
+      // confirmation note. Polished and quiet, the opposite of skeuo's warm marimba.
+      tone(c, master, { freq: 587.33, type: 'sine', dur: 0.11, gain: 0.13 }); // D5
+      tone(c, master, { freq: 987.77, type: 'sine', start: 0.075, dur: 0.18, gain: 0.1 }); // B5
+      break;
+    }
     case 'brutalism': {
       // Blunt, raw buzzer — a dissonant square-wave clash with a gritty saw stab.
       // No politeness: it's meant to feel like a fire-door honk.

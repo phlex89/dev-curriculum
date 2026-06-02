@@ -9,6 +9,7 @@
     { id: 'web1', label: 'Web 1.0', year: '1996', icon: '🌐' },
     { id: 'winxp', label: 'Win XP', year: '2001', icon: '🪟' },
     { id: 'skeuo', label: 'Skeuomorph', year: '2010', icon: '💎' },
+    { id: 'material', label: 'Material', year: '2014', icon: '📐' },
     { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
     { id: 'bento', label: 'Modern Flat', year: '2015', icon: '📱' },
     { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
@@ -472,6 +473,49 @@
   :global(:root) .theme-skeuo .label-text {
     font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, sans-serif;
     font-weight: 700;
+  }
+
+  /* --- Material Design Theme Adaptations (flat surface, elevation, ink bar) --- */
+  :global(:root) .theme-material .timeline-container {
+    background: #fff;
+    border: none;
+    border-radius: 8px;
+    box-shadow:
+      0 3px 5px -1px rgba(0, 0, 0, 0.2),
+      0 6px 10px 0 rgba(0, 0, 0, 0.14),
+      0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    backdrop-filter: none;
+  }
+
+  :global(:root) .theme-material .timeline-track {
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  :global(:root) .theme-material .node-pill {
+    background: transparent;
+    border-radius: 6px;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  :global(:root) .theme-material .timeline-stop:hover .node-pill {
+    background: rgba(63, 81, 181, 0.08);
+  }
+
+  :global(:root) .theme-material .timeline-stop.active .node-pill {
+    background: #3f51b5;
+    color: #fff;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14);
+  }
+
+  :global(:root) .theme-material .label-text {
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  :global(:root) .theme-material .timeline-fill {
+    background: linear-gradient(90deg, #3f51b5, #ff4081);
+    box-shadow: none;
   }
 
   /* --- Brutalism Theme Adaptations (raw ink + hard offset, mono) --- */

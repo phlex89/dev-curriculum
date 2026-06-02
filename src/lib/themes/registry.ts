@@ -13,6 +13,7 @@ export const themeLoaders: Record<Theme, () => Promise<{ default: Component }>> 
   web1: () => import('./Web1.svelte'),
   winxp: () => import('./WinXP.svelte'),
   skeuo: () => import('./Skeuo.svelte'),
+  material: () => import('./Material.svelte'),
   brutalism: () => import('./Brutalism.svelte'),
   bento: () => import('./BentoBox.svelte'),
   threed: () => import('./ThreeD.svelte')

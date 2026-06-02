@@ -30,20 +30,22 @@
 | 3 | Web 1.0 / HTML Puro | Metà anni '90 | ✅ Implementato | `Web1.svelte` |
 | 4 | Windows 9x / XP Desktop | Inizio anni 2000 | ✅ Implementato | `WinXP.svelte` |
 | 5 | Glossy / Skeuomorfismo (Web 2.0) | ca. 2007–2013 | ✅ Implementato | `Skeuo.svelte` |
-| 6 | Material Design & Flat | 2014–2017 | ⬜ Proposta | — |
+| 6 | Material Design & Flat | 2014–2017 | ✅ Implementato | `Material.svelte` |
 | 7 | Brutalismo | 2017–2020 | ✅ Implementato | `Brutalism.svelte` |
 | 8 | Bento Box / Modern Flat | 2021–oggi | ✅ Implementato | `BentoBox.svelte` |
 | 9 | Glassmorphism | oggi – futuro prossimo | 🟡 Parziale (unito al 3D) | dentro `ThreeD.svelte` |
 | 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
 
 > L'attuale `ERA_ORDER` è
-> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed']`. La
+> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'threed']`. La
 > **Pixel Art** è una *lineage parallela* (mondo console, non desktop/web) ma
 > contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**; il
 > **Web 1.0** (GeoCities/Netscape, metà anni '90) si inserisce **tra `pixel` e
-> `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP. La sola
-> proposta rimasta (`⬜`: Material Design) e il Glassmorphism come era autonoma sono
-> i candidati per future espansioni.
+> `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP; il
+> **Material Design** (2014) si inserisce **tra `skeuo` e `brutalism`**, raccontando
+> la "grande appiattita" come reazione diretta allo skeuomorfismo che lo precede.
+> L'unico candidato rimasto per future espansioni è il **Glassmorphism** come era
+> autonoma (oggi `🟡` unito al 3D).
 
 ---
 
@@ -236,22 +238,32 @@ personali. HTML senza CSS, documenti più che applicazioni. È il salto narrativ
 console e il desktop: il PC esce di casa e si connette al mondo. Colma **il buco più
 ampio della timeline** (tra Pixel/Terminale e XP).
 
-**Stile.**
-- **Palette:** sfondo grigio default (`#c0c0c0`) o bianco, link **blu** non visitati /
-  **viola** visitati, testo nero. Eventuali sfondi tassellati (tiled background GIF).
-- **Tipografia:** **Times New Roman** di sistema, dimensioni dettate dai tag `<h1>`–`<h6>`,
-  niente kerning né scala tipografica curata.
-- **Elementi d'epoca:** `<marquee>` scorrevole, `<blink>`, contatore visite, GIF
-  "Under Construction", bottoni "Best viewed in Netscape", righello `<hr>`, webring,
-  liste puntate con bullet-GIF, tabelle usate per il layout.
-- **Layout:** colonna singola allineata a sinistra, larghezza piena, tabelle annidate.
+**Stile** *(scelte effettive in implementazione).*
+- **Palette:** **starfield tassellato** notte-blu (`#00001e` + radial-gradient di stelle)
+  come sfondo del body/area-contenuto, **card a fondo crema** (`#fffdf2`) per la
+  leggibilità; chrome Netscape grigio-argento (`#c0c0c0`, bevel `outset/inset`); link
+  **blu** non visitati (`#0000ee`) / **viola** visitati (`#551a8b`); barre sezione e
+  accenti in **teal** (`#008080`), navy (`#000080`), maroon (`#800000`), hazard giallo/nero.
+- **Tipografia:** **Times New Roman** di sistema (corpo/titoli), **Courier** per i meta e
+  l'odometer, **Arial** per il chrome del browser — **nessun webfont**.
+- **Elementi d'epoca:** `<marquee>` scorrevole, `<blink>`, **hit counter** odometer,
+  banner "Under Construction", **badge 88×31** ("Best viewed in Netscape" & co.), righello
+  `<hr>` 3D, **webring**, liste puntate con bullet a pallina colorata, **tabelle per il layout**.
+- **Layout:** pagina **centrata** (max 800px) a **tabella a due colonne** — colonna *Site
+  Map* a sinistra + colonna contenuti (card con barra-titolo teal) a destra — il tutto
+  dentro la finestra **Netscape Navigator 3** "massimizzata" (title/menu/tool/location/status bar).
 
-**Interazione / narrativa.** Niente JS moderno percepibile: link che "navigano" tra
-sezioni come pagine separate, "Last updated", guestbook finto. Tutto deve sembrare
-servito da un server statico del 1996.
+**Interazione / narrativa.** Niente JS moderno percepibile: link interni che "saltano"
+alle sezioni (via `scrollIntoView`, senza sporcare l'hash d'era), "Last updated",
+**guestbook funzionante** (gag con finto alert `[JavaScript Application]`), banner
+"1.000.000° visitatore", **throbber Netscape** che "compone" il modem, **sparkle cursor
+trail**. Tutto deve sembrare servito da un server statico del 1996.
 
-**Note implementative.** Effetto facile e d'impatto; attenzione a `<marquee>`/`<blink>`
-(deprecati: ricrearli in CSS rispettando `prefers-reduced-motion`).
+**Note implementative.** `<marquee>`/`<blink>` (deprecati) **ricreati in CSS** e gated da
+`prefers-reduced-motion` (in reduced-motion marquee/blink/rainbow/comet/meteora/sparkle
+sono disattivati e i contenuti restano statici e leggibili). Link/bottoni **reali** per
+l'accessibilità; mobile con chrome collassato (menu bar nascosta, toolbar a sole icone,
+tabella impilata). Audio: cue **modem 56k** in `audio.ts` (`web1Modem` / `case 'web1'`).
 
 ---
 
@@ -293,8 +305,28 @@ Gli oggetti sembrano poggiati su una superficie in pelle cucita.
 
 ---
 
-## 6. Material Design & Flat — ⬜ Proposta
-**2014–2017**
+## 6. Material Design & Flat — ✅ Implementato
+**2014–2017** · `src/lib/themes/Material.svelte`
+
+> **Stato implementazione.** Realizzato come **scheda prodotto Material Design 2014–2017**.
+> **App bar estesa** in gradiente indaco (`#3f51b5`→`#303f9f`, elevazione 4dp) con avatar
+> circolare, nome (Roboto Medium), ruolo, tagline, *place-chip* della località e icon-button
+> di contatto. **Tab strip sticky** sotto l'app bar (Profilo · Esperienza · Competenze · Studi ·
+> Contatti) con **ink-bar accent (`#ff4081`) scorrevole** e **scroll-spy** (IntersectionObserver):
+> click → scroll fluido alla sezione, scroll → tab attiva sincronizzata. Contenuti su superficie
+> `#fafafa` in **card flat bianche sollevate da ombre di elevazione** (token 2/4/6/8/12dp), che
+> salgono a 8dp in hover. **Esperienze** come card con avatar-monogramma colorato (palette Material
+> 500 a rotazione), titolo/azienda/period-chip, highlight con bullet a spunta accent e tech-chip.
+> **Competenze** in chip *tonali* (indaco chiaro). **Studi** a due colonne: Istruzione (icona
+> *school* + chip certificazioni *verified*) e Lingue come **LinearProgress determinato** indaco +
+> Conferenze con icona *mic*. **Contatti** come bottoni tonali. **FAB accent** circolare fisso
+> (6dp→12dp in hover) con azione primaria *mailto*. **Ripple** autentico (azione `ripple`: cerchio
+> che si espande dal punto del tocco) su tab, icon-button, contatti e FAB. Tipografia **Roboto**
+> self-hostata (file variabile latin-subset, `fonts.css`). Hash `#material`, in `ERA_ORDER`
+> **tra `skeuo` e `brutalism`**, label d'anno **"2014"**, cue audio (`case 'material'`): *tap*
+> sine pulito a due note. **Tutto gated da `prefers-reduced-motion`** (ripple soppresso, lift/scale
+> e scroll fluido disattivati; le ombre di elevazione restano). Mobile: app bar centrata, tab strip
+> scrollabile, due-colonne impilate. La scheda sotto resta come documentazione del concept.
 
 **Contesto.** La grande "appiattita": Apple (iOS 7) e Google (Material Design) cancellano
 texture e gradienti realistici. La profondità non è più imitazione del reale ma sistema
@@ -425,6 +457,6 @@ lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
    gameplay opzionale e contenuti sempre accessibili).
 3. ~~**Web 1.0 / HTML Puro**~~ — ✅ **implementato** (home page GeoCities in chrome Netscape;
    colma il buco più ampio della timeline tra Pixel/Terminale e XP).
-4. **Material Design & Flat** — storicamente corretta ma va differenziata bene da Bento.
-   **È ora la prima proposta ancora aperta.**
-5. **Glassmorphism autonomo** — solo se si vuole separarlo dal 3D.
+4. ~~**Material Design & Flat**~~ — ✅ **implementato** (app bar indaco, tab ink-bar + scroll-spy,
+   card a elevazione, ripple, FAB accent; colma l'ultimo buco cronologico tra Skeuo e Brutalism).
+5. **Glassmorphism autonomo** — solo se si vuole separarlo dal 3D. **È ora l'unica proposta aperta.**

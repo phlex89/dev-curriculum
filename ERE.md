@@ -36,6 +36,14 @@
 | 9 | Glassmorphism | 2020 (il presente luminoso) | ✅ Implementato | `Glass.svelte` |
 | 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
 | 11 | AI / Conversazionale | 2030+ (oltre il 3D) | ⬜ Proposta | — (da creare) |
+| 12 | Y2K / Chrome & Plastica translucida | 1999–2003 | ⬜ Proposta (valutata) | — (da creare) |
+| 13 | Teletext / Televideo (Mode 7) | anni '70 – 2000 | ✅ Implementato | `Teletext.svelte` |
+| 14 | Neumorphism / Soft UI | 2020 | ⬜ Proposta (valutata) | — (da creare) |
+
+> Le proposte **§12–§14** sono state *valutate* (giu 2026) come prossimi candidati
+> memorabili: ognuna ha contesto, stile e rischio-sovrapposizione documentati. Le idee a
+> più basso valore o più a rischio di sovrapposizione (Frutiger Aero, Vaporwave, PS1
+> low-poly, Amiga, Mac Classic) restano in **"Idee oltre la lista"** come spunti/easter-egg.
 
 > L'attuale `ERA_ORDER` è
 > `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed']`. La
@@ -560,10 +568,154 @@ hash `#ai` · `ERA_ORDER` **in coda** dopo `threed` · registrare in `Theme`/`TH
 
 ---
 
+## 12. Y2K / Chrome & Plastica translucida — ⬜ Proposta (valutata)
+**1999–2003 (la svolta del millennio)** · componente da creare (es. `src/lib/themes/Y2K.svelte`)
+
+> **Stato.** Valutata (giu 2026) come **candidato headliner**: il più forte tra i nuovi.
+> Colma un buco narrativo reale — il web *Flash/splash* e l'ottimismo "tech" da millennium
+> bug **tra GeoCities '96 (§3) e il desktop XP (§4)** — ed è oggi in pieno **revival 2024–25**,
+> quindi "memorabile" anche per un recruiter giovane. Tutto fattibile in **puro CSS**.
+
+**Contesto.** La svolta del millennio: iMac G3 in plastica *Bondi-blue* translucida, lettori
+MP3 cromati, "il futuro è ORA". L'estetica è **techno-ottimista**: cromature liquide, plastica
+gommosa traslucida, lens-flare, blob lucidi, font metallici. Web pieno di siti **Flash** con
+*splash screen* e *"skip intro"*. È distintissima sia dal Web 1.0 (testo GeoCities) sia dall'XP.
+
+**Stile.**
+- **Palette:** **cromo/argento liquido** (gradienti metallici verticali), plastica translucida
+  satura (bondi-blue `#3aa9d6`, tangerine, lime gel), bianchi accecanti + lens-flare, accenti
+  che "riflettono". Sfondo a gradiente tecnologico (cielo digitale / griglia prospettica soft).
+- **Tipografia:** **display arrotondato/tecnologico** con effetto **cromato** (gradiente
+  argento + bevel + riflesso) per i titoli; corpo pulito sans (Eurostile-like / "Bank Gothic"
+  vibe → in pratica una grottesca geometrica disponibile).
+- **Materiali:** **bevel lucidi**, riflessi speculari, **glossy** ovunque, bolle/blob in
+  plastica, badge "skip intro", barre di caricamento "Macromedia Flash".
+- **Layout:** **splash screen** d'ingresso (con "ENTER »" / "skip intro" — doppio binario:
+  *skip* salta dritto ai contenuti), poi una "console" lucida con pannelli in plastica translucida.
+
+**Interazione / narrativa.** Boot da *splash Flash* (gated; in reduced-motion parte già aperto),
+hover che "accende" il riflesso cromato, bottoni in plastica che affondano lucidi. Audio: cue
+**ottimista-techno** (sweep sintetico "futuristico" 2000, ≠ chime XP, ≠ drone 3D).
+
+**Differenziazione / rischio.** **Basso.** Da Web 1.0: cromo/plastica/Flash vs testo HTML grezzo.
+Da XP: la plastica translucida iMac e il cromo liquido precedono e sono più "consumer-pop" del
+Luna desktop. Da Skeuo: il cromo Y2K è **freddo/liquido**, non legno/pelle/feltro. Attenzione a
+non sfociare nel *Frutiger Aero* (2007+, lucido-natura) che invece **sovrappone** Skeuo/Glass.
+
+**Identificatori tecnici previsti.** `Theme` key `'y2k'` · `src/lib/themes/Y2K.svelte` ·
+hash `#y2k` · `ERA_ORDER` **tra `web1` e `winxp`** · label d'anno suggerita **"2000"**, icona 💿/🛸 ·
+registrare in `Theme`/`THEMES`/`ERA_ORDER` (`store.ts`), cue audio in `audio.ts`, stile per-tema in
+`Timeline.svelte`. Font display: valutare un grottesco geometrico già self-hostabile (no nuovi pesi
+se evitabile).
+
+---
+
+## 13. Teletext / Televideo (Mode 7) — ✅ Implementato
+**1984 (servizio di testo televisivo)** · `src/lib/themes/Teletext.svelte` · chiave tema `'teletext'` · hash `#teletext`
+
+> **Stato.** ✅ Implementata (giu 2026). Scelta **charming-niche**: blocchi colorati a 8
+> tinte pure su nero, totalmente diversi dal Terminale verde, con **bonus identitario 🇮🇹**
+> (**Televideo RAI**). Collocata in `ERA_ORDER` **subito dopo `terminal`** (lineage parallela
+> dei primi anni: schermo TV, non PC), label d'anno **"1984"**, icona 📺.
+
+**Contesto.** Il **televideo**: pagine di testo trasmesse via TV (Ceefax/Mode 7 UK, **Televideo
+RAI** in Italia), navigate digitando **numeri di pagina** (es. `100`, `777`). Griglia rigida
+**40×25**, **blocchi grafici chunky** (sixel/mosaico 2×3), 8 colori puri su fondo nero, header
+con numero pagina + orologio che scorre. Nostalgia fortissima per chi è cresciuto col 🇮🇹.
+
+**Stile.**
+- **Palette:** **8 colori puri** (nero, rosso, verde, giallo, blu, magenta, ciano, bianco) su
+  fondo **nero**, niente sfumature. Esattamente la tavolozza Teletext.
+- **Tipografia:** **Bedstead** (ricostruzione del char-ROM SAA5050 di Ceefax/Televideo, pubblico
+  dominio; fallback JetBrains Mono). **Doppia altezza** per i titoli (tipico del televideo).
+- **Materiali / rendering:** **grafica a mosaico** (caratteri-blocco 2×3) per icone/decori,
+  bordi a blocchi colorati, **niente** ombre/blur/radius. Header pagina `P100 RAI · gio 02 giu · 21:47`.
+- **Layout:** pagina **40×25** centrata, **indice numerato** (`101 PROFILO  102 ESPERIENZA …`),
+  riga di stato in basso, **fast-text** a 4 tasti colorati (rosso/verde/giallo/blu) per saltare sezione.
+
+**Interazione / narrativa.** Si "digita il numero di pagina" (input a 3 cifre **+** indice
+cliccabile = doppio binario) per cambiare sezione; **reveal** dei testi (gag televideo: tasto
+per svelare la "battuta nascosta"); orologio che avanza. Audio: **beep di pagina** secco (≠ CRT
+terminale). Tutto in DOM/CSS.
+
+**Differenziazione / rischio.** **Bassissimo.** Dal Terminale: **colori a blocchi + griglia TV +
+navigazione a numero di pagina** vs riga di comando verde monocromatica. È l'unico stile a
+**8 colori a mosaico** del parco.
+
+**Implementazione effettiva.** Schermo TV nero **40 colonne** centrato in una "stanza buia"
+(`radial-gradient`), bordo CRT + scanline. **Header** blu con numero pagina (giallo), nome
+(ciano), `TELEVIDEO` e **orologio broadcast live** (verde, `gio 02 GIU 21:47:31`, `setInterval`).
+**Magazine a pagine numerate**: 100 indice (con **mosaico TV** a blocchi CSS + indice cliccabile +
+gag CONCEAL), 101 profilo, 102 esperienza (→ dettagli 110+), 103 origini, 104 competenze, 105
+lingue, 106 formazione+certificazioni, 107 conferenze, 108 contatti (+download PDF), **777 pagina
+segreta** (oroscopo del frontend + battuta nascosta). **Doppio binario** di navigazione: digitazione
+**3 cifre** (buffer in header, beep `teletextBeep` per pagina) **+** tastierino on-screen, indice
+cliccabile, **4 tasti FASTEXT colorati** (rosso/verde/giallo/ciano), ◄/► prev-next, tasto **SVELA**
+(`R`) per il reveal televideo. **8 colori puri** su nero (blu alzato a `#5a6bff` per leggibilità),
+**titoli a doppia altezza**, **barra rainbow** a mosaico come separatore. Font **Bedstead** (ricostruzione
+del char-ROM SAA5050 di Ceefax/Televideo, **pubblico dominio**, self-hostato/subsettato `~7KB`, range peso
+`400 700` per evitare il faux-bold; fallback JetBrains Mono — è l'unica era con webfont perché nessun SO ha
+un font teletext). Cue audio `case 'teletext'` (doppio blip secco) + flicker
+"page rolling-in", tutto gated da `prefers-reduced-motion`. Registrata in `store.ts` (type, `THEMES`,
+`ERA_ORDER`), `registry.ts`, `Timeline.svelte`, `audio.ts`, `+page.svelte`.
+
+---
+
+## 14. Neumorphism / Soft UI — ⬜ Proposta (valutata)
+**2020 (il trend-meteora)** · componente da creare (es. `src/lib/themes/Neumorphism.svelte`)
+
+> **Stato.** Valutata (giu 2026) come **wink da designer**: l'era del trend che il mondo del
+> design discusse per mesi e poi abbandonò (per i problemi di **contrasto/accessibilità**).
+> L'autoironia su quel limite *diventa* la personalità dell'era. Cronologicamente vicinissima a
+> Glass/Bento (2020).
+
+**Contesto.** Il **Soft UI**: tutto sembra **estruso dalla stessa superficie** monocromatica —
+forme che emergono o affondano grazie a una **doppia ombra** (una chiara in alto-sinistra, una
+scura in basso-destra). Esteticamente ipnotico e morbidissimo; **moriì in fretta** perché i bordi
+quasi-invisibili lo rendevano poco leggibile. Momento preciso e riconoscibile (Dribbble 2020).
+
+**Stile.**
+- **Palette:** **monocromatica a bassissimo contrasto** — un unico grigio/azzurrino di base
+  (`#e0e5ec` classico) per sfondo *e* elementi; accento tenue solo per gli stati attivi.
+- **Tipografia:** sans morbida e leggera (Inter/Poppins-like), pesi medi, colore testo soft.
+- **Materiali:** **doppia ombra** (`box-shadow: chiara + scura`) per "estrusione/incavo";
+  toggle a interruttore incassato, pulsanti che da convessi diventano concavi al press.
+- **Layout:** card e controlli che affiorano dalla superficie, spaziatura generosa, tutto stondato.
+
+**Interazione / narrativa.** `:active` che **inverte** l'ombra (convesso → concavo, "premuto
+dentro"); hover che alza appena. **Risoluzione del difetto d'epoca**: un toggle "✶ Contrasto"
+(o automaticamente sotto `prefers-contrast`/`prefers-reduced-motion`) che **rinforza i bordi** →
+mostra di conoscere *perché* il trend fallì (= competenza UX onesta, coerente con la regola d'oro).
+
+**Differenziazione / rischio.** **Medio.** Da Glass: niente trasparenza/blur, **opaco e
+monocromo**. Da Material: niente elevazione a ombre nette/colore forte, niente ripple — qui
+l'ombra è **doppia e soffusa** e l'estetica **piatta-estrusa**. Va distinto bene da entrambi
+nel testo per non sovrapporre.
+
+**Identificatori tecnici previsti.** `Theme` key `'neumorph'` · `src/lib/themes/Neumorphism.svelte` ·
+hash `#neumorph` · `ERA_ORDER` **adiacente a `glass`** (tra `bento` e `glass`, oppure tra `glass`
+e `threed`) · label d'anno **"2020"**, icona ◼️/🔘 · registrare in `store.ts`/`audio.ts`/`Timeline.svelte`.
+Cue audio: "tap" morbido e ovattato. Font: Inter (già self-hostato) — **nessun nuovo webfont**.
+
+---
+
 ## Idee oltre la lista (timeline futura)
 
+Spunti **a più basso valore narrativo** o **a maggior rischio di sovrapposizione** con le ere già
+implementate: ottimi come *variante* o *easter egg*, non (ancora) come ere autonome.
+
 - 🤖 **Era AI / conversazionale (2030+):** promossa a proposta strutturata — vedi **§11**.
-- 🅰️ **Amiga Workbench / BBS / Teletext:** alternative di nicchia per il blocco anni '80-'90.
+- 🪞 **Frutiger Aero (2007–2012):** vetro lucido Vista/Win7, bolle, erba+cielo, delfini; forte
+  revival oggi. **Rischio alto**: calpesta Skeuo (gel lucido) e Glass (translucenza) → meglio come
+  *easter egg* dentro Skeuo/Glass che come era a sé.
+- 🌴 **Vaporwave / Synthwave (2015+):** griglia neon, tramonto sfumato, busti di marmo, katakana,
+  VHS. Iper-riconoscibile ma è un'**estetica/meme**, non un'epoca UI reale, e il neon **confligge
+  col 3D** (§10). Più adatto come *easter egg* (es. dentro il 3D/Futuro).
+- 🎮 **PS1 / low-poly 3D (1995–2000):** texture "ballerine", fog, poligoni grezzi; *lineage
+  parallela* gaming come la Pixel Art, oggi in revival. **Caveat:** richiede di nuovo WebGL/3D a
+  ridosso dell'era Futuro → rischia di sembrare "un altro 3D".
+- 🅰️ **Amiga Workbench / BBS / ANSI art:** alternative di nicchia per il blocco anni '80-'90
+  (copper-bar, scroller demoscene / blocchi ANSI dial-up). Sovrappongono in parte Terminale + Web 1.0.
 - 🪟 **Mac OS Classic (System 7) / Windows 95:** desktop a 16 colori; rischio sovrapposizione
   con l'era XP, da valutare solo se si vuole sdoppiare l'epoca desktop.
 
@@ -582,3 +734,13 @@ hash `#ai` · `ERA_ORDER` **in coda** dopo `threed` · registrare in `Theme`/`TH
 6. **Era AI / conversazionale** (§11) — l'unica vera *nuova frontiera narrativa* oltre il 3D.
    Motore: **finta AI deterministica** (no invenzioni). Chrome Prompt API valutata e **rinviata**
    (riprendere come *progressive enhancement* quando l'API sarà stabile). Alto impatto concettuale.
+7. **Y2K / Chrome** (§12) — 🥇 **headliner consigliato** tra i nuovi: colma il buco web 1999–2003
+   (Flash/splash), in pieno revival, nettamente distinto, tutto in CSS. Va **tra `web1` e `winxp`**.
+8. **Teletext / Televideo** (§13) — 🥈 scelta *charming-niche*: 8 colori a mosaico, navigazione a
+   numero di pagina, bonus identitario 🇮🇹. Lineage parallela, rischio-sovrapposizione bassissimo.
+9. **Neumorphism / Soft UI** (§14) — 🥉 *wink da designer*: il trend-meteora 2020, con l'autoironia
+   sull'accessibilità come personalità. Adiacente a `glass`; distinguere bene da Glass/Material.
+
+> **Da maneggiare con cautela (vedi "Idee oltre la lista"):** Frutiger Aero (sovrappone Skeuo/Glass),
+> Vaporwave (estetica/meme, neon come il 3D) e PS1 low-poly (re-introduce WebGL a ridosso del Futuro)
+> rendono di più come *easter egg/variante* che come ere autonome.

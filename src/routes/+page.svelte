@@ -8,6 +8,7 @@
 
   const eraLabels: Record<string, string> = {
     terminal: 'Terminale · 1980s',
+    teletext: 'Televideo · 1984',
     pixel: 'Pixel Art · 1988',
     web1: 'Web 1.0 · 1996',
     winxp: 'Windows XP · 2001',
@@ -111,7 +112,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -305,6 +306,16 @@
     backdrop-filter: none;
   }
   .audio-fab.theme-terminal.on { background: #002200; box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.5); }
+
+  .audio-fab.theme-teletext {
+    background: #000;
+    border: 2px solid #ffff00;
+    border-radius: 0;
+    color: #ffff00;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .audio-fab.theme-teletext.on { background: #0000ff; border-color: #00ffff; color: #fff; }
 
   .audio-fab.theme-winxp {
     bottom: 40px; /* clear the XP taskbar, like the Timeline does */

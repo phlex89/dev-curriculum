@@ -9,6 +9,7 @@ import type { Theme } from '$lib/store';
  */
 export const themeLoaders: Record<Theme, () => Promise<{ default: Component }>> = {
   terminal: () => import('./Terminal.svelte'),
+  teletext: () => import('./Teletext.svelte'),
   pixel: () => import('./PixelArt.svelte'),
   web1: () => import('./Web1.svelte'),
   winxp: () => import('./WinXP.svelte'),

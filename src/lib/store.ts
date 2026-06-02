@@ -1,16 +1,18 @@
 import { writable } from 'svelte/store';
 
-export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass';
+export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass' | 'teletext';
 
 /** Valid themes (used to validate persisted / deep-linked values). */
-const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass'];
+const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass', 'teletext'];
 
 /** Chronological order of the eras — drives the directional time-travel transition.
- *  Pixel Art (console 8-bit) is a parallel lineage contemporary to the Terminal,
- *  so it sits right after it. Web 1.0 (mid-'90s GeoCities/Netscape) bridges the
- *  gap between the console/terminal age and the Windows XP desktop. Glassmorphism
- *  (the luminous Big Sur / Windows 11 present) sits between Bento and the 3D future. */
-export const ERA_ORDER: Theme[] = ['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'];
+ *  Teletext / Televideo (text broadcast over TV, 1984) is a parallel lineage to the
+ *  Terminal — same chunky text age, different screen (TV not PC) — so it sits right
+ *  after it. Pixel Art (console 8-bit) follows. Web 1.0 (mid-'90s GeoCities/Netscape)
+ *  bridges the gap between the console/terminal age and the Windows XP desktop.
+ *  Glassmorphism (the luminous Big Sur / Windows 11 present) sits between Bento and
+ *  the 3D future. */
+export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'];
 
 const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 

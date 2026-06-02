@@ -130,6 +130,18 @@ export function web1Modem() {
   modemHandshake(c, master);
 }
 
+/** Standalone Televideo "page change" tick (used by Teletext.svelte on navigation).
+ *  A single curt high square blip — the decoder latching a new page. */
+export function teletextBeep() {
+  if (!enabled) return;
+  const c = ensureCtx();
+  if (!c) return;
+  const master = c.createGain();
+  master.gain.value = 0.5;
+  master.connect(c.destination);
+  tone(c, master, { freq: 1396.91, type: 'square', dur: 0.045, gain: 0.05 });
+}
+
 /** Play the cue for an era. No-op while audio is disabled. */
 export function playEra(theme: Theme) {
   if (!enabled) return;
@@ -185,6 +197,13 @@ export function playEra(theme: Theme) {
     case 'web1':
       // The sound of getting online in 1996: a 56k dial-up handshake.
       modemHandshake(c, master);
+      break;
+    case 'teletext':
+      // Crisp "page acquired" double blip of a Televideo/Ceefax decoder — two
+      // very short high square ticks. Sharper and higher than the terminal's CRT
+      // beep, so the two text-age eras stay sonically distinct.
+      tone(c, master, { freq: 1244.51, type: 'square', dur: 0.05, gain: 0.07 });
+      tone(c, master, { freq: 1567.98, type: 'square', start: 0.06, dur: 0.07, gain: 0.06 });
       break;
     case 'bento':
       // Soft, modern "pop" that lifts in pitch.

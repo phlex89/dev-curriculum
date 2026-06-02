@@ -5,6 +5,7 @@
 
   const themes: { id: Theme; label: string; year: string; icon: string }[] = [
     { id: 'terminal', label: 'Terminal', year: '1980s', icon: '⌨️' },
+    { id: 'teletext', label: 'Televideo', year: '1984', icon: '📺' },
     { id: 'pixel', label: 'Pixel Art', year: '1988', icon: '🎮' },
     { id: 'web1', label: 'Web 1.0', year: '1996', icon: '🌐' },
     { id: 'winxp', label: 'Win XP', year: '2001', icon: '🪟' },
@@ -315,6 +316,51 @@
   :global(:root) .theme-terminal .label-text {
     font-family: 'Courier New', Courier, monospace;
     font-weight: normal;
+  }
+
+  /* --- Teletext / Televideo Theme Adaptations (8-colour blocks on black) --- */
+  :global(:root) .theme-teletext .timeline-container {
+    background: #000;
+    border: 2px solid #00ffff;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  :global(:root) .theme-teletext .timeline-track {
+    background: transparent;
+    border-top: 2px solid #003;
+  }
+
+  :global(:root) .theme-teletext .node-pill {
+    background: #000;
+    color: #ffff00;
+    border: 1px solid transparent;
+    border-radius: 0;
+  }
+
+  :global(:root) .theme-teletext .timeline-stop:hover .node-pill {
+    background: #0000ff;
+    color: #fff;
+  }
+
+  :global(:root) .theme-teletext .timeline-stop.active .node-pill {
+    background: #00ffff;
+    color: #000;
+    border: 1px solid #fff;
+    box-shadow: none;
+  }
+
+  :global(:root) .theme-teletext .label-text {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  :global(:root) .theme-teletext .timeline-fill {
+    background: #00ffff;
+    box-shadow: none;
   }
 
   /* --- Pixel Art Theme Adaptations (NES dialog-box chrome, no blur) --- */

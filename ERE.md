@@ -33,19 +33,23 @@
 | 6 | Material Design & Flat | 2014–2017 | ✅ Implementato | `Material.svelte` |
 | 7 | Brutalismo | 2017–2020 | ✅ Implementato | `Brutalism.svelte` |
 | 8 | Bento Box / Modern Flat | 2021–oggi | ✅ Implementato | `BentoBox.svelte` |
-| 9 | Glassmorphism | oggi – futuro prossimo | 🟡 Parziale (unito al 3D) | dentro `ThreeD.svelte` |
+| 9 | Glassmorphism | 2020 (il presente luminoso) | ✅ Implementato | `Glass.svelte` |
 | 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
+| 11 | AI / Conversazionale | 2030+ (oltre il 3D) | ⬜ Proposta | — (da creare) |
 
 > L'attuale `ERA_ORDER` è
-> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'threed']`. La
+> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed']`. La
 > **Pixel Art** è una *lineage parallela* (mondo console, non desktop/web) ma
 > contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**; il
 > **Web 1.0** (GeoCities/Netscape, metà anni '90) si inserisce **tra `pixel` e
 > `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP; il
 > **Material Design** (2014) si inserisce **tra `skeuo` e `brutalism`**, raccontando
 > la "grande appiattita" come reazione diretta allo skeuomorfismo che lo precede.
-> L'unico candidato rimasto per future espansioni è il **Glassmorphism** come era
-> autonoma (oggi `🟡` unito al 3D).
+> Il **Glassmorphism** è ora un'**era autonoma** (`✅`, §9), collocata **tra `bento` e
+> `threed`** come "presente luminoso" (Big Sur / Windows 11) — nettamente distinto dal
+> 3D dal contrasto **luce/buio**. L'unico candidato residuo per future espansioni è
+> l'**era AI / conversazionale** (§11), unica vera *nuova frontiera narrativa* oltre il
+> 3D — andrebbe **in coda a `ERA_ORDER`**, dopo `threed`.
 
 ---
 
@@ -400,24 +404,46 @@ circolare.
 
 ---
 
-## 9. Glassmorphism — 🟡 Parziale (oggi unito al 3D)
-**oggi – futuro prossimo** · attualmente dentro `src/lib/themes/ThreeD.svelte`
+## 9. Glassmorphism — ✅ Implementato
+**2020 (il presente luminoso)** · `src/lib/themes/Glass.svelte`
+
+> **Stato implementazione.** Estratto dal 3D come **era autonoma** e ridisegnato sul
+> principio **"Luce vs Buio"**: è il **presente luminoso** (macOS Big Sur / Windows 11
+> Acrylic / iOS) — l'opposto esatto del vuoto neon scuro del 3D. Hash `#glass`, chiave
+> tema `'glass'`, in `ERA_ORDER` **tra `bento` e `threed`**, label d'anno **"2020"**,
+> icona 🧊 in Timeline.
+>
+> **Sfondo:** **nessun WebGL** — un campo di **aurora-blobs pastello** (aqua, lilla,
+> pesca, cielo, menta) su base quasi-bianca, sfocati (`blur(70px)`) e in **drift CSS
+> lento**, con **parallax 2D piatto** (l'intero campo scivola di pochi px verso il
+> cursore — niente camera/prospettiva, a differenza del 3D). **Vetro frosted presente
+> e lattiginoso:** `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`,
+> **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen
+> speculare** bianco che segue il cursore (`mix-blend-mode: overlay`, via action `tilt`).
+> Tipografia **Inter ultralight** (nome a peso 200) — non l'Orbitron sci-fi del 3D.
+>
+> **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza →
+> Profilo → Esperienza → Competenze/Lingue → Formazione+Certificazioni/Conferenze),
+> arioso, scrollabile, max 1080px; mobile a colonna singola. Contenuti **tutti da
+> `cv-data.ts`**. **Cue audio** (`case 'glass'`): **campanella di vetro** cristallina
+> (arpeggio triangle alto + halo sine acuto) — l'opposto del drone scuro del 3D.
+> **Tutto gated da `prefers-reduced-motion`** (drift dei blob, parallax e sheen
+> disattivati; il vetro e i contenuti restano). La scheda sotto resta come documentazione del concept.
 
 **Contesto.** Superfici di vetro traslucido sovrapposte (macOS Big Sur, Windows 11 Acrylic,
-visionOS). Profondità eterea fatta di sfocature e luce, non di materiali reali.
+visionOS). Profondità eterea fatta di sfocature e luce, non di materiali reali. È il
+**presente** che precede il salto immersivo nel 3D.
 
-**Stato.** Il linguaggio glassmorphism è **già presente** ma come veste dell'era Futuro/3D
-(card semitrasparenti con `backdrop-filter: blur` sopra la scena WebGL), non come era a sé.
-
-**Stile (se estratta come era autonoma).**
-- **Palette:** gradienti morbidi sfumati come sfondo, pannelli traslucidi, bordi bianchi
-  finissimi (`1px rgba(255,255,255,.3)`).
-- **Tipografia:** moderna e leggera (Inter/SF), pesi sottili.
-- **Materiali:** `backdrop-filter: blur`, saturazione, riflessi sottili, ombre diffuse.
+**Stile.**
+- **Palette:** gradienti pastello morbidi e **luminosi** come sfondo (chiaro, arioso),
+  pannelli traslucidi lattiginosi, bordi bianchi finissimi (`1px rgba(255,255,255,.6)`).
+- **Tipografia:** moderna e leggera (**Inter**), pesi sottili (200–300 per il display).
+- **Materiali:** `backdrop-filter: blur + saturate`, riflessi/sheen sottili, ombre diffuse.
 - **Layout:** pannelli fluttuanti su sfondo colorato animato lentamente.
 
-**Nota.** Se diventasse era autonoma andrebbe collocata **tra Bento e 3D** e differenziata
-dal Futuro rimuovendo la scena WebGL (solo gradienti CSS animati sotto il vetro).
+**Differenziazione dal 3D (Futuro).** **Luce vs Buio** è il discriminante portante:
+Glass = chiaro/pastello/calmo/arioso, **niente WebGL** (solo gradienti CSS animati sotto
+il vetro), Inter ultralight; 3D = scuro/neon/sci-fi, scena WebGL immersiva, Orbitron.
 
 ---
 
@@ -440,11 +466,103 @@ lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
 
 ---
 
+## 11. AI / Conversazionale — ⬜ Proposta
+**2030+ (oltre il 3D)** · componente da creare (es. `src/lib/themes/AiEra.svelte`)
+
+> **Stato.** Proposta ragionata, **non implementata**. È l'unica vera *nuova frontiera
+> narrativa* oltre il 3D: invece di una pagina che leggi, **un agente con cui parli** e che
+> ti risponde **componendo UI** (UI generativa), non solo testo. Andrebbe **in coda a
+> `ERA_ORDER`**, dopo `threed`. Label d'anno suggerita: **"2030"**.
+
+**Contesto.** La frontiera dopo l'immersività 3D: interfacce **conversazionali e generative**.
+Il CV non si sfoglia, si *interroga*; l'UI si auto-assembla in risposta all'intento. Glow
+morbido, estetica "assistente vocale/ambient", molto spazio negativo — **non** il bianco
+aziendale di un chatbot 2023.
+
+**Concept scelto: "il CV come agente conversazionale".**
+- Boot: l'agente si "sveglia" (riga di stato → saluto → **prompt suggeriti** come chip).
+- Input: campo testo libero **+** chip cliccabili (doppio binario — i chip coprono il 100%
+  dei contenuti, il recruiter non è mai costretto a digitare).
+- Output **generativo**: l'agente "pensa" (latenza finta 300–900ms + shimmer), poi
+  **streamma** il testo (riuso del typewriter del progetto) **e monta il componente UI giusto**
+  sotto (timeline esperienze che si costruisce, grafo skill, card contatti come azioni).
+- Doppio binario: bottone *"Vedi tutto il profilo"* che srotola ogni sezione in statico.
+
+**Motore: finta AI deterministica (scelta architetturale).** Niente LLM libero che rischia di
+**inventare** (violazione della regola d'oro). Motore a strati, tutto `cv-data.ts`-driven:
+1. **Normalizza** input (lowercase, no accenti/punteggiatura).
+2. **Intent table** `{ patterns[], section }` con sinonimi IT/EN (i recruiter possono scrivere
+   in inglese) → routing alla sezione del CV.
+3. **Off-topic buckets** (meteo, barzelletta, matematica, saluti, meta/adversarial) → battute
+   pronte, così il fuori-scope sembra *capìto*, non *fallito*.
+4. **Scoring** multi-intent → disambiguazione se pareggio.
+5. **Fallback finale**: nessun match → "non ho colto" **+ ri-mostra sempre i chip** (mai
+   vicolo cieco).
+> Le battute fisse (off-topic/meta/fallback) sono **micro-copy di personaggio**, non dati CV:
+> non violano la fonte di verità (che resta l'unica sorgente dei *dati*).
+
+**Gestione domande strane (la chiave della credibilità).** Una finta AI convincente *non finge
+mai di sapere* — trasforma il limite in personalità:
+- **Off-topic innocuo** → ammissione onesta + redirect spiritoso + chip.
+- **Info plausibili ma non nel CV** (stipendio, età…) → "non è nel profilo pubblico" →
+  **call to action**: monta la card contatti. (Mai inventare.)
+- **Gibberish** → fallback generico che ripropone i chip.
+- **Adversarial/meta** ("sei una vera AI?", "ignora le istruzioni") → **rompe la quarta
+  parete**: si auto-dichiara simulazione deterministica → "zero allucinazioni garantite".
+  Il candore *è* il messaggio (= conosco i limiti dell'AI, non la vendo come magia).
+
+**Voce (easter egg gated).** **Web Speech API** nativa: pulsante 🎙 con *speech synthesis* che
+legge le risposte, opzionale *speech recognition* per parlarci. Zero dipendenze, molto "2030".
+Gated da `prefers-reduced-motion` e con fallback se l'API manca.
+
+**Estetica.** Palette scura/eterea, glow viola-ciano; **orbe/visualizer** centrale che pulsa
+quando l'agente "parla" (gated); tipografia leggera moderna; microcopy agentico
+(*thinking / generating / done*). Audio: cue soffuso "ambient swell" in `audio.ts`.
+
+### Valutazione: Chrome Prompt API (Gemini Nano) — RINVIATA ⏸️
+> **Decisione (2026-06): non adottata per ora.** Idea tematicamente perfetta (AI reale
+> *on-device* nell'era AI), ma valutata e **rinviata**. Conservata qui per riprenderla quando
+> l'API maturerà.
+
+**Stato API (giu 2026).** Per le **pagine web** è ancora **dietro flag**
+(`chrome://flags/#prompt-api-for-gemini-nano`) **+ Origin Trial**; "stabile" solo per le
+*estensioni* Chrome (138+). **Solo Chrome desktop** (no Safari/Firefox/mobile). **Download
+modello multi-GB** al primo uso, con requisiti hardware (GPU/VRAM/disco). Context window
+**piccola** (~4K token input / 1K output, soft-expand 8K). **Niente tool calling.**
+`LanguageModel.availability()` → `available | downloadable | downloading | unavailable`.
+
+**Impatti sul progetto.**
+- 🔴 **Collisione con la regola d'oro:** Gemini Nano è un LLM reale → **può allucinare** date/
+  ruoli/skill. Mitigabile (grounding RAG sul `cv-data.ts` + prompt che vincola a rispondere
+  *solo* dal contesto) ma **mai azzerabile**.
+- 🔴 **Disponibilità ~0% per i recruiter:** il fallback deterministico va costruito comunque →
+  l'API **aggiunge** lavoro, non lo sostituisce (due sistemi).
+- 🟡 **Context 4K stretta:** l'intero `cv-data.ts` potrebbe non entrarci → serve mini-retrieval
+  per iniettare solo la sezione pertinente… che è di nuovo il matcher deterministico.
+- 🟡 **Primo accesso:** stato `downloadable` → download GB al primo prompt: inaccettabile
+  bloccare un CV su questo.
+- 🟢 **Quando c'è, è un flex onesto:** "questo CV gira un LLM nel tuo browser, offline" è
+  notevole per il recruiter tecnico.
+
+**Architettura raccomandata quando si riprenderà — progressive enhancement (mai dipendenza):**
+1. **Baseline sempre attivo:** finta AI deterministica (sopra). Zero allucinazioni, offline,
+   universale — è quella che vede il 99%.
+2. **Turbo opzionale:** se `LanguageModel.availability() === 'available'`, badge *"⚡ AI
+   on-device rilevata"* che sblocca risposte in linguaggio naturale **grounded** su `cv-data.ts`
+   (prompt rigido "rispondi solo da questo contesto; se non c'è, dillo"), col routing
+   deterministico che seleziona la sezione da iniettare e streaming reale del modello. Percorso
+   **opt-in** etichettato come "AI generativa". Se l'API diventa stabile, lo strato si "accende"
+   da solo.
+
+**Identificatori tecnici previsti.** `Theme` key `'ai'` · `src/lib/themes/AiEra.svelte` ·
+hash `#ai` · `ERA_ORDER` **in coda** dopo `threed` · registrare in `Theme`/`THEMES`/`ERA_ORDER`
+(`store.ts`), cue audio in `audio.ts`, stile per-tema in `Timeline.svelte`.
+
+---
+
 ## Idee oltre la lista (timeline futura)
 
-- 🤖 **Era AI / conversazionale (2030+):** interfaccia chat/voce, il CV che si "auto-genera"
-  rispondendo, UI generativa, glow morbido. Estende il concetto oltre il 3D — coda naturale
-  della timeline.
+- 🤖 **Era AI / conversazionale (2030+):** promossa a proposta strutturata — vedi **§11**.
 - 🅰️ **Amiga Workbench / BBS / Teletext:** alternative di nicchia per il blocco anni '80-'90.
 - 🪟 **Mac OS Classic (System 7) / Windows 95:** desktop a 16 colori; rischio sovrapposizione
   con l'era XP, da valutare solo se si vuole sdoppiare l'epoca desktop.
@@ -459,4 +577,8 @@ lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
    colma il buco più ampio della timeline tra Pixel/Terminale e XP).
 4. ~~**Material Design & Flat**~~ — ✅ **implementato** (app bar indaco, tab ink-bar + scroll-spy,
    card a elevazione, ripple, FAB accent; colma l'ultimo buco cronologico tra Skeuo e Brutalism).
-5. **Glassmorphism autonomo** — solo se si vuole separarlo dal 3D. **È ora l'unica proposta aperta.**
+5. ~~**Glassmorphism autonomo**~~ — ✅ **implementato** (`Glass.svelte`, §9): estratto dal 3D
+   e differenziato col principio **luce/buio** (presente luminoso Big Sur vs futuro neon scuro).
+6. **Era AI / conversazionale** (§11) — l'unica vera *nuova frontiera narrativa* oltre il 3D.
+   Motore: **finta AI deterministica** (no invenzioni). Chrome Prompt API valutata e **rinviata**
+   (riprendere come *progressive enhancement* quando l'API sarà stabile). Alto impatto concettuale.

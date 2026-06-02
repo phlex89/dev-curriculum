@@ -190,6 +190,15 @@ export function playEra(theme: Theme) {
       // Soft, modern "pop" that lifts in pitch.
       tone(c, master, { freq: 420, type: 'sine', dur: 0.16, gain: 0.16, slideTo: 720 });
       break;
+    case 'glass': {
+      // Crystalline glass chime — bright, airy, shimmering. A soft high triangle
+      // arpeggio with a sine "halo" on top. The luminous, weightless opposite of
+      // threed's low sci-fi drone.
+      const chime = [659.25, 987.77, 1318.51]; // E5 · B5 · E6
+      chime.forEach((f, i) => tone(c, master, { freq: f, type: 'triangle', start: i * 0.07, dur: 0.5, gain: 0.07 }));
+      tone(c, master, { freq: 1975.53, type: 'sine', start: 0.16, dur: 0.6, gain: 0.03 }); // high shimmer halo
+      break;
+    }
     case 'threed': {
       // Suspended sci-fi swell — a low detuned drone that rises.
       tone(c, master, { freq: 110, type: 'sawtooth', dur: 0.7, gain: 0.05, slideTo: 220 });

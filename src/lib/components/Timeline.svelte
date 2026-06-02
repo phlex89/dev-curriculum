@@ -12,6 +12,7 @@
     { id: 'material', label: 'Material', year: '2014', icon: '📐' },
     { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
     { id: 'bento', label: 'Modern Flat', year: '2015', icon: '📱' },
+    { id: 'glass', label: 'Glass', year: '2020', icon: '🧊' },
     { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
   ];
 
@@ -556,6 +557,48 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+  }
+
+  /* --- Glassmorphism Theme Adaptations (frosted milky pill, light Big Sur) --- */
+  :global(:root) .theme-glass .timeline-container {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 40px;
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 30px rgba(31, 38, 135, 0.18);
+  }
+
+  :global(:root) .theme-glass .timeline-track {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  :global(:root) .theme-glass .node-pill {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #3b3a52;
+  }
+
+  :global(:root) .theme-glass .timeline-stop:hover .node-pill {
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  :global(:root) .theme-glass .timeline-stop.active .node-pill {
+    background: rgba(124, 116, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 6px 16px rgba(124, 116, 255, 0.4);
+  }
+
+  :global(:root) .theme-glass .label-text {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  :global(:root) .theme-glass .timeline-fill {
+    background: linear-gradient(90deg, #7cc5ff, #a78bfa, #f9a8d4);
+    box-shadow: none;
   }
 
   /* --- ThreeD Theme Adaptations --- */

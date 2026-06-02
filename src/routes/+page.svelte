@@ -15,6 +15,7 @@
     material: 'Material Design · 2014',
     brutalism: 'Brutalism · 2017',
     bento: 'Modern Flat · 2015',
+    glass: 'Glassmorphism · 2020',
     threed: 'Future 3D · 2026'
   };
 
@@ -110,7 +111,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -378,6 +379,22 @@
     background: rgba(0, 255, 255, 0.25);
     border-color: #00ffff;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  }
+
+  /* Glassmorphism: frosted milky pill with a fine top light-edge — the luminous
+     Big Sur look (light, not the dark neon of threed). */
+  .audio-fab.theme-glass {
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #4338ca;
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 24px rgba(31, 38, 135, 0.18);
+  }
+  .audio-fab.theme-glass.on {
+    background: rgba(124, 116, 255, 0.42);
+    border-color: rgba(255, 255, 255, 0.8);
+    color: #fff;
   }
 
   /* Pixel-art: chunky NES dialog-box chrome, hard pixel shadow, no blur. */

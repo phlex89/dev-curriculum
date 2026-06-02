@@ -16,6 +16,7 @@ export const themeLoaders: Record<Theme, () => Promise<{ default: Component }>> 
   material: () => import('./Material.svelte'),
   brutalism: () => import('./Brutalism.svelte'),
   bento: () => import('./BentoBox.svelte'),
+  glass: () => import('./Glass.svelte'),
   threed: () => import('./ThreeD.svelte')
 };
 

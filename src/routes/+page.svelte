@@ -4,19 +4,12 @@
   import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
   import Timeline from '$lib/components/Timeline.svelte';
-
-  // Theme Components
-  import TerminalTheme from '$lib/themes/Terminal.svelte';
-  import PixelArtTheme from '$lib/themes/PixelArt.svelte';
-  import WinXPTheme from '$lib/themes/WinXP.svelte';
-  import SkeuoTheme from '$lib/themes/Skeuo.svelte';
-  import BrutalismTheme from '$lib/themes/Brutalism.svelte';
-  import BentoTheme from '$lib/themes/BentoBox.svelte';
-  import ThreeDTheme from '$lib/themes/ThreeD.svelte';
+  import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
 
   const eraLabels: Record<string, string> = {
     terminal: 'Terminale · 1980s',
     pixel: 'Pixel Art · 1988',
+    web1: 'Web 1.0 · 1996',
     winxp: 'Windows XP · 2001',
     skeuo: 'Skeuomorphism · 2010',
     brutalism: 'Brutalism · 2017',
@@ -34,22 +27,55 @@
   // cross-dissolve/time-travel FX don't fire on load — just a clean fade-in.
   let booted = $state(false);
 
+  // The era actually on screen. It LAGS `$currentTheme`: when a new era is picked
+  // we keep the current one rendered until its (code-split) chunk has loaded, then
+  // swap. So the cross-fade always animates between two *real* layers — the
+  // visitor never sees an empty layer fade in while the chunk downloads. The
+  // Timeline pill follows `$currentTheme` immediately, so the click still feels live.
+  let displayedTheme = $state<Theme | null>(null);
+  let loadingTheme = $state<Theme | null>(null); // chunk in flight, for the loading cue
+
   // Directional time-travel transition: glitch going back, bloom going forward.
   let fxClass = $state<'fx-back' | 'fx-forward' | null>(null);
   let fxKey = $state(0);
   let prevIdx = -1;
 
+  // Load the selected era's chunk, THEN reveal it. Watching the store covers every
+  // entry point: Timeline click, keyboard nav, deep-link/back-forward hashchange.
   $effect(() => {
-    const idx = ERA_ORDER.indexOf($currentTheme);
-    if (!booted) {
-      prevIdx = idx; // before boot: just track the era, never animate
+    const target = $currentTheme;
+    if (!booted || target === displayedTheme) {
+      loadingTheme = null;
       return;
     }
+    loadingTheme = target;
+    let cancelled = false;
+    themeLoaders[target]()
+      .then(() => {
+        if (cancelled || $currentTheme !== target) return; // a newer selection won the race
+        displayedTheme = target;
+        loadingTheme = null;
+      })
+      .catch(() => {
+        // Chunk failed to load: drop the cue and let the current era stay put.
+        if (!cancelled) loadingTheme = null;
+      });
+    return () => {
+      cancelled = true;
+    };
+  });
+
+  // Fire the time-travel FX + era audio on the real swap (displayedTheme), so the
+  // overlay masks the cross-fade rather than playing over a still-loading layer.
+  $effect(() => {
+    const dt = displayedTheme;
+    if (!booted || dt === null) return;
+    const idx = ERA_ORDER.indexOf(dt);
     if (idx === prevIdx) return;
     const dir = idx > prevIdx ? 'fx-forward' : 'fx-back';
     prevIdx = idx;
 
-    playEra($currentTheme); // no-op unless the visitor opted into audio
+    playEra(dt); // no-op unless the visitor opted into audio
 
     if (!prefersReduced()) {
       fxClass = dir;
@@ -66,15 +92,24 @@
     currentTheme.init(); // resolves the real era synchronously (URL hash / saved pref)
     initAudio();
 
-    // Sync prevIdx to the resolved era so unlocking `booted` doesn't read as a
-    // navigation — then reveal, letting the theme layer fade in for the first time.
+    // Sync prevIdx + displayedTheme to the resolved era so unlocking `booted` doesn't
+    // read as a navigation — then reveal, letting the theme layer fade in for the first time.
+    displayedTheme = $currentTheme;
     prevIdx = ERA_ORDER.indexOf($currentTheme);
     booted = true;
+
+    // Warm the neighbouring eras' chunks so left/right time-travel feels instant.
+    const warmNeighbours = () => {
+      if (ERA_ORDER[prevIdx - 1]) prefetchTheme(ERA_ORDER[prevIdx - 1]);
+      if (ERA_ORDER[prevIdx + 1]) prefetchTheme(ERA_ORDER[prevIdx + 1]);
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(warmNeighbours);
+    else setTimeout(warmNeighbours, 600);
 
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'pixel', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -88,24 +123,20 @@
 </svelte:head>
 
 <main class="app-container">
-  {#if booted}
-    {#key $currentTheme}
-      <div class="theme-layer" in:fade={{ duration: 450, delay: 120 }} out:fade={{ duration: 300 }}>
-        {#if $currentTheme === 'terminal'}
-          <TerminalTheme />
-        {:else if $currentTheme === 'pixel'}
-          <PixelArtTheme />
-        {:else if $currentTheme === 'winxp'}
-          <WinXPTheme />
-        {:else if $currentTheme === 'skeuo'}
-          <SkeuoTheme />
-        {:else if $currentTheme === 'brutalism'}
-          <BrutalismTheme />
-        {:else if $currentTheme === 'bento'}
-          <BentoTheme />
-        {:else if $currentTheme === 'threed'}
-          <ThreeDTheme />
-        {/if}
+  <!-- Thin top bar while a not-yet-cached era chunk is loading. The CSS fade-in
+       delay means it only ever shows for genuinely slow (uncached) navigations;
+       prefetched eras swap before it would appear. -->
+  {#if loadingTheme}
+    <div class="load-bar" aria-hidden="true"></div>
+  {/if}
+
+  {#if booted && displayedTheme}
+    {#key displayedTheme}
+      <div class="theme-layer" in:fade={{ duration: 600, delay: 260 }} out:fade={{ duration: 460 }}>
+        {#await themeLoaders[displayedTheme]() then mod}
+          {@const ThemeComponent = mod.default}
+          <ThemeComponent />
+        {/await}
       </div>
     {/key}
   {/if}
@@ -152,6 +183,35 @@
     inset: 0;
     width: 100%;
     height: 100%;
+  }
+
+  /* --- Loading bar: only surfaces when a chunk load is genuinely slow --- */
+  .load-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    z-index: 9995; /* above themes, below the Timeline (9999) */
+    transform-origin: 0 50%;
+    background: linear-gradient(90deg, #0071e3, #4f46e5, #7df9ff);
+    /* Stay invisible for the first 220ms (covers prefetched/cached swaps), then
+       fade in and creep across so a long load reads as progress, not a freeze. */
+    opacity: 0;
+    animation:
+      loadBarFade 0.3s ease 0.22s forwards,
+      loadBarCreep 8s cubic-bezier(0.1, 0.7, 0.1, 1) 0.22s forwards;
+  }
+  @keyframes loadBarFade {
+    to { opacity: 1; }
+  }
+  @keyframes loadBarCreep {
+    0% { transform: scaleX(0.02); }
+    60% { transform: scaleX(0.7); }
+    100% { transform: scaleX(0.95); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .load-bar { animation: loadBarFade 0.2s ease 0.22s forwards; transform: scaleX(1); }
   }
 
   /* --- Directional time-travel FX overlay --- */
@@ -278,6 +338,18 @@
   }
   .audio-fab.theme-brutalism:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #0c0c0c; }
   .audio-fab.theme-brutalism.on { background: #e9ff1a; }
+
+  /* Web 1.0: silver Netscape/Win95 button bevel, no blur. */
+  .audio-fab.theme-web1 {
+    background: #c0c0c0;
+    border: 2px outset #f5f5f5;
+    border-radius: 0;
+    color: #000080;
+    box-shadow: 1px 1px 0 #808080, 2px 2px 4px rgba(0, 0, 0, 0.4);
+    backdrop-filter: none;
+  }
+  .audio-fab.theme-web1:active { border-style: inset; }
+  .audio-fab.theme-web1.on { background: #000080; color: #fff; border-style: inset; }
 
   .audio-fab.theme-threed {
     background: rgba(255, 255, 255, 0.08);

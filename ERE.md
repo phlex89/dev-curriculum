@@ -27,7 +27,7 @@
 |---|-----|---------|-------|------------|
 | 1 | Terminale Unix / MS-DOS | Anni '80 – primi '90 | ✅ Implementato | `Terminal.svelte` |
 | 2 | Pixel Art / 8-bit Console Gaming | metà anni '80 – metà '90 | ✅ Implementato | `PixelArt.svelte` |
-| 3 | Web 1.0 / HTML Puro | Metà anni '90 | ⬜ Proposta | — |
+| 3 | Web 1.0 / HTML Puro | Metà anni '90 | ✅ Implementato | `Web1.svelte` |
 | 4 | Windows 9x / XP Desktop | Inizio anni 2000 | ✅ Implementato | `WinXP.svelte` |
 | 5 | Glossy / Skeuomorfismo (Web 2.0) | ca. 2007–2013 | ✅ Implementato | `Skeuo.svelte` |
 | 6 | Material Design & Flat | 2014–2017 | ⬜ Proposta | — |
@@ -37,11 +37,13 @@
 | 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
 
 > L'attuale `ERA_ORDER` è
-> `['terminal', 'pixel', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed']`. La
+> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed']`. La
 > **Pixel Art** è una *lineage parallela* (mondo console, non desktop/web) ma
-> contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**. Le
-> proposte rimaste (`⬜`: Web 1.0, Material Design) e il Glassmorphism come era
-> autonoma sono i candidati per future espansioni.
+> contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**; il
+> **Web 1.0** (GeoCities/Netscape, metà anni '90) si inserisce **tra `pixel` e
+> `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP. La sola
+> proposta rimasta (`⬜`: Material Design) e il Glassmorphism come era autonoma sono
+> i candidati per future espansioni.
 
 ---
 
@@ -197,13 +199,42 @@ API già usata in `audio.ts`.
 
 ---
 
-## 3. Web 1.0 / HTML Puro — ⬜ Proposta
-**Metà anni '90**
+## 3. Web 1.0 / HTML Puro — ✅ Implementato
+**Metà anni '90** · `src/lib/themes/Web1.svelte`
+
+> **Stato implementazione.** Realizzato come **home page personale GeoCities del 1996
+> incorniciata in una finestra Netscape Navigator 3 "massimizzata"**. Chrome completo
+> (title bar con **throbber "N"** animato + meteora, menu bar `File Edit View Go…`,
+> toolbar `Back/Forward/Reload/Home/Images/Open/Print/Find/Stop` con bevel 3D, location
+> bar `http://www.geocities.com/SiliconValley/Heights/2600/…`, **status bar** con
+> meteora di caricamento + testo scorrevole + `Document: Done`). Pagina a **layout di
+> tabelle** centrato (max 800px) con colonna **Site Map** (bullet a pallina colorata)
+> + colonna contenuti in **card a barra teal** (`#008080`). Tutti i contenuti da
+> `cv-data.ts` (About, Esperienze, Skill, Formazione+Award+Conferenze, Cool Links,
+> Contatti) — **nessun dato inventato**, solo la cornice anni '96. Tipografia di
+> **sistema** (Times New Roman + Courier per i meta): **nessun webfont**. Hash `#web1`,
+> in `ERA_ORDER` **tra `pixel` e `winxp`**. Label d'anno **"1996"**.
+>
+> **Dettagli d'epoca (CSS originale):** sfondo **starfield** tassellato (notte blu),
+> heading **rainbow** animato, banner **`UNDER CONSTRUCTION`** a strisce hazard, **hit
+> counter** odometer LCD (`0013337`), **6 badge 88×31** ("Netscape Now!", "Made with
+> Notepad", "HTML 3.2 Checked!", "Best viewed 800×600", "Lynx Enhanced", "Y2K Ready"),
+> **webring** widget, `<marquee>` e `<blink>` ricreati in CSS, `<hr>` 3D groove,
+> footer "Made with Notepad on a Pentium 133MHz · best viewed in Netscape 3.0".
+>
+> **Interazione / easter egg:** **guestbook funzionante** (form → nuova entry + finto
+> alert **`[JavaScript Application]`**); banner **"1.000.000° visitatore"** → stesso
+> alert-gag; **throbber Netscape** → cue **modem 56k dial-up** (sintetizzato in
+> `audio.ts`, `web1Modem()` + `case 'web1'` di `playEra`); toolbar con messaggi di
+> stato a tema; **sparkle cursor trail** (solo pointer fine). **Tutto gated da
+> `prefers-reduced-motion`** (marquee/blink/rainbow/comet/meteora/sparkle disattivati;
+> i contenuti restano statici e leggibili). Mobile: menu bar nascosta, toolbar a sole
+> icone, tabella impilata. La scheda sotto resta come documentazione del concept.
 
 **Contesto.** L'alba di internet di massa: GeoCities, Angelfire, le prime home page
 personali. HTML senza CSS, documenti più che applicazioni. È il salto narrativo tra la
-console e il desktop: il PC esce di casa e si connette al mondo. **Candidata a più alto
-impatto** perché colma il buco più ampio della timeline attuale (tra Terminale e XP).
+console e il desktop: il PC esce di casa e si connette al mondo. Colma **il buco più
+ampio della timeline** (tra Pixel/Terminale e XP).
 
 **Stile.**
 - **Palette:** sfondo grigio default (`#c0c0c0`) o bianco, link **blu** non visitati /
@@ -392,6 +423,8 @@ lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
 1. ~~**Brutalismo**~~ — ✅ **implementato** (era con lo stile più differenziante).
 2. ~~**Pixel Art / 8-bit Gaming**~~ — ✅ **implementato** (overworld top-down giocabile,
    gameplay opzionale e contenuti sempre accessibili).
-3. **Web 1.0 / HTML Puro** — massimo impatto narrativo, colma il buco più ampio, basso costo.
+3. ~~**Web 1.0 / HTML Puro**~~ — ✅ **implementato** (home page GeoCities in chrome Netscape;
+   colma il buco più ampio della timeline tra Pixel/Terminale e XP).
 4. **Material Design & Flat** — storicamente corretta ma va differenziata bene da Bento.
+   **È ora la prima proposta ancora aperta.**
 5. **Glassmorphism autonomo** — solo se si vuole separarlo dal 3D.

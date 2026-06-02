@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { currentTheme, type Theme } from '../store';
+  import { prefetchTheme } from '../themes/registry';
 
   const themes: { id: Theme; label: string; year: string; icon: string }[] = [
     { id: 'terminal', label: 'Terminal', year: '1980s', icon: '⌨️' },
     { id: 'pixel', label: 'Pixel Art', year: '1988', icon: '🎮' },
+    { id: 'web1', label: 'Web 1.0', year: '1996', icon: '🌐' },
     { id: 'winxp', label: 'Win XP', year: '2001', icon: '🪟' },
     { id: 'skeuo', label: 'Skeuomorph', year: '2010', icon: '💎' },
     { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
@@ -94,6 +96,8 @@
             tabindex={$currentTheme === theme.id ? 0 : -1}
             bind:this={tabButtons[i]}
             onclick={() => selectTheme(theme.id)}
+            onmouseenter={() => prefetchTheme(theme.id)}
+            onfocus={() => prefetchTheme(theme.id)}
             onkeydown={(e) => handleKeydown(e, i)}
             aria-label="{theme.year} - {theme.label}"
           >
@@ -350,6 +354,48 @@
     font-weight: 400;
     font-size: 0.6rem;
     text-transform: uppercase;
+  }
+
+  /* --- Web 1.0 Theme Adaptations (silver Netscape/Win95 bevel, Times) --- */
+  :global(:root) .theme-web1 .timeline-container {
+    background: #c0c0c0;
+    border: 2px outset #f5f5f5;
+    border-radius: 0;
+    box-shadow: 1px 1px 0 #808080, 2px 2px 4px rgba(0, 0, 0, 0.4);
+    backdrop-filter: none;
+  }
+
+  :global(:root) .theme-web1 .timeline-track {
+    background: transparent;
+    border-top: 2px groove #fff;
+  }
+
+  :global(:root) .theme-web1 .node-pill {
+    background: #c0c0c0;
+    border: 2px outset #f5f5f5;
+    border-radius: 0;
+    color: #000080;
+  }
+
+  :global(:root) .theme-web1 .timeline-stop:hover .node-pill {
+    background: #d4d0c8;
+  }
+
+  :global(:root) .theme-web1 .timeline-stop.active .node-pill {
+    background: #000080;
+    color: #fff;
+    border: 2px inset #f5f5f5;
+    box-shadow: none;
+  }
+
+  :global(:root) .theme-web1 .label-text {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 700;
+  }
+
+  :global(:root) .theme-web1 .timeline-fill {
+    background: #000080;
+    box-shadow: none;
   }
 
   /* --- WinXP Theme Adaptations --- */

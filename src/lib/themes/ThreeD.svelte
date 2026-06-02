@@ -454,6 +454,10 @@
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     transform-style: preserve-3d;
+  }
+  /* Promote to a GPU layer only while being tilted, so idle cards off the pointer
+     don't pin layers in GPU memory. */
+  .glass-card:hover {
     will-change: transform;
   }
 

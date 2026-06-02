@@ -1,14 +1,15 @@
 import { writable } from 'svelte/store';
 
-export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'brutalism' | 'pixel';
+export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'brutalism' | 'pixel' | 'web1';
 
 /** Valid themes (used to validate persisted / deep-linked values). */
-const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'brutalism', 'pixel'];
+const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'brutalism', 'pixel', 'web1'];
 
 /** Chronological order of the eras — drives the directional time-travel transition.
  *  Pixel Art (console 8-bit) is a parallel lineage contemporary to the Terminal,
- *  so it sits right after it. */
-export const ERA_ORDER: Theme[] = ['terminal', 'pixel', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed'];
+ *  so it sits right after it. Web 1.0 (mid-'90s GeoCities/Netscape) bridges the
+ *  gap between the console/terminal age and the Windows XP desktop. */
+export const ERA_ORDER: Theme[] = ['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'brutalism', 'bento', 'threed'];
 
 const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 

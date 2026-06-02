@@ -72,6 +72,64 @@ function tone(c: AudioContext, dest: AudioNode, o: ToneOpts) {
   osc.stop(t0 + dur + 0.02);
 }
 
+/** A short band-limited noise burst — the rasping "carrier" of a dial-up handshake.
+ *  Uses a one-shot buffer so we never leave an oscillator ringing. */
+function noiseBurst(c: AudioContext, dest: AudioNode, start: number, dur: number, gain: number, filterHz: number) {
+  const t0 = c.currentTime + start;
+  const frames = Math.floor(c.sampleRate * dur);
+  const buf = c.createBuffer(1, frames, c.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < frames; i++) data[i] = Math.random() * 2 - 1;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const bp = c.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = filterHz;
+  bp.Q.value = 0.7;
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(gain, t0 + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(bp).connect(g).connect(dest);
+  src.start(t0);
+  src.stop(t0 + dur + 0.02);
+}
+
+/** The unmistakable 56k dial-up handshake: dial tone → a few touch-tone digits →
+ *  the warbling carrier screech. Synthesised on the fly; reuses the shared ctx. */
+function modemHandshake(c: AudioContext, dest: AudioNode) {
+  // 1. Dial tone (350 Hz + 440 Hz, the North-American "ready to dial" pair).
+  tone(c, dest, { freq: 350, type: 'sine', dur: 0.32, gain: 0.05 });
+  tone(c, dest, { freq: 440, type: 'sine', dur: 0.32, gain: 0.05 });
+  // 2. Three DTMF "dialing" digits (dual-tone, low+high group).
+  const dtmf: [number, number, number][] = [
+    [697, 1209, 0.4], // "1"
+    [770, 1336, 0.56], // "5"
+    [852, 1477, 0.72] // "9"
+  ];
+  for (const [lo, hi, at] of dtmf) {
+    tone(c, dest, { freq: lo, type: 'sine', start: at, dur: 0.1, gain: 0.05 });
+    tone(c, dest, { freq: hi, type: 'sine', start: at, dur: 0.1, gain: 0.05 });
+  }
+  // 3. Carrier handshake — answer tone + warbling FSK over a noisy hiss.
+  tone(c, dest, { freq: 2100, type: 'sine', start: 0.92, dur: 0.42, gain: 0.045 }); // answer tone
+  tone(c, dest, { freq: 1180, type: 'sawtooth', start: 1.0, dur: 0.16, gain: 0.03, slideTo: 1650 });
+  tone(c, dest, { freq: 1650, type: 'sawtooth', start: 1.18, dur: 0.16, gain: 0.03, slideTo: 1080 });
+  noiseBurst(c, dest, 1.0, 0.5, 0.035, 1800); // the "kshhhh" screech
+  noiseBurst(c, dest, 1.34, 0.34, 0.028, 3200);
+}
+
+/** Standalone modem cue (used by Web1.svelte's Netscape throbber). */
+export function web1Modem() {
+  if (!enabled) return;
+  const c = ensureCtx();
+  if (!c) return;
+  const master = c.createGain();
+  master.gain.value = 0.5;
+  master.connect(c.destination);
+  modemHandshake(c, master);
+}
+
 /** Play the cue for an era. No-op while audio is disabled. */
 export function playEra(theme: Theme) {
   if (!enabled) return;
@@ -117,6 +175,10 @@ export function playEra(theme: Theme) {
       arp.forEach((f, i) => tone(c, master, { freq: f, type: 'square', start: i * 0.07, dur: 0.09, gain: 0.07 }));
       break;
     }
+    case 'web1':
+      // The sound of getting online in 1996: a 56k dial-up handshake.
+      modemHandshake(c, master);
+      break;
     case 'bento':
       // Soft, modern "pop" that lifts in pitch.
       tone(c, master, { freq: 420, type: 'sine', dur: 0.16, gain: 0.16, slideTo: 720 });

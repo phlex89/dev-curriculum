@@ -20,13 +20,16 @@
     icon: string;
   }
 
+  // Scattered start positions so each folder lands in its own spot on the desktop
+  // (not a tidy diagonal cascade). Kept within a safe envelope — x ≤ ~560, y ≤ ~180 —
+  // so a 450px-wide window stays mostly on screen even on smaller desktops.
   let windows = $state<WindowState[]>([
-    { id: 'about', title: 'About Me', content: 'about', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 100, y: 50, icon: 'doc' },
-    { id: 'skills', title: 'Skills', content: 'skills', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 150, y: 100, icon: 'gear' },
-    { id: 'exp', title: 'Esperienze', content: 'experiences', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 200, y: 150, icon: 'folder' },
-    { id: 'edu', title: 'Formazione', content: 'education', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 250, y: 200, icon: 'cap' },
-    { id: 'contact', title: 'Contatti', content: 'contact', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 300, y: 250, icon: 'contacts' },
-    { id: 'error', title: 'Errore', content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 300, y: 200, icon: '' }
+    { id: 'about', title: 'About Me', content: 'about', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 80, y: 56, icon: 'doc' },
+    { id: 'skills', title: 'Skills', content: 'skills', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 470, y: 44, icon: 'gear' },
+    { id: 'exp', title: 'Esperienze', content: 'experiences', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 250, y: 168, icon: 'folder' },
+    { id: 'edu', title: 'Formazione', content: 'education', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 560, y: 138, icon: 'cap' },
+    { id: 'contact', title: 'Contatti', content: 'contact', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 360, y: 92, icon: 'contacts' },
+    { id: 'error', title: 'Errore', content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 330, y: 176, icon: '' }
   ]);
 
   const prefersReduced = () =>
@@ -235,7 +238,7 @@
           class="window"
           class:maximized={win.maximized || isMobile}
           style={win.maximized || isMobile ? `z-index: ${win.zIndex};` : `top: ${win.y}px; left: ${win.x}px; z-index: ${win.zIndex};`}
-          use:draggable={{ handle: '.titlebar', disabled: isMobile }}
+          use:draggable={{ handle: '.titlebar', disabled: isMobile, onMove: (x, y) => { win.x = x; win.y = y; } }}
           onmousedown={() => bringToFront(win.id)}
           transition:windowPop
         >
@@ -472,7 +475,12 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    background-image: url('/wallpapers/bliss-1366x768.jpg');
+    background-image: url('/wallpapers/bliss-1366x768.jpg'); /* fallback for no image-set() */
+    background-image: image-set(
+      url('/wallpapers/bliss-1366x768.avif') type('image/avif'),
+      url('/wallpapers/bliss-1366x768.webp') type('image/webp'),
+      url('/wallpapers/bliss-1366x768.jpg') type('image/jpeg')
+    );
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -486,13 +494,34 @@
   /* Serve the wallpaper that best fits the viewport (and high-DPI screens).
      Browsers only download the background-image whose media query matches. */
   @media (min-width: 1367px), (min-resolution: 1.5dppx) {
-    .xp-desktop { background-image: url('/wallpapers/bliss-1920x1080.jpg'); }
+    .xp-desktop {
+      background-image: url('/wallpapers/bliss-1920x1080.jpg');
+      background-image: image-set(
+        url('/wallpapers/bliss-1920x1080.avif') type('image/avif'),
+        url('/wallpapers/bliss-1920x1080.webp') type('image/webp'),
+        url('/wallpapers/bliss-1920x1080.jpg') type('image/jpeg')
+      );
+    }
   }
   @media (min-width: 1921px), (min-width: 1100px) and (min-resolution: 2dppx) {
-    .xp-desktop { background-image: url('/wallpapers/bliss-2560x1440.jpg'); }
+    .xp-desktop {
+      background-image: url('/wallpapers/bliss-2560x1440.jpg');
+      background-image: image-set(
+        url('/wallpapers/bliss-2560x1440.avif') type('image/avif'),
+        url('/wallpapers/bliss-2560x1440.webp') type('image/webp'),
+        url('/wallpapers/bliss-2560x1440.jpg') type('image/jpeg')
+      );
+    }
   }
   @media (min-width: 2561px), (min-width: 1500px) and (min-resolution: 2dppx) {
-    .xp-desktop { background-image: url('/wallpapers/bliss-3840x2160.jpg'); }
+    .xp-desktop {
+      background-image: url('/wallpapers/bliss-3840x2160.jpg');
+      background-image: image-set(
+        url('/wallpapers/bliss-3840x2160.avif') type('image/avif'),
+        url('/wallpapers/bliss-3840x2160.webp') type('image/webp'),
+        url('/wallpapers/bliss-3840x2160.jpg') type('image/jpeg')
+      );
+    }
   }
 
   .bsod {

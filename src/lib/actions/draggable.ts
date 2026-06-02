@@ -1,22 +1,39 @@
-type DragParam = string | { handle?: string; disabled?: boolean };
+type DragOptions = {
+  handle?: string;
+  disabled?: boolean;
+  /** Reports the new top-left (px) on every move so the caller can keep its own
+   *  state in sync — otherwise a re-render would snap the node back to its bound
+   *  start position. */
+  onMove?: (x: number, y: number) => void;
+};
+type DragParam = string | DragOptions;
 
 export function draggable(node: HTMLElement, param: DragParam = {}) {
   let handle: string | undefined;
   let disabled = false;
+  let onMove: ((x: number, y: number) => void) | undefined;
 
   function apply(p: DragParam) {
     if (typeof p === 'string') {
       handle = p;
       disabled = false;
+      onMove = undefined;
     } else {
       handle = p?.handle;
       disabled = !!p?.disabled;
+      onMove = p?.onMove;
     }
   }
   apply(param);
 
-  let x = 0;
-  let y = 0;
+  // Pointer position at the last move, plus the node's own current top-left. We
+  // track left/top internally (seeded from the computed style on mousedown) rather
+  // than re-reading getComputedStyle each move, so a re-render mid-drag can't make
+  // the deltas drift.
+  let pointerX = 0;
+  let pointerY = 0;
+  let left = 0;
+  let top = 0;
 
   function handleMousedown(event: MouseEvent) {
     if (disabled) return; // e.g. on mobile, where windows are fixed/maximised
@@ -28,23 +45,23 @@ export function draggable(node: HTMLElement, param: DragParam = {}) {
       }
     }
 
-    x = event.clientX;
-    y = event.clientY;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+
+    const style = window.getComputedStyle(node);
+    top = parseInt(style.top, 10) || 0;
+    left = parseInt(style.left, 10) || 0;
 
     window.addEventListener('mousemove', handleMousemove);
     window.addEventListener('mouseup', handleMouseup);
   }
 
   function handleMousemove(event: MouseEvent) {
-    const dx = event.clientX - x;
-    const dy = event.clientY - y;
+    const dx = event.clientX - pointerX;
+    const dy = event.clientY - pointerY;
 
-    x = event.clientX;
-    y = event.clientY;
-
-    const style = window.getComputedStyle(node);
-    const top = parseInt(style.top, 10) || 0;
-    const left = parseInt(style.left, 10) || 0;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
 
     // Constrain to the viewport so a window can never be dragged fully off-screen
     // and lost: the title bar must always stay reachable.
@@ -55,11 +72,12 @@ export function draggable(node: HTMLElement, param: DragParam = {}) {
     const minTop = 0; // never let the title bar go above the top edge
     const maxTop = window.innerHeight - taskbar - 30; // keep the title bar above the taskbar
 
-    const nextLeft = Math.min(Math.max(left + dx, minLeft), maxLeft);
-    const nextTop = Math.min(Math.max(top + dy, minTop), maxTop);
+    left = Math.min(Math.max(left + dx, minLeft), maxLeft);
+    top = Math.min(Math.max(top + dy, minTop), maxTop);
 
-    node.style.top = `${nextTop}px`;
-    node.style.left = `${nextLeft}px`;
+    node.style.left = `${left}px`;
+    node.style.top = `${top}px`;
+    onMove?.(left, top); // keep the caller's bound state in sync
   }
 
   function handleMouseup() {

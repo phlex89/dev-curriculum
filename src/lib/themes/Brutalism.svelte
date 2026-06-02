@@ -370,7 +370,13 @@
   }
 
   /* ░░ SECTION SCAFFOLD ░░ */
-  .bru-section { margin-bottom: 54px; }
+  .bru-section {
+    margin-bottom: 54px;
+    /* Skip layout/paint for sections scrolled out of view; `auto` remembers each
+       section's real height after first render so scrolling back never jumps. */
+    content-visibility: auto;
+    contain-intrinsic-size: auto 400px;
+  }
   .bru-shead {
     display: flex;
     align-items: center;

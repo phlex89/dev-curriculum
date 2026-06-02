@@ -428,7 +428,7 @@ circolare.
 > e lattiginoso:** `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`,
 > **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen
 > speculare** bianco che segue il cursore (`mix-blend-mode: overlay`, via action `tilt`).
-> Tipografia **Inter ultralight** (nome a peso 200) — non l'Orbitron sci-fi del 3D.
+> Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso) — non l'Orbitron sci-fi del 3D.
 >
 > **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza →
 > Profilo → Esperienza → Competenze/Lingue → Formazione+Certificazioni/Conferenze),
@@ -451,7 +451,7 @@ visionOS). Profondità eterea fatta di sfocature e luce, non di materiali reali.
 
 **Differenziazione dal 3D (Futuro).** **Luce vs Buio** è il discriminante portante:
 Glass = chiaro/pastello/calmo/arioso, **niente WebGL** (solo gradienti CSS animati sotto
-il vetro), Inter ultralight; 3D = scuro/neon/sci-fi, scena WebGL immersiva, Orbitron.
+il vetro), Outfit ultralight; 3D = scuro/neon/sci-fi, scena WebGL immersiva, Orbitron.
 
 ---
 

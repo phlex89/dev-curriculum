@@ -1094,8 +1094,8 @@
     background: #1c1c2e;
     border: 2px solid #fcd800;
     color: #fcd800;
-    font-size: 0.4rem;
-    padding: 3px 5px;
+    font-size: 0.66rem;
+    padding: 5px 8px;
     z-index: 9;
   }
 
@@ -1146,9 +1146,9 @@
   .hero-sprite.flip { transform: translateX(-50%) scaleX(-1); }
   .hero-sprite > span { position: absolute; image-rendering: pixelated; }
 
-  /* Cap (green), brim, face, eyes */
-  .h-hat-top { top: 0; left: calc(var(--px) * 2.5); width: calc(var(--px) * 7); height: calc(var(--px) * 2.5); background: #1f9e3a; box-shadow: inset 0 calc(var(--px) * 1) 0 #36c456; }
-  .h-hat-brim { top: calc(var(--px) * 2.5); left: calc(var(--px) * 1.5); width: calc(var(--px) * 9); height: calc(var(--px) * 1.5); background: #16782c; }
+  /* Hair (blond, short & messy), fringe, face, eyes */
+  .h-hat-top { top: 0; left: calc(var(--px) * 2.5); width: calc(var(--px) * 7); height: calc(var(--px) * 2.5); background: #e6bd4d; box-shadow: inset 0 calc(var(--px) * 1) 0 #f3d77f, calc(var(--px) * -1.5) 0 0 #e6bd4d, calc(var(--px) * 1.5) calc(var(--px) * -1) 0 #f3d77f; }
+  .h-hat-brim { top: calc(var(--px) * 2.5); left: calc(var(--px) * 1.5); width: calc(var(--px) * 9); height: calc(var(--px) * 1.5); background: #c9962f; }
   .h-face { top: calc(var(--px) * 4); left: calc(var(--px) * 3); width: calc(var(--px) * 6); height: calc(var(--px) * 4); background: #fcb878; box-shadow: inset 0 0 0 var(--px) #e09850; }
   .h-eye { top: calc(var(--px) * 5.5); width: var(--px); height: calc(var(--px) * 1.5); background: #20123a; }
   .h-eye.l { left: calc(var(--px) * 4); }
@@ -1167,8 +1167,8 @@
   .hero-sprite.step .h-leg.r { transform: translateY(calc(var(--px) * 0.5)); }
   .hero-sprite.step .h-arm.l { transform: translateY(calc(var(--px) * 0.8)); }
   .hero-sprite.step .h-arm.r { transform: translateY(calc(var(--px) * -0.8)); }
-  /* Facing up: back of head (hair, no eyes), arms tuck in */
-  .facing-up .h-face { background: #6b3d12; box-shadow: inset 0 0 0 var(--px) #4a2a0c; }
+  /* Facing up: back of head (blond hair, no eyes), arms tuck in */
+  .facing-up .h-face { background: #d9a93f; box-shadow: inset 0 0 0 var(--px) #c9962f; }
   .facing-up .h-eye { opacity: 0; }
   /* Facing right (left = mirrored via .flip): single eye toward the front */
   .facing-right .h-eye.l { opacity: 0; }
@@ -1186,12 +1186,11 @@
     background: #1c1c2e;
     border: 2px solid #fcd800;
     color: #fcd800;
-    font-size: 0.52rem;
-    padding: 7px 10px;
-    white-space: nowrap;
-    max-width: 92vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.64rem;
+    line-height: 1.7;
+    padding: 9px 12px;
+    max-width: 88vw;
+    text-align: center;
     animation: blinkSoft 1.2s steps(2, end) infinite;
   }
   @keyframes blinkSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
@@ -1382,11 +1381,11 @@
     border: 3px solid #5c94fc;
     box-shadow: 4px 4px 0 #000;
     color: #fcfcfc;
-    font-size: 0.55rem;
-    line-height: 1.6;
-    padding: 12px 16px;
-    white-space: nowrap;
-    max-width: 92vw;
+    font-size: 0.68rem;
+    line-height: 1.8;
+    padding: 14px 18px;
+    text-align: center;
+    max-width: 88vw;
   }
 
   /* ── Easter-egg toasts (Konami / secret unlock) ──────────────────────── */
@@ -1408,9 +1407,9 @@
     animation: pop 0.3s steps(3, end);
   }
   .egg-toast.secret { border-color: #5cf0a0; }
-  .egg-toast span { font-size: 0.66rem; color: #fcd800; }
+  .egg-toast span { font-size: 0.76rem; color: #fcd800; }
   .egg-toast.secret span { color: #5cf0a0; }
-  .egg-toast small { font-size: 0.46rem; color: #fcfcfc; line-height: 1.6; }
+  .egg-toast small { font-size: 0.62rem; color: #fcfcfc; line-height: 1.7; }
   @media (prefers-reduced-motion: reduce) { .egg-toast { animation: none; } }
 
   /* ── Secret zone "hero stat sheet" ───────────────────────────────────── */

@@ -27,6 +27,7 @@ Ogni era usa un font scelto in base al contesto storico/estetico, caricato da Go
 -   **Press Start 2P** → Pixel Art (font bitmap NES per HUD, dialog box e pannelli); **Silkscreen** per le **etichette delle zone** sulla mappa (font pixel ottimizzato per la leggibilità a piccola dimensione).
 -   **Space Grotesk** → titoli/nomi di Modern Flat e Future, label della Timeline in Modern Flat.
 -   **Inter** → corpo testo di Modern Flat e Future.
+-   **Outfit** → tutta la tipografia del Glassmorphism (geometrico arioso, variable `wght 100–900` self-hostato latin-subset `/static/fonts/outfit.woff2`): la voce luminosa Big Sur/SF, distinta dall'Inter delle altre ere.
 -   **Orbitron** → titoli display futuristici (Future) e label della Timeline in Future.
 -   **Anton** → titoli display giganti del Brutalismo (nome, header sezioni, numeri).
 -   **Archivo** → corpo/sottotitoli del Brutalismo (grottesco industriale).
@@ -132,7 +133,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **Sfondo:** campo di 5 **aurora-blobs pastello** (aqua/lilla/pesca/cielo/menta) su base quasi-bianca, sfocati (`blur(70px)`) e in **drift CSS lento**, con **parallax 2D piatto** (l'intero campo scivola di pochi px verso il cursore via `--px/--py` aggiornati su `mousemove` — niente camera/prospettiva). Tutto puro CSS, zero canvas.
 -   **Vetro frosted presente e lattiginoso:** pannelli `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`, **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen speculare** bianco che segue il cursore (via action `tilt` → `::after` con `mix-blend-mode: overlay`). Molto più presente del vetro quasi invisibile del 3D.
 -   **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza → Profilo → Esperienza → Competenze/Lingue → Formazione+Certificazioni/Conferenze), arioso, scrollabile; mobile a colonna singola. Contenuti **tutti da `cv-data.ts`**, ingresso con `use:reveal` + tilt con `use:tilt`.
--   Tipografia **Inter ultralight** (nome a peso 200) — la voce SF/Big Sur, opposta all'Orbitron sci-fi del 3D. Hash `#glass`, label d'anno **"2020"**, icona 🧊, cue audio `case 'glass'` (**campanella di vetro**: arpeggio triangle E5·B5·E6 + halo sine acuto). Tutto gated da `prefers-reduced-motion` (drift dei blob, parallax e sheen disattivati; vetro e contenuti restano).
+-   Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso, variable self-hostato `~34KB`) — la voce SF/Big Sur, opposta all'Orbitron sci-fi del 3D. Hash `#glass`, label d'anno **"2020"**, icona 🧊, cue audio `case 'glass'` (**campanella di vetro**: arpeggio triangle E5·B5·E6 + halo sine acuto). Tutto gated da `prefers-reduced-motion` (drift dei blob, parallax e sheen disattivati; vetro e contenuti restano).
 
 ### 11. Il Futuro - 3D Immersivo (2026+)
 **Componente:** `src/lib/themes/ThreeD.svelte`

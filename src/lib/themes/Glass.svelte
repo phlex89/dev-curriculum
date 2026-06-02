@@ -191,7 +191,7 @@
     /* Luminous, near-white base — the airy opposite of the 3D deep-space void. */
     background: linear-gradient(135deg, #eef2fb 0%, #f4eefb 50%, #ecf6fb 100%);
     color: #2b2b3a;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   .glass-wrapper::-webkit-scrollbar { width: 0; }
@@ -342,7 +342,7 @@
   .hero h1 {
     margin: 0;
     font-size: clamp(2rem, 4.4vw, 3rem);
-    font-weight: 200; /* Inter ultralight — the airy Big Sur / SF voice */
+    font-weight: 200; /* Outfit ultralight — the airy, luminous Big Sur / SF voice */
     letter-spacing: -0.02em;
     line-height: 1.05;
     color: #20202e;

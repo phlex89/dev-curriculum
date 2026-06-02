@@ -6,12 +6,16 @@
       <stop offset="100%" stop-color="#9333ea"/>
     </linearGradient>
     <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#0f172a"/>
+      <stop offset="0%" stop-color="#f7f9fc"/>
+      <stop offset="100%" stop-color="#dbe2ec"/>
     </linearGradient>
     <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#f6c9a6"/>
       <stop offset="100%" stop-color="#eab28a"/>
+    </linearGradient>
+    <linearGradient id="hair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3d77f"/>
+      <stop offset="100%" stop-color="#d9a93f"/>
     </linearGradient>
     <clipPath id="circle"><circle cx="120" cy="120" r="120"/></clipPath>
   </defs>
@@ -22,11 +26,16 @@
     <circle cx="120" cy="118" r="92" fill="rgba(255,255,255,0.08)"/>
     <circle cx="120" cy="124" r="70" fill="rgba(255,255,255,0.07)"/>
 
-    <!-- shoulders / shirt -->
+    <!-- shoulders / sporty tee -->
     <path d="M40 240 C40 196 76 168 120 168 C164 168 200 196 200 240 Z" fill="url(#shirt)"/>
-    <path d="M120 168 C108 178 132 178 120 168 Z" fill="#0b1220"/>
-    <!-- collar -->
-    <path d="M104 172 L120 188 L136 172 L130 168 L120 176 L110 168 Z" fill="#334155"/>
+    <!-- raglan shoulder accents (athletic look) -->
+    <path d="M120 168 C104 169 91 174 81 182 L88 194 C98 186 109 182 120 181 Z" fill="#2563eb"/>
+    <path d="M120 168 C136 169 149 174 159 182 L152 194 C142 186 131 182 120 181 Z" fill="#2563eb"/>
+    <!-- side sleeve stripes -->
+    <path d="M52 224 L60 220 L66 240 L58 240 Z" fill="#2563eb" opacity="0.85"/>
+    <path d="M188 224 L180 220 L174 240 L182 240 Z" fill="#2563eb" opacity="0.85"/>
+    <!-- crew-neck ribbing -->
+    <path d="M103 170 Q120 185 137 170 L141 177 Q120 194 99 177 Z" fill="#1e4fd0"/>
 
     <!-- neck -->
     <path d="M106 150 L106 172 Q120 184 134 172 L134 150 Z" fill="#e0a079"/>
@@ -37,25 +46,32 @@
     <circle cx="74" cy="120" r="9" fill="#e3a87f"/>
     <circle cx="166" cy="120" r="9" fill="#e3a87f"/>
 
-    <!-- hair -->
-    <path d="M73 116 C68 70 100 56 120 56 C140 56 173 70 167 116 C165 100 158 92 150 90 C152 80 146 74 138 74 C150 86 140 96 126 92 C108 87 92 86 84 100 C80 106 76 110 73 116 Z" fill="#2b2b35"/>
-    <path d="M73 116 C70 96 78 84 88 80 C80 92 80 104 80 112 Z" fill="#22222c"/>
+    <!-- hair: short, messy, blond -->
+    <path d="M72 114
+             C66 76 98 54 120 54
+             C142 54 174 76 168 114
+             C163 100 155 94 147 94
+             C150 85 143 80 136 83
+             C139 73 129 70 122 77
+             C118 70 110 70 106 78
+             C100 73 92 79 95 89
+             C86 87 79 94 79 105
+             C77 99 74 105 72 114 Z" fill="url(#hair)"/>
+    <!-- messy tufts sticking up -->
+    <path d="M95 60 L100 46 L108 61 Z" fill="#e9c057"/>
+    <path d="M113 56 L120 43 L127 57 Z" fill="#f0d06e"/>
+    <path d="M131 60 L139 48 L145 63 Z" fill="#e9c057"/>
+    <!-- hair highlight + side shadow for depth -->
+    <path d="M104 66 C112 60 124 60 132 66" fill="none" stroke="#f7e3a0" stroke-width="3" stroke-linecap="round"/>
+    <path d="M79 105 C77 92 83 84 90 81 C83 92 82 100 82 110 Z" fill="#c9962f"/>
 
-    <!-- eyebrows -->
-    <path d="M96 106 Q104 101 112 105" fill="none" stroke="#3a3a44" stroke-width="3.2" stroke-linecap="round"/>
-    <path d="M128 105 Q136 101 144 106" fill="none" stroke="#3a3a44" stroke-width="3.2" stroke-linecap="round"/>
+    <!-- eyebrows (light brown to suit blond) -->
+    <path d="M96 106 Q104 101 112 105" fill="none" stroke="#bb8b3e" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M128 105 Q136 101 144 106" fill="none" stroke="#bb8b3e" stroke-width="3.2" stroke-linecap="round"/>
 
-    <!-- glasses -->
-    <g fill="none" stroke="#2b2b35" stroke-width="3">
-      <rect x="90" y="110" width="26" height="20" rx="7"/>
-      <rect x="124" y="110" width="26" height="20" rx="7"/>
-      <line x1="116" y1="119" x2="124" y2="119"/>
-      <line x1="90" y1="116" x2="80" y2="114"/>
-      <line x1="150" y1="116" x2="160" y2="114"/>
-    </g>
-    <!-- eyes -->
-    <circle cx="103" cy="120" r="3.4" fill="#2b2b35"/>
-    <circle cx="137" cy="120" r="3.4" fill="#2b2b35"/>
+    <!-- eyes (no glasses) -->
+    <circle cx="103" cy="120" r="3.6" fill="#3a2f2a"/>
+    <circle cx="137" cy="120" r="3.6" fill="#3a2f2a"/>
 
     <!-- nose + smile -->
     <path d="M120 124 L116 136 Q120 139 124 136" fill="none" stroke="#d9966e" stroke-width="2.4" stroke-linecap="round"/>

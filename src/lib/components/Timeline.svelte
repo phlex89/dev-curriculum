@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { currentTheme, type Theme } from '../store';
   import { prefetchTheme } from '../themes/registry';
 
@@ -22,9 +22,17 @@
   let tabButtons = $state<HTMLButtonElement[]>([]);
   let showHint = $state(false);
 
+  // Mobile (<=720px) swaps the full pill — which can't fit ~11 stops on a phone —
+  // for a compact stepper (◄ current ►) whose centre opens a full-list era sheet.
+  let isMobile = $state(false);
+  let sheetOpen = $state(false);
+  let sheetCloseBtn = $state<HTMLButtonElement | undefined>();
+
   const activeIndex = $derived(Math.max(0, themes.findIndex((t) => t.id === $currentTheme)));
   const fillFraction = $derived(activeIndex / (themes.length - 1));
   const activeTheme = $derived(themes[activeIndex]);
+  const atStart = $derived(activeIndex === 0);
+  const atEnd = $derived(activeIndex === themes.length - 1);
 
   onMount(() => {
     let seen = false;
@@ -37,6 +45,24 @@
       showHint = true;
       setTimeout(dismissHint, 6000);
     }
+
+    const mq = window.matchMedia('(max-width: 720px)');
+    const applyMq = () => {
+      isMobile = mq.matches;
+      if (!isMobile) sheetOpen = false; // never leave the sheet stuck open after a resize
+    };
+    applyMq();
+    mq.addEventListener('change', applyMq);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && sheetOpen) closeSheet();
+    };
+    window.addEventListener('keydown', onKey);
+
+    return () => {
+      mq.removeEventListener('change', applyMq);
+      window.removeEventListener('keydown', onKey);
+    };
   });
 
   function dismissHint() {
@@ -52,6 +78,28 @@
   function selectTheme(t: Theme) {
     dismissHint(); // first interaction dissolves the welcome hint
     currentTheme.set(t);
+  }
+
+  // Mobile stepper: step one era at a time (no wrap — the ends clamp, mirrored by
+  // the disabled arrows, so the linear time-travel never loops back unexpectedly).
+  function step(delta: number) {
+    const next = activeIndex + delta;
+    if (next < 0 || next >= themes.length) return;
+    selectTheme(themes[next].id);
+  }
+
+  async function openSheet() {
+    dismissHint();
+    sheetOpen = true;
+    await tick();
+    sheetCloseBtn?.focus();
+  }
+  function closeSheet() {
+    sheetOpen = false;
+  }
+  function selectEra(t: Theme) {
+    selectTheme(t);
+    closeSheet();
   }
 
   function handleKeydown(e: KeyboardEvent, index: number) {
@@ -86,35 +134,95 @@
       Sei in <strong>{activeTheme.year} · {activeTheme.label}</strong>. Viaggia nel tempo <span class="hint-arrow">→</span>
     </div>
   {/if}
-  <nav class="timeline-container" aria-label="Linea del tempo: scegli l'era">
-    <div class="timeline-track"></div>
-    <div class="timeline-fill"></div>
-    <ul class="timeline-stops" role="tablist" aria-orientation="horizontal">
-      {#each themes as theme, i}
-        <li class="timeline-stop" class:active="{$currentTheme === theme.id}">
-          <button
-            role="tab"
-            id="timeline-tab-{theme.id}"
-            aria-selected={$currentTheme === theme.id}
-            tabindex={$currentTheme === theme.id ? 0 : -1}
-            bind:this={tabButtons[i]}
-            onclick={() => selectTheme(theme.id)}
-            onmouseenter={() => prefetchTheme(theme.id)}
-            onfocus={() => prefetchTheme(theme.id)}
-            onkeydown={(e) => handleKeydown(e, i)}
-            aria-label="{theme.year} - {theme.label}"
-          >
-            <div class="node-pill">
-              <span class="icon">{theme.icon}</span>
-              {#if $currentTheme === theme.id}
-                <span class="label-text">{theme.year} - {theme.label}</span>
-              {/if}
-            </div>
-          </button>
-        </li>
-      {/each}
-    </ul>
-  </nav>
+  {#if isMobile}
+    <!-- Compact stepper: ◄ prev | current (opens sheet) | ► next.
+         Reuses .timeline-container / .node-pill / .timeline-stop.active so every
+         era's per-theme skin applies for free, no new per-theme CSS needed. -->
+    <div class="timeline-container timeline-stepper" role="group" aria-label="Linea del tempo: scegli l'era">
+      <button class="step-arrow" onclick={() => step(-1)} disabled={atStart} aria-label="Era precedente">
+        <span class="node-pill" aria-hidden="true">‹</span>
+      </button>
+
+      <button
+        class="step-current timeline-stop active"
+        onclick={openSheet}
+        aria-haspopup="dialog"
+        aria-expanded={sheetOpen}
+        aria-label="Era attuale: {activeTheme.year} {activeTheme.label}. Tocca per scegliere un'altra era"
+      >
+        <span class="node-pill">
+          <span class="icon">{activeTheme.icon}</span>
+          <span class="label-text">{activeTheme.year} · {activeTheme.label}</span>
+        </span>
+        <span class="step-dots" aria-hidden="true">
+          {#each themes as _theme, i (i)}
+            <span class="dot" class:on={i <= activeIndex}></span>
+          {/each}
+        </span>
+      </button>
+
+      <button class="step-arrow" onclick={() => step(1)} disabled={atEnd} aria-label="Era successiva">
+        <span class="node-pill" aria-hidden="true">›</span>
+      </button>
+    </div>
+  {:else}
+    <nav class="timeline-container" aria-label="Linea del tempo: scegli l'era">
+      <div class="timeline-track"></div>
+      <div class="timeline-fill"></div>
+      <ul class="timeline-stops" role="tablist" aria-orientation="horizontal">
+        {#each themes as theme, i}
+          <li class="timeline-stop" class:active="{$currentTheme === theme.id}">
+            <button
+              role="tab"
+              id="timeline-tab-{theme.id}"
+              aria-selected={$currentTheme === theme.id}
+              tabindex={$currentTheme === theme.id ? 0 : -1}
+              bind:this={tabButtons[i]}
+              onclick={() => selectTheme(theme.id)}
+              onmouseenter={() => prefetchTheme(theme.id)}
+              onfocus={() => prefetchTheme(theme.id)}
+              onkeydown={(e) => handleKeydown(e, i)}
+              aria-label="{theme.year} - {theme.label}"
+            >
+              <div class="node-pill">
+                <span class="icon">{theme.icon}</span>
+                {#if $currentTheme === theme.id}
+                  <span class="label-text">{theme.year} - {theme.label}</span>
+                {/if}
+              </div>
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </nav>
+  {/if}
+
+  {#if isMobile && sheetOpen}
+    <button class="era-sheet-backdrop" aria-label="Chiudi l'elenco delle ere" onclick={closeSheet}></button>
+    <div class="era-sheet timeline-container" role="dialog" aria-modal="true" aria-label="Scegli l'era">
+      <header class="era-sheet-head">
+        <span>Scegli l'era</span>
+        <button class="sheet-close" onclick={closeSheet} aria-label="Chiudi" bind:this={sheetCloseBtn}>✕</button>
+      </header>
+      <ul class="era-list">
+        {#each themes as theme}
+          <li class="timeline-stop" class:active={$currentTheme === theme.id}>
+            <button
+              class="era-row"
+              onclick={() => selectEra(theme.id)}
+              aria-current={$currentTheme === theme.id ? 'true' : undefined}
+            >
+              <span class="node-pill">
+                <span class="icon">{theme.icon}</span>
+                <span class="label-text">{theme.year} · {theme.label}</span>
+                {#if $currentTheme === theme.id}<span class="era-row-check" aria-hidden="true">✓</span>{/if}
+              </span>
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -709,5 +817,198 @@
   :global(:root) .theme-pixel .timeline-fill {
     background: #fcd800;
     box-shadow: none;
+  }
+
+  /* ===================================================================== */
+  /*  Mobile stepper + era sheet (<=720px)                                  */
+  /*  Built on the same .timeline-container / .node-pill / .timeline-stop   */
+  /*  .active hooks as the desktop pill, so every per-theme skin above      */
+  /*  applies here automatically. Only layout + dots are new.               */
+  /* ===================================================================== */
+  .timeline-stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: min(94vw, 460px);
+  }
+
+  .step-arrow,
+  .step-current {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .step-arrow {
+    flex: 0 0 auto;
+  }
+  .step-arrow .node-pill {
+    min-width: 0;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .step-arrow:disabled {
+    cursor: default;
+    opacity: 0.32;
+  }
+
+  .step-current {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-current .node-pill {
+    max-width: 100%;
+    padding: 9px 16px;
+  }
+  .step-current .label-text {
+    animation: none; /* don't replay the slide-in on every step */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .step-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    color: #555; /* dot tint; overridden for dark eras below */
+  }
+  .step-dots .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.28;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .step-dots .dot.on {
+    opacity: 0.95;
+  }
+  .step-dots .dot.on:last-of-type,
+  .step-current:focus-visible .step-dots .dot.on:last-of-type {
+    transform: scale(1.35);
+  }
+  .step-current:focus-visible .node-pill {
+    outline: 2px solid #0071e3;
+    outline-offset: 3px;
+  }
+
+  /* --- Era sheet (floating rounded card above the stepper) --- */
+  .era-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    border: none;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    animation: sheetFade 0.25s ease;
+  }
+  .era-sheet {
+    position: fixed;
+    z-index: 10000;
+    left: 50%;
+    bottom: 84px;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+    max-height: min(62vh, 470px);
+    overflow-y: auto;
+    padding: 10px;
+    color: #2b2b33; /* head/close tint; overridden for dark eras below */
+    animation: sheetUp 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .era-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px 10px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .sheet-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-size: 1.05rem;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+  .era-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .era-list .timeline-stop {
+    width: 100%;
+  }
+  .era-row {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .era-sheet .node-pill {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 11px 14px;
+  }
+  .era-row .icon {
+    font-size: 1.15rem;
+  }
+  .era-row-check {
+    margin-left: auto;
+    font-weight: 700;
+  }
+  .era-row:focus-visible .node-pill {
+    outline: 2px solid #0071e3;
+    outline-offset: 2px;
+  }
+
+  /* Dark eras: lift the dot tint + sheet head text off the dark chrome. */
+  :global(:root) .theme-terminal .step-dots,
+  :global(:root) .theme-terminal .era-sheet { color: #00ff00; }
+  :global(:root) .theme-teletext .step-dots,
+  :global(:root) .theme-teletext .era-sheet { color: #ffff00; }
+  :global(:root) .theme-pixel .step-dots,
+  :global(:root) .theme-pixel .era-sheet { color: #fcfcfc; }
+  :global(:root) .theme-threed .step-dots,
+  :global(:root) .theme-threed .era-sheet { color: #7df9ff; }
+
+  @keyframes sheetUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(22px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+  @keyframes sheetFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .era-sheet,
+    .era-sheet-backdrop { animation: none; }
+    .step-dots .dot { transition: none; }
   }
 </style>

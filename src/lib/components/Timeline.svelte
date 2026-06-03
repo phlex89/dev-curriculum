@@ -159,7 +159,7 @@
         onclick={openSheet}
         aria-haspopup="dialog"
         aria-expanded={sheetOpen}
-        aria-label="Era attuale: {activeTheme.year} {activeTheme.label}. Tocca per scegliere un'altra era"
+        aria-label="Era attuale: {activeTheme.year} · {activeTheme.label}. Tocca per scegliere un'altra era"
       >
         <span class="node-pill">
           <span class="icon">{activeTheme.icon}</span>
@@ -182,7 +182,7 @@
       <div class="timeline-fill"></div>
       <ul class="timeline-stops" role="tablist" aria-orientation="horizontal">
         {#each themes as theme, i}
-          <li class="timeline-stop" class:active="{$currentTheme === theme.id}">
+          <li class="timeline-stop" class:active="{$currentTheme === theme.id}" role="presentation">
             <button
               role="tab"
               id="timeline-tab-{theme.id}"

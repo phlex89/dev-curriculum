@@ -662,6 +662,11 @@
   @media (max-width: 500px) {
     .bento-grid { display: flex; flex-direction: column; }
     .bento-box { width: 100%; box-sizing: border-box; }
-    .theme-toggle { top: 16px; right: 16px; }
+  }
+
+  /* On mobile the global volume toggle lives top-right, so the theme toggle moves
+     to the top-left to avoid stacking the two in the same corner. */
+  @media (max-width: 720px) {
+    .theme-toggle { top: 16px; left: 16px; right: auto; }
   }
 </style>

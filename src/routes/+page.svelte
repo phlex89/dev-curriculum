@@ -4,6 +4,7 @@
   import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
   import Timeline from '$lib/components/Timeline.svelte';
+  import SeoContent from '$lib/components/SeoContent.svelte';
   import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
 
   const eraLabels: Record<string, string> = {
@@ -126,6 +127,13 @@
 </svelte:head>
 
 <main class="app-container">
+  <!-- Canonical, prerendered CV (single source of truth: cv-data.ts). Always
+       mounted and visually hidden (.sr-only): present in the static HTML for
+       crawlers and screen readers, while the eleven eras render the visible UI. -->
+  <div class="sr-only">
+    <SeoContent />
+  </div>
+
   <!-- Thin top bar while a not-yet-cached era chunk is loading. The CSS fade-in
        delay means it only ever shows for genuinely slow (uncached) navigations;
        prefetched eras swap before it would appear. -->
@@ -182,6 +190,22 @@
     height: 100vh;
     height: 100dvh; /* mobile: account for browser chrome so the Timeline stays reachable */
     position: relative;
+  }
+
+  /* Visually-hidden but crawlable/announced: the canonical CV ships in the
+     prerendered HTML for search engines and screen readers without affecting the
+     era overlay on screen. Standard sr-only clip technique (not display:none, so
+     it stays in the accessibility tree and the indexed markup). */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* Each theme fades in/out over the other for a smooth cross-dissolve */

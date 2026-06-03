@@ -87,7 +87,7 @@ const skillGroups: SkillGroup[] = [
   },
   {
     label: 'Styling & Design System',
-    items: ['Tailwind CSS', 'Vanilla-extract', 'CSS-in-JS', 'Storybook', 'Dynamic Theming']
+    items: ['Vanilla-extract', 'CSS-in-JS', 'Storybook', 'Dynamic Theming']
   },
   {
     label: 'Tooling & Architettura',
@@ -134,10 +134,10 @@ export const cvData = {
         'Ownership tecnica del frontend: riprogettazione e sviluppo di applicazioni moderne e scalabili, dalle piattaforme core ai tool di backoffice.',
       highlights: [
         'Definizione dell’architettura frontend e di un design system condiviso, con component library riutilizzabili e dynamic theming.',
-        'Migrazione di web app legacy verso uno stack moderno (React + Tailwind CSS), riducendo debito tecnico e tempi di sviluppo.',
+        'Migrazione di web app legacy verso uno stack moderno (React), riducendo debito tecnico e tempi di sviluppo.',
         'Sviluppo dell’app mobile in Flutter (BLoC) e collaborazione con team cross-funzionali lungo l’intero product lifecycle.'
       ],
-      technologies: ['Vue 3', 'TypeScript', 'Pinia', 'Nx Monorepo', 'Vanilla-extract', 'React', 'Tailwind CSS', 'Flutter']
+      technologies: ['Vue 3', 'TypeScript', 'Pinia', 'Nx Monorepo', 'Vanilla-extract', 'React', 'Flutter']
     },
     {
       title: 'Senior Front End Developer / Frontend Architect',

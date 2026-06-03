@@ -467,6 +467,6 @@
     /* WinXP: leave the top strip free for the desktop icons — sit bottom-left.
        The Timeline rides higher here (it clears the XP taskbar), so lift the
        toggle well above it. */
-    .audio-fab.theme-winxp { top: auto; bottom: 116px; left: 14px; right: auto; }
+    .audio-fab.theme-winxp { top: auto; bottom: 132px; left: 14px; right: auto; }
   }
 </style>

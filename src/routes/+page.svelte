@@ -15,8 +15,8 @@
     winxp: 'Windows XP · 2001',
     skeuo: 'Skeuomorphism · 2010',
     material: 'Material Design · 2014',
-    brutalism: 'Brutalism · 2017',
     bento: 'Modern Flat · 2015',
+    brutalism: 'Brutalism · 2017',
     glass: 'Glassmorphism · 2020',
     threed: 'Future 3D · 2026'
   };

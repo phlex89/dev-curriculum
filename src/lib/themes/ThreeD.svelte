@@ -445,7 +445,12 @@
 
   .glass-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.045);
+    /* A faint dark veil under the frost: the body text is light, so a barely-there
+       backing (not a brighter fill) is what lifts it off the luminous 3D scene
+       and keeps it readable — without losing the translucent glass look. */
+    background:
+      linear-gradient(rgba(8, 5, 26, 0.34), rgba(8, 5, 26, 0.34)),
+      rgba(255, 255, 255, 0.045);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.12);

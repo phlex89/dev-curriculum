@@ -11,8 +11,8 @@
     { id: 'winxp', label: 'Win XP', year: '2001', icon: '🪟' },
     { id: 'skeuo', label: 'Skeuomorph', year: '2010', icon: '💎' },
     { id: 'material', label: 'Material', year: '2014', icon: '📐' },
-    { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
     { id: 'bento', label: 'Modern Flat', year: '2015', icon: '📱' },
+    { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
     { id: 'glass', label: 'Glass', year: '2020', icon: '🧊' },
     { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
   ];
@@ -78,6 +78,17 @@
   function selectTheme(t: Theme) {
     dismissHint(); // first interaction dissolves the welcome hint
     currentTheme.set(t);
+  }
+
+  // After a click/tap selection we hand focus back to the page: the eras listen
+  // for keydown on `window` (Pixel Art's hero, Teletext's page numbers, …), so if
+  // the just-clicked tab keeps focus its onkeydown hijacks the arrows to step the
+  // timeline instead. Blurring lets the active era receive them. NOT called on the
+  // keyboard arrow-nav path (handleKeydown), which deliberately keeps focus on the
+  // tablist so keyboard users can keep travelling through eras.
+  function selectThemeFromPointer(t: Theme, el: HTMLElement) {
+    selectTheme(t);
+    el.blur();
   }
 
   // Mobile stepper: step one era at a time (no wrap — the ends clamp, mirrored by
@@ -178,7 +189,7 @@
               aria-selected={$currentTheme === theme.id}
               tabindex={$currentTheme === theme.id ? 0 : -1}
               bind:this={tabButtons[i]}
-              onclick={() => selectTheme(theme.id)}
+              onclick={(e) => selectThemeFromPointer(theme.id, e.currentTarget)}
               onmouseenter={() => prefetchTheme(theme.id)}
               onfocus={() => prefetchTheme(theme.id)}
               onkeydown={(e) => handleKeydown(e, i)}

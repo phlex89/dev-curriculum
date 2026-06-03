@@ -12,7 +12,7 @@ const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'mater
  *  bridges the gap between the console/terminal age and the Windows XP desktop.
  *  Glassmorphism (the luminous Big Sur / Windows 11 present) sits between Bento and
  *  the 3D future. */
-export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'];
+export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'bento', 'brutalism', 'glass', 'threed'];
 
 const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 

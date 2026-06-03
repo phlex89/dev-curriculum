@@ -1495,5 +1495,7 @@
     .hud-box { font-size: 0.5rem; }
     .panel-bar { font-size: 0.5rem; }
     .nes-panel { margin-bottom: 64px; }
+    /* The HUD stacks into a taller column here; drop the hint box clear of it. */
+    .controls-hint { top: 124px; }
   }
 </style>

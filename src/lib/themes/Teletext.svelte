@@ -700,8 +700,14 @@
     .screen.acquiring .page-body { animation: none; }
   }
 
+  /* On mobile the global volume toggle floats top-right over the blue header
+     band: anchor the broadcast to the top and clear a strip for the button. */
+  @media (max-width: 720px) {
+    .tv-room { justify-content: flex-start; padding-top: 60px; }
+    .screen { height: 56vh; }
+  }
   @media (max-width: 520px) {
-    .screen { height: 60vh; }
+    .screen { height: 54vh; }
     .status-row { font-size: 0.66em; gap: 4px; }
     .key { width: 38px; }
   }

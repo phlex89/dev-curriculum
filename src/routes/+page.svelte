@@ -455,5 +455,17 @@
       width: 38px;
       height: 38px;
     }
+
+    /* Per-era nudges: each chrome keeps its own top-of-screen furniture, so the
+       toggle steps aside to avoid covering it. */
+    /* Material: drop below the sticky 48px tab-bar so it never hides the strip. */
+    .audio-fab.theme-material { top: 58px; }
+    /* Brutalism: clear the sticky scrolling ticker pinned at the very top. */
+    .audio-fab.theme-brutalism { top: 48px; }
+    /* Web 1.0: tuck it just left of the Netscape "N" throbber in the toolbar. */
+    .audio-fab.theme-web1 { top: 30px; right: 54px; }
+    /* WinXP: leave the top strip free for the desktop icons — sit bottom-right,
+       above the Timeline stepper (and the XP taskbar). */
+    .audio-fab.theme-winxp { top: auto; bottom: 86px; right: 14px; left: auto; }
   }
 </style>

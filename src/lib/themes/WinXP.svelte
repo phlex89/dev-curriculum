@@ -1056,14 +1056,15 @@
       flex-direction: row;
       flex-wrap: wrap;
       gap: 14px 6px;
-      top: 62px; /* start a row lower so the top strip stays clear for the global volume toggle */
+      top: 10px;
       left: 10px;
       right: 10px;
     }
     .desktop-icon { width: 72px; }
 
-    /* Windows are forced maximised in markup; make the chrome touch-friendly. */
-    .window.maximized .titlebar { height: 36px; padding-right: 56px; } /* reserve room so the close [X] clears the floating volume toggle */
+    /* Windows are forced maximised in markup; make the chrome touch-friendly.
+       The volume toggle lives bottom-right on mobile, so the close [X] is free. */
+    .window.maximized .titlebar { height: 36px; }
     .win-btn { width: 28px; height: 28px; }
     .window-content { max-height: none; font-size: 14px; }
 

@@ -436,7 +436,17 @@ circolare.
 > `cv-data.ts`**. **Cue audio** (`case 'glass'`): **campanella di vetro** cristallina
 > (arpeggio triangle alto + halo sine acuto) — l'opposto del drone scuro del 3D.
 > **Tutto gated da `prefers-reduced-motion`** (drift dei blob, parallax e sheen
-> disattivati; il vetro e i contenuti restano). La scheda sotto resta come documentazione del concept.
+> disattivati; il vetro e i contenuti restano).
+>
+> **Toggle aspetto chiaro/scuro (sole/luna).** Pulsante frosted fisso in alto a destra
+> (in alto a sinistra su mobile, per non sovrapporsi al FAB audio). I colori del tema sono
+> tutti **CSS custom properties** (`--g-*`) definite su `.glass-wrapper` (valori *light*)
+> e ribaltate in blocco da `.glass-wrapper.dark`: base near-black, aurora a **toni gioiello**
+> (indaco/viola/magenta/teal/ambra) che brilla nel buio, pannelli di vetro scuro traslucido
+> con bordi-luce tenui. È **storicamente fedele** (macOS Big Sur / Windows 11 spediscono
+> entrambe le modalità) → non una seconda era, la stessa superficie illuminata dall'altro lato.
+> La scelta persiste in `localStorage` (`cv_glass_mode`), indipendente dalla selezione dell'era.
+> La scheda sotto resta come documentazione del concept.
 
 **Contesto.** Superfici di vetro traslucido sovrapposte (macOS Big Sur, Windows 11 Acrylic,
 visionOS). Profondità eterea fatta di sfocature e luce, non di materiali reali. È il

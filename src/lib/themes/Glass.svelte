@@ -10,6 +10,28 @@
   let avatarFailed = $state(false);
   let wrapper: HTMLElement;
 
+  // Light/dark mode toggle. Real glassmorphism OSes (macOS Big Sur, Windows 11,
+  // iOS) ship BOTH a light and a dark appearance, so a sun/moon switch is
+  // period-accurate — not a second era, just the same surface lit differently.
+  // The choice persists separately from the era selection.
+  const readDark = () => {
+    if (typeof localStorage === 'undefined') return false;
+    try {
+      return localStorage.getItem('cv_glass_mode') === 'dark';
+    } catch {
+      return false;
+    }
+  };
+  let dark = $state(readDark());
+  const toggleDark = () => {
+    dark = !dark;
+    try {
+      localStorage.setItem('cv_glass_mode', dark ? 'dark' : 'light');
+    } catch {
+      /* storage blocked */
+    }
+  };
+
   const prefersReduced = () =>
     typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -42,7 +64,19 @@
   });
 </script>
 
-<div class="glass-wrapper" bind:this={wrapper}>
+<div class="glass-wrapper" class:dark bind:this={wrapper}>
+  <!-- Appearance toggle (light ↔ dark), like macOS / Windows 11 ship. -->
+  <button
+    class="mode-toggle"
+    type="button"
+    onclick={toggleDark}
+    aria-pressed={dark}
+    aria-label={dark ? 'Passa all’aspetto chiaro' : 'Passa all’aspetto scuro'}
+    title={dark ? 'Aspetto chiaro' : 'Aspetto scuro'}
+  >
+    <span class="mode-icon" aria-hidden="true">{dark ? '☀' : '☾'}</span>
+  </button>
+
   <!-- Luminous animated aurora backdrop (pure CSS — the panels' frosted blur
        samples these drifting pastel blobs). -->
   <div class="aurora" aria-hidden="true">
@@ -183,19 +217,139 @@
   .glass-wrapper {
     --px: 0;
     --py: 0;
+
+    /* ── Light appearance tokens (default) ──────────────────────────────
+       Every surface/text colour below is a token so the .dark variant can
+       flip the whole era by overriding this one block. */
+    --g-bg: linear-gradient(135deg, #eef2fb 0%, #f4eefb 50%, #ecf6fb 100%);
+    --g-text: #2b2b3a;
+    --g-h1: #20202e;
+    --g-strong: #25253a;
+    --g-accent: #5b54b8;
+    --g-accent2: #6a5fd0;
+    --g-tagline: #4a4a5e;
+    --g-summary: #3a3a4c;
+    --g-muted: #6b6b80;
+    --g-meta: #8484a0;
+    --g-label: #7c74cc;
+    --g-dot: #9b8bff;
+    --g-panel-bg: rgba(255, 255, 255, 0.45);
+    --g-panel-border: rgba(255, 255, 255, 0.6);
+    --g-panel-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+      0 10px 40px rgba(31, 38, 135, 0.12);
+    --g-panel-shadow-hover:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+      0 18px 50px rgba(31, 38, 135, 0.18);
+    --g-sheen: rgba(255, 255, 255, 0.55);
+    --g-divider: rgba(124, 116, 204, 0.14);
+    --g-exp-hover: rgba(255, 255, 255, 0.4);
+    --g-chip-bg: rgba(124, 116, 255, 0.12);
+    --g-chip-border: rgba(124, 116, 255, 0.2);
+    --g-chip-text: #4f4796;
+    --g-chip-soft-bg: rgba(255, 255, 255, 0.5);
+    --g-chip-soft-border: rgba(255, 255, 255, 0.7);
+    --g-chip-soft-text: #555569;
+    --g-pill-bg: rgba(255, 255, 255, 0.5);
+    --g-pill-border: rgba(255, 255, 255, 0.7);
+    --g-pill-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 14px rgba(31, 38, 135, 0.1);
+    --g-pill-text: #3b3a52;
+    --g-pill-hover-bg: rgba(255, 255, 255, 0.72);
+    --g-avatar-inner: rgba(255, 255, 255, 0.7);
+    --g-avatar-fallback: #5b54b8;
+
     position: relative;
     width: 100vw;
     height: 100vh;
     height: 100dvh;
     overflow-y: auto;
     /* Luminous, near-white base — the airy opposite of the 3D deep-space void. */
-    background: linear-gradient(135deg, #eef2fb 0%, #f4eefb 50%, #ecf6fb 100%);
-    color: #2b2b3a;
+    background: var(--g-bg);
+    color: var(--g-text);
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.45s ease, color 0.45s ease;
+  }
+
+  /* ── Dark appearance ──────────────────────────────────────────────────
+     Same frosted-glass language, lit from the other side: a deep near-black
+     base, vivid jewel-tone aurora glowing through, dark translucent panels
+     with faint light edges. macOS/Windows 11 dark mode. */
+  .glass-wrapper.dark {
+    --g-bg: linear-gradient(135deg, #0a0c18 0%, #120f1f 50%, #0a1016 100%);
+    --g-text: #d7d7e6;
+    --g-h1: #f3f3fb;
+    --g-strong: #eef0fb;
+    --g-accent: #b3a8ff;
+    --g-accent2: #b9aeff;
+    --g-tagline: #c2c2d6;
+    --g-summary: #c8c8db;
+    --g-muted: #9a9ab4;
+    --g-meta: #8a8aa8;
+    --g-label: #a99bff;
+    --g-dot: #b9aeff;
+    --g-panel-bg: rgba(28, 28, 44, 0.45);
+    --g-panel-border: rgba(255, 255, 255, 0.12);
+    --g-panel-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 10px 40px rgba(0, 0, 0, 0.45);
+    --g-panel-shadow-hover:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 18px 50px rgba(0, 0, 0, 0.55);
+    --g-sheen: rgba(255, 255, 255, 0.22);
+    --g-divider: rgba(255, 255, 255, 0.08);
+    --g-exp-hover: rgba(255, 255, 255, 0.06);
+    --g-chip-bg: rgba(150, 140, 255, 0.18);
+    --g-chip-border: rgba(160, 150, 255, 0.3);
+    --g-chip-text: #c9c2ff;
+    --g-chip-soft-bg: rgba(255, 255, 255, 0.07);
+    --g-chip-soft-border: rgba(255, 255, 255, 0.14);
+    --g-chip-soft-text: #b9b9cf;
+    --g-pill-bg: rgba(255, 255, 255, 0.08);
+    --g-pill-border: rgba(255, 255, 255, 0.16);
+    --g-pill-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 14px rgba(0, 0, 0, 0.4);
+    --g-pill-text: #d7d7e6;
+    --g-pill-hover-bg: rgba(255, 255, 255, 0.14);
+    --g-avatar-inner: rgba(40, 40, 58, 0.7);
+    --g-avatar-fallback: #b3a8ff;
   }
   .glass-wrapper::-webkit-scrollbar { width: 0; }
   .glass-wrapper { scrollbar-width: none; }
+
+  /* ── Appearance toggle (sun/moon) — a frosted pill in the top-right corner.
+     Desktop is free here (the audio FAB lives bottom-left); on mobile it steps
+     to the top-left so it never overlaps the audio FAB. */
+  .mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background: var(--g-panel-bg);
+    border: 1px solid var(--g-panel-border);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: var(--g-pill-shadow);
+    color: var(--g-accent);
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s ease,
+      color 0.3s ease, border-color 0.3s ease;
+  }
+  .mode-toggle:hover { transform: translateY(-2px) scale(1.05); background: var(--g-pill-hover-bg); }
+  .mode-toggle:active { transform: scale(0.94); }
+  .mode-toggle:focus-visible { outline: 2px solid var(--g-accent); outline-offset: 3px; }
+  .mode-icon { display: block; }
 
   /* ── Aurora backdrop ───────────────────────────────────────────────── */
   .aurora {
@@ -226,6 +380,14 @@
   @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(4vw, -6vh) scale(1.1); } }
   @keyframes drift4 { 0%, 100% { transform: translate(0, 0) scale(0.95); } 50% { transform: translate(-6vw, -4vh) scale(1.08); } }
 
+  /* In dark mode the aurora turns to saturated jewel tones glowing out of the
+     near-black — the same drifting field, lit like a night sky. */
+  .glass-wrapper.dark .b1 { background: radial-gradient(circle, #4f7bff, transparent 70%); opacity: 0.55; }
+  .glass-wrapper.dark .b2 { background: radial-gradient(circle, #9d6bff, transparent 70%); opacity: 0.5; }
+  .glass-wrapper.dark .b3 { background: radial-gradient(circle, #ff5fa0, transparent 70%); opacity: 0.46; }
+  .glass-wrapper.dark .b4 { background: radial-gradient(circle, #2fd9c8, transparent 70%); opacity: 0.42; }
+  .glass-wrapper.dark .b5 { background: radial-gradient(circle, #ffb05f, transparent 70%); opacity: 0.36; }
+
   @media (prefers-reduced-motion: reduce) {
     .aurora { transition: none; transform: none; }
     .blob { animation: none; }
@@ -253,27 +415,21 @@
   /* ── Frosted glass panel — the hallmark: present, milky, light-edged ── */
   .panel {
     position: relative;
-    background: rgba(255, 255, 255, 0.45);
+    background: var(--g-panel-bg);
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--g-panel-border);
     border-radius: 26px;
     padding: 28px 30px;
     /* Fine top light-edge highlight + soft diffuse ambient shadow. */
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.15),
-      0 10px 40px rgba(31, 38, 135, 0.12);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    box-shadow: var(--g-panel-shadow);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background 0.45s ease, border-color 0.45s ease;
     transform-style: preserve-3d;
     overflow: hidden;
   }
   .panel:hover {
     will-change: transform;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-      0 18px 50px rgba(31, 38, 135, 0.18);
+    box-shadow: var(--g-panel-shadow-hover);
   }
 
   /* Specular sheen following the cursor (driven by the tilt action's vars). */
@@ -287,7 +443,7 @@
     transition: opacity 0.35s ease;
     background: radial-gradient(
       340px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(255, 255, 255, 0.55),
+      var(--g-sheen),
       transparent 60%
     );
     mix-blend-mode: overlay;
@@ -300,7 +456,7 @@
     font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #7c74cc;
+    color: var(--g-label);
     margin-bottom: 16px;
   }
   .label.sub { margin-top: 22px; }
@@ -329,13 +485,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--g-avatar-inner);
     object-fit: cover;
   }
   .avatar-fallback {
     font-size: 2.4rem;
     font-weight: 300;
-    color: #5b54b8;
+    color: var(--g-avatar-fallback);
     letter-spacing: 1px;
   }
   .hero-info { min-width: 0; }
@@ -345,29 +501,29 @@
     font-weight: 200; /* Outfit ultralight — the airy, luminous Big Sur / SF voice */
     letter-spacing: -0.02em;
     line-height: 1.05;
-    color: #20202e;
+    color: var(--g-h1);
   }
   .hero .role {
     margin: 8px 0 0;
     font-size: 1.05rem;
     font-weight: 500;
-    color: #5b54b8;
+    color: var(--g-accent);
   }
   .hero .tagline {
     margin: 12px 0 0;
     font-size: 0.96rem;
     font-weight: 300;
     line-height: 1.55;
-    color: #4a4a5e;
+    color: var(--g-tagline);
     max-width: 560px;
   }
   .hero .location {
     margin: 12px 0 0;
     font-size: 0.88rem;
     font-weight: 400;
-    color: #6b6b80;
+    color: var(--g-muted);
   }
-  .hero .location .dot { color: #9b8bff; }
+  .hero .location .dot { color: var(--g-dot); }
 
   .contact-pills {
     display: flex;
@@ -381,16 +537,16 @@
     gap: 8px;
     padding: 9px 16px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 14px rgba(31, 38, 135, 0.1);
-    color: #3b3a52;
+    background: var(--g-pill-bg);
+    border: 1px solid var(--g-pill-border);
+    box-shadow: var(--g-pill-shadow);
+    color: var(--g-pill-text);
     font-size: 0.86rem;
     font-weight: 500;
     text-decoration: none;
     transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background 0.25s ease;
   }
-  .pill:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.72); }
+  .pill:hover { transform: translateY(-2px); background: var(--g-pill-hover-bg); }
   .pill-icon {
     display: inline-flex;
     align-items: center;
@@ -410,7 +566,7 @@
     font-size: 1.02rem;
     font-weight: 300;
     line-height: 1.7;
-    color: #3a3a4c;
+    color: var(--g-summary);
   }
 
   /* ── Experience ────────────────────────────────────────────────────── */
@@ -421,8 +577,8 @@
     border-radius: 16px;
     transition: background 0.25s ease;
   }
-  .exp-item:not(:last-child) { border-bottom: 1px solid rgba(124, 116, 204, 0.14); }
-  .exp-item:hover { background: rgba(255, 255, 255, 0.4); }
+  .exp-item:not(:last-child) { border-bottom: 1px solid var(--g-divider); }
+  .exp-item:hover { background: var(--g-exp-hover); }
   .exp-head {
     display: flex;
     justify-content: space-between;
@@ -433,27 +589,27 @@
     margin: 0;
     font-size: 1.08rem;
     font-weight: 600;
-    color: #25253a;
+    color: var(--g-strong);
   }
   .period {
     flex: 0 0 auto;
     font-size: 0.8rem;
     font-weight: 500;
-    color: #8484a0;
+    color: var(--g-meta);
     white-space: nowrap;
   }
   .exp-role {
     margin: 3px 0 0;
     font-size: 0.92rem;
     font-weight: 500;
-    color: #6a5fd0;
+    color: var(--g-accent2);
   }
   .exp-desc {
     margin: 8px 0 0;
     font-size: 0.88rem;
     font-weight: 300;
     line-height: 1.55;
-    color: #50505f;
+    color: var(--g-tagline);
   }
   .exp-item.early { opacity: 0.92; }
 
@@ -464,15 +620,15 @@
     border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 500;
-    background: rgba(124, 116, 255, 0.12);
-    border: 1px solid rgba(124, 116, 255, 0.2);
-    color: #4f4796;
+    background: var(--g-chip-bg);
+    border: 1px solid var(--g-chip-border);
+    color: var(--g-chip-text);
     white-space: nowrap;
   }
   .chip.soft {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.7);
-    color: #555569;
+    background: var(--g-chip-soft-bg);
+    border-color: var(--g-chip-soft-border);
+    color: var(--g-chip-soft-text);
   }
 
   /* ── Skills ────────────────────────────────────────────────────────── */
@@ -481,32 +637,46 @@
     display: block;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #3a3a4c;
+    color: var(--g-summary);
     margin-bottom: 8px;
   }
 
   /* ── Languages ─────────────────────────────────────────────────────── */
   .lang-list { display: flex; flex-direction: column; gap: 14px; }
   .lang-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-  .lang-name { font-size: 1rem; font-weight: 600; color: #25253a; }
-  .lang-level { font-size: 0.84rem; font-weight: 500; color: #6a5fd0; }
-  .lang-note { display: block; margin-top: 4px; font-size: 0.78rem; font-weight: 300; color: #7a7a90; }
+  .lang-name { font-size: 1rem; font-weight: 600; color: var(--g-strong); }
+  .lang-level { font-size: 0.84rem; font-weight: 500; color: var(--g-accent2); }
+  .lang-note { display: block; margin-top: 4px; font-size: 0.78rem; font-weight: 300; color: var(--g-muted); }
 
   /* ── Education ─────────────────────────────────────────────────────── */
   .edu-item { display: flex; flex-direction: column; gap: 2px; }
   .edu-item:not(:last-of-type) { margin-bottom: 14px; }
-  .edu-item strong { font-size: 0.96rem; font-weight: 600; color: #25253a; }
-  .edu-meta { font-size: 0.82rem; font-weight: 300; color: #6b6b80; }
+  .edu-item strong { font-size: 0.96rem; font-weight: 600; color: var(--g-strong); }
+  .edu-meta { font-size: 0.82rem; font-weight: 300; color: var(--g-muted); }
 
   /* ── Talks ─────────────────────────────────────────────────────────── */
   .talk-list { display: flex; flex-direction: column; gap: 12px; }
   .talk-item { display: flex; flex-direction: column; gap: 2px; }
-  .talk-name { font-size: 0.94rem; font-weight: 600; color: #25253a; }
-  .talk-meta { font-size: 0.8rem; font-weight: 300; color: #6b6b80; }
+  .talk-name { font-size: 0.94rem; font-weight: 600; color: var(--g-strong); }
+  .talk-meta { font-size: 0.8rem; font-weight: 300; color: var(--g-muted); }
 
   @media (prefers-reduced-motion: reduce) {
-    .panel { transition: box-shadow 0.3s ease; }
+    .panel { transition: box-shadow 0.3s ease, background 0.45s ease, border-color 0.45s ease; }
     .pill { transition: background 0.25s ease; }
+    .mode-toggle { transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+  }
+
+  /* On mobile the audio FAB jumps to the top-right corner, so the appearance
+     toggle steps aside to the top-left to avoid stacking on top of it. */
+  @media (max-width: 720px) {
+    .mode-toggle {
+      top: 14px;
+      left: 14px;
+      right: auto;
+      width: 38px;
+      height: 38px;
+      font-size: 1rem;
+    }
   }
 
   /* ── Responsive ────────────────────────────────────────────────────── */

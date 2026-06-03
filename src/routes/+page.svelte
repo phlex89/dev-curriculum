@@ -164,7 +164,7 @@
 
   <!-- Soft bottom scrim: lifts the Timeline off the background so it stays legible
        even on the light-on-light eras (Material, Bento, Glass, Web 1.0). -->
-  <div class="timeline-scrim" aria-hidden="true"></div>
+  <div class="timeline-scrim theme-{$currentTheme}" aria-hidden="true"></div>
 
   <Timeline />
 </main>
@@ -277,10 +277,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: 140px;
+    height: 160px;
     z-index: 9998; /* under the Timeline (9999), over the theme layer */
     pointer-events: none;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.07) 45%, transparent 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.13) 50%, transparent 100%);
+  }
+  /* Future 3D is the worst case: the Timeline pill is near-transparent glass over
+     a busy luminous scene, so it needs a deeper scrim to read against. */
+  .timeline-scrim.theme-threed {
+    height: 190px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.66) 0%, rgba(0, 0, 0, 0.32) 45%, transparent 100%);
   }
 
   /* --- Global audio toggle (bottom-left, aligned with the Timeline) --- */

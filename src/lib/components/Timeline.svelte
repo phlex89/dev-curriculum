@@ -757,9 +757,11 @@
 
   /* --- ThreeD Theme Adaptations --- */
   :global(:root) .theme-threed .timeline-container {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(10, 8, 28, 0.62);
+    border: 1px solid rgba(125, 249, 255, 0.35);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   }
 
   :global(:root) .theme-threed .timeline-track {

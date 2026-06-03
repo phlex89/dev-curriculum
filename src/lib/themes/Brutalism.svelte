@@ -617,6 +617,8 @@
   .bru-num.acid,
   .accent-acid .bru-exp-index,
   .accent-acid .bru-skill-label { background: var(--acid); }
+  /* acid is a light yellow: keep the label text dark, not the default --paper. */
+  .accent-acid .bru-skill-label { color: var(--ink); }
   .bru-num.cobalt,
   .accent-cobalt .bru-exp-index { background: var(--cobalt); color: var(--paper); }
   .accent-cobalt .bru-skill-label { background: var(--cobalt); }

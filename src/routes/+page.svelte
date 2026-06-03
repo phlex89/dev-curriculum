@@ -455,10 +455,5 @@
       width: 38px;
       height: 38px;
     }
-    /* WinXP opens windows maximised on mobile and the close [X] sits top-right (a
-       window control we can't relocate), so here the audio toggle moves to the
-       top-left. Every other theme keeps the volume fixed top-right — themes with
-       their own top-right control move that control instead (e.g. bento's theme toggle). */
-    .audio-fab.theme-winxp { top: 14px; bottom: auto; left: 14px; right: auto; }
   }
 </style>

@@ -1056,14 +1056,14 @@
       flex-direction: row;
       flex-wrap: wrap;
       gap: 14px 6px;
-      top: 10px;
+      top: 62px; /* start a row lower so the top strip stays clear for the global volume toggle */
       left: 10px;
       right: 10px;
     }
     .desktop-icon { width: 72px; }
 
     /* Windows are forced maximised in markup; make the chrome touch-friendly. */
-    .window.maximized .titlebar { height: 36px; }
+    .window.maximized .titlebar { height: 36px; padding-right: 56px; } /* reserve room so the close [X] clears the floating volume toggle */
     .win-btn { width: 28px; height: 28px; }
     .window-content { max-height: none; font-size: 14px; }
 

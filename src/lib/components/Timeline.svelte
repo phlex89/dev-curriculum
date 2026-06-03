@@ -831,7 +831,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    width: min(100vw - 32px, 460px); /* 16px breathing room each side so it never touches the edge */
+    box-sizing: border-box; /* include the container's 16px padding, otherwise it spills to the edges */
+    width: min(100vw - 40px, 460px); /* 20px breathing room each side */
   }
 
   .step-arrow,
@@ -925,9 +926,10 @@
     left: 50%;
     bottom: 84px;
     transform: translateX(-50%);
-    width: min(100vw - 32px, 360px);
+    width: min(100vw - 40px, 360px);
     max-height: min(62vh, 470px);
     overflow-y: auto;
+    box-sizing: border-box;
     padding: 10px;
     color: #2b2b33; /* head/close tint; overridden for dark eras below */
     animation: sheetUp 0.32s cubic-bezier(0.22, 1, 0.36, 1);

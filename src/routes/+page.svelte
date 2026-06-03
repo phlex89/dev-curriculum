@@ -162,6 +162,10 @@
     <span class="audio-icon">{$audioEnabled ? '🔊' : '🔇'}</span>
   </button>
 
+  <!-- Soft bottom scrim: lifts the Timeline off the background so it stays legible
+       even on the light-on-light eras (Material, Bento, Glass, Web 1.0). -->
+  <div class="timeline-scrim" aria-hidden="true"></div>
+
   <Timeline />
 </main>
 
@@ -265,6 +269,18 @@
   @media (prefers-reduced-motion: reduce) {
     .theme-layer { transition: none; }
     .fx-overlay { display: none; }
+  }
+
+  /* --- Soft bottom scrim behind the Timeline --- */
+  .timeline-scrim {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 140px;
+    z-index: 9998; /* under the Timeline (9999), over the theme layer */
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.07) 45%, transparent 100%);
   }
 
   /* --- Global audio toggle (bottom-left, aligned with the Timeline) --- */
@@ -422,8 +438,17 @@
   .audio-fab.theme-pixel.on { background: #d82800; }
   .audio-fab.theme-pixel .audio-icon { font-size: 0.95rem; }
 
-  @media (max-width: 500px) {
-    .audio-fab { bottom: 16px; left: 16px; width: 38px; height: 38px; }
-    .audio-fab.theme-winxp { bottom: 40px; }
+  @media (max-width: 720px) {
+    /* The Timeline collapses to a full-width bottom stepper here, so the audio
+       toggle moves to the top-right corner to stop the two from overlapping. */
+    .audio-fab {
+      top: 14px;
+      right: 14px;
+      left: auto;
+      bottom: auto;
+      width: 38px;
+      height: 38px;
+    }
+    .audio-fab.theme-winxp { top: 14px; bottom: auto; }
   }
 </style>

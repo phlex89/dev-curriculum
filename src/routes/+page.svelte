@@ -455,6 +455,8 @@
       width: 38px;
       height: 38px;
     }
-    .audio-fab.theme-winxp { top: 14px; bottom: auto; }
+    /* WinXP opens windows maximised on mobile; the close [X] sits top-right, so
+       keep that corner clear and move the audio toggle to the top-left instead. */
+    .audio-fab.theme-winxp { top: 14px; bottom: auto; left: 14px; right: auto; }
   }
 </style>

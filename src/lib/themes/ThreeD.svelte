@@ -523,4 +523,34 @@
     .ui-layer { grid-template-columns: 1fr; }
     .about-card, .exp-card { grid-column: 1 / -1; }
   }
+
+  /* Phones: reclaim the wide side gutters and give the cramped panels room, then
+     stack each experience row so the description gets the full width — the period
+     moves to the top as a small label instead of squeezing the text from the right. */
+  @media (max-width: 640px) {
+    .ui-layer {
+      padding: 16px;
+      padding-bottom: 96px;
+      gap: 16px;
+    }
+    .glass-card {
+      padding: 20px;
+      border-radius: 18px;
+    }
+    h1 { font-size: 2.1rem; }
+
+    .exp-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 14px;
+    }
+    .exp-year {
+      order: -1;
+      margin-left: 0;
+      padding-left: 15px;
+      font-size: 0.78rem;
+      color: #a5b4fc;
+    }
+  }
 </style>

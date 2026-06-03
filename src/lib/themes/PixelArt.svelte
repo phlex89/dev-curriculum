@@ -323,16 +323,20 @@
     if (fresh) openZone(fresh);
   }
 
-  function onKeyDown(e: KeyboardEvent) {
-    const k = e.key.toLowerCase();
-
-    // Konami code (↑↑↓↓←→←→ B A) — tracked regardless of dialog state.
-    konamiBuf.push(k);
+  // Konami code (↑↑↓↓←→←→ B A). Fed from BOTH the keyboard and the touch pad,
+  // so the easter egg is reachable on mobile (D-pad directions + B + A).
+  function feedKonami(token: string) {
+    konamiBuf.push(token);
     if (konamiBuf.length > KONAMI.length) konamiBuf.shift();
     if (konamiBuf.length === KONAMI.length && konamiBuf.every((v, i) => v === KONAMI[i])) {
       triggerKonami();
       konamiBuf = [];
     }
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    const k = e.key.toLowerCase();
+    feedKonami(k); // tracked regardless of dialog state
 
     // Escape always closes; Enter advances the typewriter first, then closes
     // (classic NES dialog feel).
@@ -415,6 +419,7 @@
     if (blockingOverlay()) return;
     dismissHint();
     pokeIdle();
+    feedKonami('arrow' + dir); // up/down/left/right → arrowup/… for the mobile Konami
     if (!held.has(dir)) {
       held.add(dir);
       order.push(dir);
@@ -423,6 +428,35 @@
     startStepping();
   }
   const dpadUp = (dir: Facing) => held.delete(dir);
+
+  // ── A / B action buttons (touch, Game Boy style) ──────────────────────────
+  // A = confirm/interact: advance then close the dialog (like Enter), cast the
+  // fishing line when facing water, or open the zone you're standing next to.
+  // B = back: close the open dialog or the directory (like Escape).
+  function pressA() {
+    feedKonami('a');
+    dismissHint();
+    if (activeZone) {
+      if (currentZone && typed !== currentZone.intro) skipType = true;
+      else closeZone();
+      return;
+    }
+    if (directoryOpen || showQuest) return;
+    if (facingWater) {
+      tryFish();
+      return;
+    }
+    const adj = visibleZones.find((z) => Math.abs(z.x - hero.x) + Math.abs(z.y - hero.y) === 1);
+    if (adj) openZone(adj.id);
+  }
+  function pressB() {
+    feedKonami('b');
+    if (activeZone) {
+      closeZone();
+      return;
+    }
+    if (directoryOpen) directoryOpen = false;
+  }
 
   // ── Zone panels ─────────────────────────────────────────────────────────
   const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -593,12 +627,18 @@
         <div class="fish-toast" role="status">{fishMsg}</div>
       {/if}
 
-      <!-- Touch D-pad -->
+      <!-- Touch D-pad (left) -->
       <div class="dpad" aria-hidden="true">
         <button class="d up" onpointerdown={() => dpadDown('up')} onpointerup={() => dpadUp('up')} onpointerleave={() => dpadUp('up')}>▲</button>
         <button class="d left" onpointerdown={() => dpadDown('left')} onpointerup={() => dpadUp('left')} onpointerleave={() => dpadUp('left')}>◄</button>
         <button class="d right" onpointerdown={() => dpadDown('right')} onpointerup={() => dpadUp('right')} onpointerleave={() => dpadUp('right')}>►</button>
         <button class="d down" onpointerdown={() => dpadDown('down')} onpointerup={() => dpadUp('down')} onpointerleave={() => dpadUp('down')}>▼</button>
+      </div>
+
+      <!-- A / B action buttons (right) -->
+      <div class="ab-pad" aria-hidden="true">
+        <button class="ab b" onpointerdown={pressB}>B</button>
+        <button class="ab a" onpointerdown={pressA}>A</button>
       </div>
     </div>
   {:else}
@@ -1199,8 +1239,8 @@
   /* ── Touch D-pad ─────────────────────────────────────────────────────── */
   .dpad {
     position: absolute;
-    right: 18px;
-    bottom: 88px;
+    left: 16px;
+    bottom: 96px;
     z-index: 58;
     display: grid;
     grid-template-columns: repeat(3, 38px);
@@ -1223,8 +1263,40 @@
   .dpad .left { grid-area: 2 / 1; }
   .dpad .right { grid-area: 2 / 3; }
   .dpad .down { grid-area: 3 / 2; }
-  /* Mouse/desktop users have the keyboard; hide the D-pad unless touch. */
-  @media (hover: hover) and (pointer: fine) { .dpad { display: none; } }
+
+  /* ── A / B action buttons (Game Boy style, right side) ───────────────── */
+  .ab-pad {
+    position: absolute;
+    right: 16px;
+    bottom: 96px;
+    z-index: 85; /* above the dialog .overlay (70) so A/B can drive the text */
+    display: grid;
+    grid-template-columns: repeat(2, 52px);
+    grid-template-rows: repeat(2, 52px);
+    gap: 4px;
+  }
+  .ab-pad .ab {
+    border-radius: 50%;
+    border: 3px solid #fcfcfc;
+    background: #d82800;
+    color: #fcfcfc;
+    box-shadow: 2px 2px 0 #000;
+    font-family: inherit;
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ab-pad .ab:active { background: #1c1c2e; transform: translate(1px, 1px); box-shadow: 1px 1px 0 #000; }
+  .ab-pad .a { grid-area: 1 / 2; } /* A: upper-right */
+  .ab-pad .b { grid-area: 2 / 1; } /* B: lower-left  */
+
+  /* Mouse/desktop users have the keyboard; hide the touch controls unless touch. */
+  @media (hover: hover) and (pointer: fine) { .dpad, .ab-pad { display: none; } }
 
   /* ── Static reduced-motion village ───────────────────────────────────── */
   .static-village { position: absolute; inset: 0; padding: 80px 20px 110px; overflow-y: auto; box-sizing: border-box; }

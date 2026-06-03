@@ -360,6 +360,7 @@
     align-self: flex-start;
     width: 100%;
     max-width: 560px;
+    box-sizing: border-box; /* keep the 30px padding inside the width so the pad never sticks past the desk margin on mobile */
     padding: 26px 30px 30px;
     border-radius: 3px;
     color: #2f2a22;

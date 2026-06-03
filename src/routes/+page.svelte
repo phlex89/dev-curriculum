@@ -464,8 +464,9 @@
     .audio-fab.theme-brutalism { top: 48px; }
     /* Web 1.0: tuck it just left of the Netscape "N" throbber in the toolbar. */
     .audio-fab.theme-web1 { top: 30px; right: 54px; }
-    /* WinXP: leave the top strip free for the desktop icons — sit bottom-right,
-       above the Timeline stepper (and the XP taskbar). */
-    .audio-fab.theme-winxp { top: auto; bottom: 86px; right: 14px; left: auto; }
+    /* WinXP: leave the top strip free for the desktop icons — sit bottom-left.
+       The Timeline rides higher here (it clears the XP taskbar), so lift the
+       toggle well above it. */
+    .audio-fab.theme-winxp { top: auto; bottom: 116px; left: 14px; right: auto; }
   }
 </style>

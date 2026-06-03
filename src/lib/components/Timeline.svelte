@@ -976,6 +976,7 @@
   }
   .era-sheet .node-pill {
     width: 100%;
+    box-sizing: border-box; /* keep padding inside the 100% so rows don't overflow */
     justify-content: flex-start;
     gap: 12px;
     padding: 11px 14px;

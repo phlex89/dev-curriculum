@@ -831,7 +831,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    width: min(94vw, 460px);
+    width: min(100vw - 32px, 460px); /* 16px breathing room each side so it never touches the edge */
   }
 
   .step-arrow,
@@ -925,7 +925,7 @@
     left: 50%;
     bottom: 84px;
     transform: translateX(-50%);
-    width: min(92vw, 360px);
+    width: min(100vw - 32px, 360px);
     max-height: min(62vh, 470px);
     overflow-y: auto;
     padding: 10px;

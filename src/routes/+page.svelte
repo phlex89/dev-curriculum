@@ -456,7 +456,9 @@
       height: 38px;
     }
     /* WinXP opens windows maximised on mobile; the close [X] sits top-right, so
-       keep that corner clear and move the audio toggle to the top-left instead. */
-    .audio-fab.theme-winxp { top: 14px; bottom: auto; left: 14px; right: auto; }
+       keep that corner clear and move the audio toggle to the top-left instead.
+       Modern Flat (bento) has its dark/light theme toggle top-right — same fix. */
+    .audio-fab.theme-winxp,
+    .audio-fab.theme-bento { top: 14px; bottom: auto; left: 14px; right: auto; }
   }
 </style>

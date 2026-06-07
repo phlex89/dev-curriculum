@@ -17,6 +17,7 @@
     material: 'Material Design · 2014',
     bento: 'Modern Flat · 2015',
     brutalism: 'Brutalism · 2017',
+    parallax: 'Parallax · 2018',
     glass: 'Glassmorphism · 2020',
     threed: 'Future 3D · 2026'
   };
@@ -113,7 +114,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -452,6 +453,22 @@
     background: rgba(124, 116, 255, 0.42);
     border-color: rgba(255, 255, 255, 0.8);
     color: #fff;
+  }
+
+  /* Parallax: warm cream pill with an olive accent when active — matches the
+     editorial light palette of the era (no neon, no heavy blur). */
+  .audio-fab.theme-parallax {
+    background: rgba(243, 239, 231, 0.85);
+    border: 1px solid rgba(40, 38, 34, 0.16);
+    color: #6b6a4b;
+    box-shadow: 0 10px 30px rgba(40, 38, 34, 0.12);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  .audio-fab.theme-parallax.on {
+    background: #6b6a4b;
+    border-color: #6b6a4b;
+    color: #f3efe7;
   }
 
   /* Pixel-art: chunky NES dialog-box chrome, hard pixel shadow, no blur. */

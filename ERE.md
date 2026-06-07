@@ -39,8 +39,9 @@
 | 12 | Y2K / Chrome & Plastica translucida | 1999–2003 | ⬜ Proposta (valutata) | — (da creare) |
 | 13 | Teletext / Televideo (Mode 7) | anni '70 – 2000 | ✅ Implementato | `Teletext.svelte` |
 | 14 | Neumorphism / Soft UI | 2020 | ⬜ Proposta (valutata) | — (da creare) |
+| 15 | Parallax / Immersive Scroll | ~2018–oggi (apice premium) | ✅ Implementata | `Parallax.svelte` (`'parallax'`, `#parallax`) |
 
-> Le proposte **§12–§14** sono state *valutate* (giu 2026) come prossimi candidati
+> Le proposte **§12–§15** sono state *valutate* (giu 2026) come prossimi candidati
 > memorabili: ognuna ha contesto, stile e rischio-sovrapposizione documentati. Le idee a
 > più basso valore o più a rischio di sovrapposizione (Frutiger Aero, Vaporwave, PS1
 > low-poly, Amiga, Mac Classic) restano in **"Idee oltre la lista"** come spunti/easter-egg.
@@ -57,7 +58,11 @@
 > `threed`** come "presente luminoso" (Big Sur / Windows 11) — nettamente distinto dal
 > 3D dal contrasto **luce/buio**. L'unico candidato residuo per future espansioni è
 > l'**era AI / conversazionale** (§11), unica vera *nuova frontiera narrativa* oltre il
-> 3D — andrebbe **in coda a `ERA_ORDER`**, dopo `threed`.
+> 3D — andrebbe **in coda a `ERA_ORDER`**, dopo `threed`. Il **Parallax / Immersive
+> Scroll** (§15) è invece l'estetica **premium contemporanea** del *craft web* (smooth-scroll
+> + parallax raffinato, stile synthesis.capital / tresmarescapital): collocazione **tra
+> `brutalism` e `bento`** (la corrente "immersive/cinematografica" emersa accanto al
+> consolidamento modulare del Bento).
 
 ---
 
@@ -709,6 +714,140 @@ Cue audio: "tap" morbido e ovattato. Font: Inter (già self-hostato) — **nessu
 
 ---
 
+## 15. Parallax / Immersive Scroll — ✅ Implementata
+**Il web premium contemporaneo (apice ~2018–oggi)** · `src/lib/themes/Parallax.svelte` · chiave `'parallax'` · hash `#parallax` · in `ERA_ORDER` tra `brutalism` e `glass` · label "2018", icona 🎬
+
+> **Stato.** ✅ **Implementata** (giu 2026). Componente `Parallax.svelte`, smooth-scroll **Lenis**
+> lazy (~3KB, unico runtime dep oltre Three), serif display **Fraunces** self-hostato/subsettato
+> (`fonts.css` + `/static/fonts/fraunces.woff2`, ~67KB, variabile opsz/wght). La realizzazione
+> combacia con la spec qui sotto, che resta come riferimento di design. È l'era in cui il sito
+> smette di essere una *pagina* e diventa un'**esperienza cinematografica da scrollare**: lo
+> **scroll (manuale o automatico) è il regista**, i contenuti compaiono **gradualmente** con
+> animazioni curatissime, e tutto si muove in **parallax rispetto allo sfondo**. È l'estetica
+> del *craft web* premium da agenzia/Awwwards. **L'estetica è il protagonista; i contenuti
+> passano deliberatamente in secondo piano** (sottoinsieme ridotto rispetto alle altre ere).
+>
+> **Riferimenti estetici scelti da Stefano:** [synthesis.capital](https://www.synthesis.capital/)
+> (chiaro/crema, editoriale, calmo) · [tresmarescapital.com](https://www.tresmarescapital.com/en/)
+> (scuro/cinematografico). Comune denominatore: **smooth-scroll con inerzia**, tipografia
+> enorme, **spazio negativo abbondante**, palette sofisticata e desaturata, reveal del testo
+> **riga-per-riga con maschera**, immagini full-bleed che scorrono più lente del testo
+> (parallax), micro-grana, eleganza e lentezza.
+>
+> ⚠️ **Nota sul nome.** "Parallax" qui ≠ il micro-effetto di parallax-verso-il-cursore già
+> usato come *dettaglio* in **Glass** (§9) e **3D** (§10). Là il driver è il **puntatore**; qui
+> è lo **scroll**, e il movimento è l'intera regia della pagina, non un tocco di profondità.
+>
+> **Decisioni confermate (giu 2026):** palette **chiara editoriale** (alla Synthesis) · tipografia
+> **serif display ad alto contrasto** + corpo sans · `ERA_ORDER` **tra `brutalism` e `glass`** ·
+> smooth-scroll **Lenis** (~3KB, lazy).
+
+**Principio guida.** *Aesthetic-first.* La **coreografia dello scroll è il design**. Ogni
+sezione è messa in scena (entra, si compone, esce) con tempi lunghi ed easing morbidi; il testo
+è ridotto all'osso e usato anche come **elemento grafico** (display giganti, kicker spaziati).
+
+**Il sistema di movimento (il cuore dell'era).**
+- **Smooth-scroll con inerzia** (lerp/lerp-momentum): lo scroll non è secco ma fluido e pesato
+  — è la *firma* tattile di questi siti. *(Implementazione → sezione tecnica.)*
+- **Parallax multi-piano sullo sfondo:** ogni scena ha 2–4 piani (sfondo / mid / contenuto /
+  decoro in primo piano) che traslano a **velocità diverse** in funzione di `scrollY`. Lo sfondo
+  scorre più lento, il decoro in primo piano più veloce → profondità reale.
+- **Reveal choreography (comparsa graduale):** titoli che salgono **riga per riga da dietro una
+  maschera** (`clip-path`/overflow), immagini con **clip/scale-reveal**, blocchi con
+  fade+`translateY` **staggered**, tutto su easing lenti (`cubic-bezier` morbidi, 0.8–1.4s).
+- **Sezioni *pinned* (sticky):** alcune scene si "bloccano" mentre il contenuto interno avanza
+  (es. un **momento a scorrimento orizzontale**, una sequenza che cambia, **contatori animati**).
+- **Auto-scroll cinematografico (opzionale):** una modalità "▶ Play" che fa **scorrere
+  automaticamente** il viaggio a velocità dolce (pausabile al primo input dell'utente / hover) —
+  copre il "sia manuale che automatico". Disattiva sotto `prefers-reduced-motion`.
+- **Indicatori:** barra/righello di **progresso scroll**, **indice di sezione** a puntini
+  (cliccabili → scroll fluido alla scena: doppio binario, nessun vicolo cieco).
+- **Micro-interazioni:** **cursore custom** (dot che segue con lag + si ingrandisce sui link),
+  **bottoni magnetici**, hover che svela immagini/dettagli, linee che si "disegnano" allo scroll.
+
+**Sistema visivo.**
+- **Palette — chiara editoriale** (scelta, stile Synthesis): base **off-white/crema `#f3efe7`**,
+  testo **near-black `#111`**, **un solo accento** naturale desaturato (salvia/oliva/terracotta).
+  Mood calmo, arioso, luminoso; le scene variano per *tono* (crema più caldo/più freddo, sezioni
+  a fondo leggermente più scuro per stacco) ma restano nella **famiglia chiara** — nessuna
+  inversione su sfondo scuro.
+- **Tipografia — serif display ad alto contrasto** (scelta): un **serif di lusso** (tipo
+  Canela/Ogg) per gli **statement giganti**, **corpo in sans pulito** piccolo, **kicker maiuscoli
+  a tracking largo**. È **l'era in cui un webfont caratteriale si giustifica** (come Bedstead per
+  il Teletext): la tipografia *è* l'estetica — il serif display va **self-hostato/subsettato**
+  (`fonts.css` + `/static/fonts/`); il sans può **riusare un family già presente** (Inter/Outfit)
+  per non aggiungere un secondo webfont.
+- **Immagini → solo asset originali (regola del progetto):** niente stock. Al posto delle foto
+  full-bleed dei riferimenti, **campi visivi generati in CSS/SVG**: **gradient-mesh** ampi e
+  desaturati in drift lento, **grana/noise** sottile in overlay, **forme geometriche** (un motivo
+  ricorrente, es. cerchio/ottagono come quello di Synthesis), **linee/righelli sottili**,
+  **particelle/orbi** sfocati a bassa opacità. L'**avatar** può comparire come ritratto trattato
+  (duotone/grana) in una scena dedicata.
+- **Spazio negativo** dominante, **grana** filmica costante, ombre lunghissime e morbide.
+
+**Lo storyboard dello scroll (tappa per tappa, decoro + contenuto).**
+1. **Apertura / hero (`100dvh`):** sfondo gradient-mesh + grana che driftano lenti; **statement
+   gigante** che monta riga-per-riga (nome + una frase-manifesto, es. ruolo come *claim*);
+   kicker maiuscolo, **hint "Scroll"** animato in basso. *Decorativi:* forma geometrica in
+   parallax, cursore custom. *Utili:* nome, ruolo/tagline.
+2. **Manifesto / profilo:** 1–2 frasi brevi (estratto di `summary`) in tipografia grande, parole
+   chiave **evidenziate**; lo sfondo cambia tono (inizio dell'arco luce/buio). *Decorativi:*
+   linea che si disegna allo scroll, numero di sezione oversize (`01`).
+3. **Esperienza (ridotta, editoriale):** **3–4 ruoli-chiave** come grandi voci "index"
+   (azienda · ruolo · anni) che si rivelano in stagger; hover → micro-dettaglio. **Niente elenco
+   puntato completo.** *Decorativi:* immagini astratte in parallax accanto a ogni voce.
+4. **Momento *pinned* — numeri:** sezione che si blocca mentre **contatori animati** salgono
+   (anni di esperienza, progetti, tecnologie — derivati da `cv-data.ts`, sul modello "$300M AUM"
+   dei riferimenti). *Decorativi:* sfondo che cambia, forme orbitanti.
+5. **Competenze — cinetiche:** **marquee/keyword wall** delle skill che scorre in parallax (non
+   l'elenco esaustivo), eventualmente raggruppate per `skillGroups`. *Decorativi:* righe a
+   velocità alternate.
+6. **Ritratto / scena avatar (opzionale):** l'avatar trattato (duotone+grana) full-bleed con
+   parallax e una citazione breve.
+7. **Chiusura — CTA contatti (`100dvh`):** statement finale + **bottoni magnetici** (Email/
+   LinkedIn/Sito da `cv-data.ts`), sfondo che si ricompone. *Utili:* contatti reali + download CV.
+
+**Contenuti (ridotti — scelta progettuale, come da indicazione).** Si mostra un **sottoinsieme
+curato**: nome/ruolo, una frase-manifesto, **3–4 esperienze di punta** (senza bullet completi),
+un pugno di **numeri-chiave**, le **skill come keyword-wall**, i **contatti**. Formazione/
+certificazioni/conferenze/lingue **non** entrano nel flusso (restano integralmente nelle altre
+ere e nel fallback). La **fonte resta `cv-data.ts`** — si *seleziona*, non si riscrive né si
+inventa.
+
+**Tecnica (come realizzata).**
+- **Smooth-scroll — Lenis (~3KB)** (scelta): lo standard de-facto di questi siti per l'inerzia
+  impeccabile; sarebbe **l'unica dipendenza runtime** del progetto, da importare **lazy** solo
+  entrando nell'era (come Three nel 3D) e **disattivare** sotto `prefers-reduced-motion`. (No
+  GSAP/ScrollMagic pesanti.)
+- **Reveal/parallax:** **scroll-driven animations native** (`animation-timeline: scroll()` /
+  `view()`) dove supportate, con **fallback `IntersectionObserver`** + `transform: translate3d`
+  rAF-throttled. `will-change: transform`, composizione GPU, animazioni solo in-view.
+- **Perf:** lazy del tema (già code-split via `registry.ts`), grana come tile leggera, mesh in
+  CSS (no canvas pesante).
+
+**Doppio binario / `prefers-reduced-motion` (risoluzione del difetto d'epoca).** Il parallax/
+auto-scroll è il re della **motion-sickness**: sotto `prefers-reduced-motion` (o toggle "✶ Riduci
+movimento") si disattivano inerzia, parallax, auto-scroll e reveal animati → la pagina diventa un
+**scroll verticale statico** a colonna, elegante, con comparse a sola opacità (o istantanee).
+Contenuti **sempre** integri e raggiungibili. Onestà UX (stesso spirito di Neumorphism/contrasto).
+
+**Audio** (`case 'parallax'`): **swell aereo** ascendente / pad ambient soffuso (≠ campanella
+cristallina del Glass, ≠ drone scuro del 3D).
+
+**Differenziazione / rischio.** **Medio-alto** (sta nel cluster moderno). Da **Glass/3D**: là il
+parallax è micro-effetto **verso il cursore**; qui è **regia guidata dallo scroll**, **senza
+WebGL**, full-bleed e cinematografica. Da **Bento**: Bento = **griglia modulare tutta visibile**;
+qui = **viaggio lineare** in cui i contenuti **compaiono a poco a poco** e il movimento *è* il
+contenuto. Da **Material**: là il moto è *funzionale* (ripple/elevazione); qui è *espressivo*
+(reveal cinematografici). Da differenziare con cura nel testo, nella palette e nel cue audio.
+
+**Identificatori tecnici (realizzati).** `Theme` key `'parallax'` · `src/lib/themes/Parallax.svelte` ·
+hash `#parallax` · `ERA_ORDER` **tra `brutalism` e `glass`** · label d'anno **"2018"**, icona 🎬 ·
+dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
+`+page.svelte` / `audio.ts` / `Timeline.svelte`. Contenuti **selezionati da `cv-data.ts`**.
+
+---
+
 ## Idee oltre la lista (timeline futura)
 
 Spunti **a più basso valore narrativo** o **a maggior rischio di sovrapposizione** con le ere già
@@ -750,6 +889,12 @@ implementate: ottimi come *variante* o *easter egg*, non (ancora) come ere auton
    numero di pagina, bonus identitario 🇮🇹. Lineage parallela, rischio-sovrapposizione bassissimo.
 9. **Neumorphism / Soft UI** (§14) — 🥉 *wink da designer*: il trend-meteora 2020, con l'autoironia
    sull'accessibilità come personalità. Adiacente a `glass`; distinguere bene da Glass/Material.
+10. ~~**Parallax / Immersive Scroll**~~ (§15) — ✅ **implementato** (`Parallax.svelte`): il *craft web* premium contemporaneo (smooth-scroll +
+    parallax raffinato, stile synthesis.capital / tresmarescapital). **Estetica-first, contenuti
+    ridotti**; la coreografia dello scroll *è* il design. Collocata **tra `brutalism` e `glass`**;
+    palette chiara editoriale, serif display di lusso, smooth-scroll **Lenis** (~3KB, lazy).
+    **Caveat:** distinguere dal parallax-verso-il-cursore di Glass/3D e gestire la
+    motion-sickness col doppio binario `prefers-reduced-motion`.
 
 > **Da maneggiare con cautela (vedi "Idee oltre la lista"):** Frutiger Aero (sovrappone Skeuo/Glass),
 > Vaporwave (estetica/meme, neon come il 3D) e PS1 low-poly (re-introduce WebGL a ridosso del Futuro)

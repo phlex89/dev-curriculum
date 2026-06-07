@@ -13,6 +13,7 @@
     { id: 'material', label: 'Material', year: '2014', icon: '📐' },
     { id: 'bento', label: 'Modern Flat', year: '2015', icon: '📱' },
     { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
+    { id: 'parallax', label: 'Parallax', year: '2018', icon: '🎬' },
     { id: 'glass', label: 'Glass', year: '2020', icon: '🧊' },
     { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
   ];
@@ -468,6 +469,39 @@
   :global(:root) .theme-terminal .label-text {
     font-family: 'Courier New', Courier, monospace;
     font-weight: normal;
+  }
+
+  /* --- Parallax / Immersive Scroll Theme Adaptations (cream editorial) --- */
+  :global(:root) .theme-parallax .timeline-container {
+    background: rgba(243, 239, 231, 0.82);
+    border: 1px solid rgba(40, 38, 34, 0.14);
+    border-radius: 40px;
+    box-shadow: 0 10px 30px rgba(40, 38, 34, 0.12);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+  :global(:root) .theme-parallax .timeline-track {
+    background: rgba(40, 38, 34, 0.1);
+  }
+  :global(:root) .theme-parallax .timeline-fill {
+    background: linear-gradient(90deg, #8a8a5e, #b08968);
+  }
+  :global(:root) .theme-parallax .node-pill {
+    background: rgba(40, 38, 34, 0.06);
+    color: #2b2824;
+    border-radius: 30px;
+  }
+  :global(:root) .theme-parallax .timeline-stop:hover .node-pill {
+    background: rgba(40, 38, 34, 0.12);
+  }
+  :global(:root) .theme-parallax .timeline-stop.active .node-pill {
+    background: #6b6a4b;
+    color: #f3efe7;
+    box-shadow: 0 4px 15px rgba(107, 106, 75, 0.4);
+  }
+  :global(:root) .theme-parallax .label-text {
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   /* --- Teletext / Televideo Theme Adaptations (8-colour blocks on black) --- */

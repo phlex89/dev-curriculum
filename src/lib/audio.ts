@@ -218,6 +218,15 @@ export function playEra(theme: Theme) {
       tone(c, master, { freq: 1975.53, type: 'sine', start: 0.16, dur: 0.6, gain: 0.03 }); // high shimmer halo
       break;
     }
+    case 'parallax': {
+      // Airy cinematic swell — a soft pad that rises and opens, breathy and calm.
+      // Distinct from glass's crystalline chime and threed's dark drone: warm,
+      // editorial, premium. Slow ascending sines/triangle that bloom together.
+      tone(c, master, { freq: 261.63, type: 'sine', dur: 0.95, gain: 0.06, slideTo: 392.0 }); // C4 → G4
+      tone(c, master, { freq: 392.0, type: 'triangle', start: 0.14, dur: 0.85, gain: 0.05, slideTo: 523.25 }); // G4 → C5
+      tone(c, master, { freq: 783.99, type: 'sine', start: 0.3, dur: 0.7, gain: 0.025, slideTo: 1046.5 }); // airy top sheen
+      break;
+    }
     case 'threed': {
       // Suspended sci-fi swell — a low detuned drone that rises.
       tone(c, master, { freq: 110, type: 'sawtooth', dur: 0.7, gain: 0.05, slideTo: 220 });

@@ -118,3 +118,47 @@ export function reveal(node: HTMLElement, options: RevealOptions = {}) {
     }
   };
 }
+
+interface MagneticOptions {
+  /** How strongly the element is pulled toward the cursor (0–1). */
+  strength?: number;
+}
+
+/**
+ * Magnetic hover: the element eases toward the cursor while hovered, then springs
+ * back on leave. Used by the Parallax era's contact buttons. No-op under reduced
+ * motion (and harmless on touch, where mousemove never fires).
+ */
+export function magnetic(node: HTMLElement, options: MagneticOptions = {}) {
+  let { strength = 0.4 } = options;
+  if (prefersReducedMotion()) return {};
+
+  let raf = 0;
+  function onMove(e: MouseEvent) {
+    const r = node.getBoundingClientRect();
+    const mx = e.clientX - (r.left + r.width / 2);
+    const my = e.clientY - (r.top + r.height / 2);
+    if (raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      node.style.transform = `translate(${(mx * strength).toFixed(1)}px, ${(my * strength).toFixed(1)}px)`;
+    });
+  }
+  function onLeave() {
+    if (raf) cancelAnimationFrame(raf);
+    node.style.transform = '';
+  }
+
+  node.addEventListener('mousemove', onMove);
+  node.addEventListener('mouseleave', onLeave);
+
+  return {
+    update(next: MagneticOptions) {
+      strength = next.strength ?? 0.4;
+    },
+    destroy() {
+      node.removeEventListener('mousemove', onMove);
+      node.removeEventListener('mouseleave', onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    }
+  };
+}

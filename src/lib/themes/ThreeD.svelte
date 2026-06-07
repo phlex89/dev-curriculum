@@ -449,8 +449,8 @@
        backing (not a brighter fill) is what lifts it off the luminous 3D scene
        and keeps it readable — without losing the translucent glass look. */
     background:
-      linear-gradient(rgba(8, 5, 26, 0.62), rgba(8, 5, 26, 0.62)),
-      rgba(255, 255, 255, 0.05);
+      linear-gradient(rgba(8, 5, 26, 0.82), rgba(8, 5, 26, 0.82)),
+      rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.12);

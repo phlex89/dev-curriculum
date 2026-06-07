@@ -47,7 +47,10 @@ export function tilt(node: HTMLElement, options: TiltOptions = {}) {
   function onLeave() {
     node.style.setProperty('--spot', '0');
     if (!reduce && opts.max > 0) {
-      node.style.transform = `perspective(${opts.perspective}px) rotateX(0deg) rotateY(0deg) scale(1)`;
+      // Clear the inline transform entirely (don't leave a lingering perspective):
+      // a persisted perspective keeps any translateZ'd child scaled up, which made
+      // the ThreeD header text creep into its padding after the first hover.
+      node.style.transform = '';
     }
   }
 

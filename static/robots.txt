@@ -2,4 +2,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://stefanotedeschi.it/sitemap.xml
+Sitemap: https://www.stefanotedeschi.it/sitemap.xml

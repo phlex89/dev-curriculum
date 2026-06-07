@@ -66,6 +66,10 @@
   ];
   const COINS_TOTAL = COIN_SPOTS.length;
 
+  // Decorative wooden signpost beside the pond (top-right) — non-interactive,
+  // just a playful nudge toward the fishing easter egg at the water.
+  const POND_SIGN = { x: 19, y: 3, text: 'AL LAGHETTO SI PESCA! ↗' };
+
   const zoneById = (id: ZoneId) => (id === 'secret' ? SECRET : ZONES.find((z) => z.id === id)!);
 
   // Stat sheet for the secret zone — derived from the real CV data (no fabricated
@@ -158,6 +162,10 @@
 
   // ── State ─────────────────────────────────────────────────────────────────
   let reduced = $state(false);
+  // True on touch devices (where the on-screen D-pad / A-B buttons are shown):
+  // there, walking next to a building does NOT auto-open it — the player must
+  // tap A (or the building itself).
+  let isTouch = $state(false);
   let viewW = $state(960);
   let viewH = $state(600);
 
@@ -320,7 +328,10 @@
     // Trigger on the not-adjacent → adjacent transition only.
     const fresh = now.find((id) => !prevAdjacent.includes(id));
     prevAdjacent = now;
-    if (fresh) openZone(fresh);
+    // On touch the on-screen buttons drive interaction: getting adjacent only
+    // raises the "!" prompt, and the player opens the zone with A (or a tap).
+    // On desktop/keyboard the adjacency still auto-opens the dialog.
+    if (fresh && !isTouch) openZone(fresh);
   }
 
   // Konami code (↑↑↓↓←→←→ B A). Fed from BOTH the keyboard and the touch pad,
@@ -516,6 +527,14 @@
     reduced =
       typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    // Mirror the CSS query that reveals the touch controls (.dpad / .ab-pad are
+    // hidden when the pointer is fine + hover-capable) so we can require manual
+    // interaction instead of auto-opening zones on approach.
+    const fineMq = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const updateTouch = () => (isTouch = !fineMq.matches);
+    updateTouch();
+    fineMq.addEventListener('change', updateTouch);
+
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     const onBlur = () => held.clear();
@@ -524,6 +543,7 @@
     pokeIdle();
 
     return () => {
+      fineMq.removeEventListener('change', updateTouch);
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
@@ -563,6 +583,12 @@
         {#each coins as c (c.x + '-' + c.y)}
           <span class="coin" style="left:{c.x * tile}px; top:{c.y * tile}px;"></span>
         {/each}
+
+        <!-- Decorative wooden sign by the pond (non-interactive) -->
+        <div class="signpost" style="left:{POND_SIGN.x * tile}px; top:{POND_SIGN.y * tile}px;" aria-hidden="true">
+          <span class="sign wood">{POND_SIGN.text}</span>
+          <span class="post-pole"></span>
+        </div>
 
         <!-- Zones (also clickable buttons — content without playing) -->
         {#each visibleZones as z (z.id)}
@@ -979,6 +1005,27 @@
     z-index: 7;
   }
   .sign.visited { color: #fcd800; border-color: #fcd800; }
+
+  /* Decorative wooden signpost by the pond (board on a short post) */
+  .signpost { position: absolute; width: var(--tile); height: var(--tile); z-index: 4; pointer-events: none; }
+  .signpost > span { position: absolute; image-rendering: pixelated; }
+  .post-pole {
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: calc(var(--px) * 3);
+    height: calc(var(--px) * 10);
+    background: #7a5224;
+    box-shadow: inset 0 0 0 var(--px) #5e3c18, inset calc(var(--px) * -1) 0 0 #6e481f;
+  }
+  .sign.wood {
+    bottom: calc(var(--px) * 8);
+    background: #7a5224;
+    border-color: #d2a05a;
+    color: #ffe6b0;
+    box-shadow: 2px 2px 0 #000, inset 0 calc(var(--px) * 2) 0 #9c6c33;
+    font-size: 0.58rem;
+  }
   .bubble {
     position: absolute;
     bottom: calc(100% + var(--tile) * 1.45);

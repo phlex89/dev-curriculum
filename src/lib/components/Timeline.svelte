@@ -22,11 +22,31 @@
   let tabButtons = $state<HTMLButtonElement[]>([]);
   let showHint = $state(false);
 
-  // Mobile (<=720px) swaps the full pill — which can't fit ~11 stops on a phone —
-  // for a compact stepper (◄ current ►) whose centre opens a full-list era sheet.
+  // When the full pill — ~11 stops — can't fit the viewport, it's swapped for a
+  // compact stepper (◄ current ►) whose centre opens a full-list era sheet. The
+  // switch is driven dynamically by measuring whether the extended bar fits
+  // (see recomputeLayout / the $effect below), not a fixed breakpoint.
   let isMobile = $state(false);
   let sheetOpen = $state(false);
   let sheetCloseBtn = $state<HTMLButtonElement | undefined>();
+  // The extended (desktop) timeline bar, bound so we can measure whether it fits.
+  let extendedNav = $state<HTMLElement | undefined>();
+  let neededWidth = 0; // intrinsic px width of the extended bar (plain, not reactive)
+
+  // Phones (<=600px) always use the compact stepper. Above that, the extended
+  // timeline shows only while it actually fits the viewport: once its measured
+  // width (which grows with the active era's label) would spill past the screen
+  // edges, we fall back to the stepper. So the bar adapts to any in-between size
+  // (e.g. a Galaxy Fold unfolded) instead of being clipped at a hard breakpoint.
+  const FIT_GUTTER = 16; // px of breathing room kept on each side
+  function recomputeLayout() {
+    if (typeof window === 'undefined') return;
+    const phone = window.matchMedia('(max-width: 600px)').matches;
+    if (phone) isMobile = true;
+    else if (neededWidth > 0) isMobile = window.innerWidth < neededWidth + FIT_GUTTER * 2;
+    else isMobile = false; // not measured yet — assume it fits; the effect corrects it
+    if (!isMobile) sheetOpen = false; // never leave the sheet stuck open
+  }
 
   const activeIndex = $derived(Math.max(0, themes.findIndex((t) => t.id === $currentTheme)));
   const fillFraction = $derived(activeIndex / (themes.length - 1));
@@ -46,13 +66,8 @@
       setTimeout(dismissHint, 6000);
     }
 
-    const mq = window.matchMedia('(max-width: 720px)');
-    const applyMq = () => {
-      isMobile = mq.matches;
-      if (!isMobile) sheetOpen = false; // never leave the sheet stuck open after a resize
-    };
-    applyMq();
-    mq.addEventListener('change', applyMq);
+    recomputeLayout();
+    window.addEventListener('resize', recomputeLayout);
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && sheetOpen) closeSheet();
@@ -60,9 +75,27 @@
     window.addEventListener('keydown', onKey);
 
     return () => {
-      mq.removeEventListener('change', applyMq);
+      window.removeEventListener('resize', recomputeLayout);
       window.removeEventListener('keydown', onKey);
     };
+  });
+
+  // Measure the extended bar's intrinsic width whenever it's mounted (and on any
+  // internal resize, e.g. the active label changing), then re-evaluate the fit.
+  $effect(() => {
+    const el = extendedNav;
+    if (!el) return;
+    const measure = () => {
+      const w = el.scrollWidth;
+      if (w && Math.abs(w - neededWidth) > 1) {
+        neededWidth = w;
+        recomputeLayout();
+      }
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
   });
 
   function dismissHint() {
@@ -177,7 +210,7 @@
       </button>
     </div>
   {:else}
-    <nav class="timeline-container" aria-label="Linea del tempo: scegli l'era">
+    <nav class="timeline-container" bind:this={extendedNav} aria-label="Linea del tempo: scegli l'era">
       <div class="timeline-track"></div>
       <div class="timeline-fill"></div>
       <ul class="timeline-stops" role="tablist" aria-orientation="horizontal">
@@ -833,7 +866,7 @@
   }
 
   /* ===================================================================== */
-  /*  Mobile stepper + era sheet (<=720px)                                  */
+  /*  Mobile stepper + era sheet (shown when the extended bar can't fit)     */
   /*  Built on the same .timeline-container / .node-pill / .timeline-stop   */
   /*  .active hooks as the desktop pill, so every per-theme skin above      */
   /*  applies here automatically. Only layout + dots are new.               */

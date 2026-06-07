@@ -497,10 +497,15 @@
     line-height: 1.5;
     letter-spacing: 0.2px;
     padding: 24px;
-    padding-bottom: 120px; /* space for suggestions and timeline */
+    padding-bottom: 92px; /* reserve room for the fixed timeline bar below */
     box-sizing: border-box;
     position: relative;
     overflow: hidden;
+    /* Column layout: the scrolling output and the suggestion buttons are
+       separate rows, so the text can never overlap the buttons (which used to
+       float over it and wrap into the text on mobile / Galaxy Fold). */
+    display: flex;
+    flex-direction: column;
     text-shadow: 0 0 6px rgba(51, 255, 102, 0.55);
   }
 
@@ -527,7 +532,8 @@
 
   .terminal-content {
     width: 100%;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0; /* allow the flex child to shrink so it scrolls instead of pushing the buttons off-screen */
     overflow-y: auto;
     position: relative;
     z-index: 2;
@@ -627,14 +633,13 @@
   }
 
   .suggestions {
-    position: absolute;
-    bottom: 80px;
-    left: 20px;
+    position: static;
+    flex: 0 0 auto;
+    margin-top: 12px;
     display: flex;
     gap: 8px;
     z-index: 20;
     flex-wrap: wrap;
-    max-width: 90%;
   }
 
   .suggestions button {

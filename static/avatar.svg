@@ -42,9 +42,11 @@
 
     <!-- head -->
     <ellipse cx="120" cy="118" rx="46" ry="50" fill="url(#skin)"/>
-    <!-- ears -->
-    <circle cx="74" cy="120" r="9" fill="#e3a87f"/>
-    <circle cx="166" cy="120" r="9" fill="#e3a87f"/>
+    <!-- ears (anatomical: helix + inner concha shadow) -->
+    <path d="M79 109 C67 106 61 117 64 126 C66 135 72 139 80 136 C75 128 75 117 79 109 Z" fill="url(#skin)"/>
+    <path d="M76 115 C70 115 68 122 70 128 C72 132 75 133 77 132" fill="none" stroke="#d99e76" stroke-width="2" stroke-linecap="round"/>
+    <path d="M161 109 C173 106 179 117 176 126 C174 135 168 139 160 136 C165 128 165 117 161 109 Z" fill="url(#skin)"/>
+    <path d="M164 115 C170 115 172 122 170 128 C168 132 165 133 163 132" fill="none" stroke="#d99e76" stroke-width="2" stroke-linecap="round"/>
 
     <!-- hair: short, messy, blond -->
     <path d="M72 114

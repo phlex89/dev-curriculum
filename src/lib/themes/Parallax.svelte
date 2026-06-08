@@ -347,6 +347,25 @@
         <span class="m m3"></span>
         <span class="m m4"></span>
       </div>
+      <!-- Abstract decor scattered down the WHOLE scroll: crisp outlined shapes,
+           orbs, dots and marks at varied parallax depths. They drift past as you
+           scroll, tying every scene into one continuous space (the mesh above is
+           the soft fixed atmosphere; these are the foreground shapes that move).
+           Picked up automatically by the parallax engine via [data-parallax]. -->
+      <div class="px-decor" aria-hidden="true">
+        <span class="dx ring r1" data-parallax="0.14"></span>
+        <span class="dx dot  dt1" data-parallax="0.34"></span>
+        <span class="dx plus px1" data-parallax="0.24">+</span>
+        <span class="dx square s1" data-parallax="0.22"></span>
+        <span class="dx orb o1" data-parallax="0.2"></span>
+        <span class="dx line ln1" data-parallax="0.12"></span>
+        <span class="dx ring r2" data-parallax="0.1"></span>
+        <span class="dx dot  dt2" data-parallax="0.3"></span>
+        <span class="dx arc a1" data-parallax="0.18"></span>
+        <span class="dx orb o2" data-parallax="0.16"></span>
+        <span class="dx plus px2" data-parallax="0.2">+</span>
+        <span class="dx dot  dt3" data-parallax="0.26"></span>
+      </div>
       <div class="px-grain" aria-hidden="true"></div>
 
       <!-- ── SCENE 1 · HERO ─────────────────────────────────────────────── -->
@@ -600,6 +619,77 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
     background-size: 150px 150px;
   }
+
+  /* ── Scrolling abstract decor (parallax foreground shapes, spans full content) ──
+     The container is absolute/inset:0 so it never adds scroll height; anything
+     that lands past the content edge is simply clipped. Each shape carries its
+     parallax translate on the host element; spinning visuals live on a ::before
+     so the animation never fights the parallax transform. */
+  .px-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .dx {
+    position: absolute;
+    transform: translate3d(0, var(--py, 0), 0);
+    will-change: transform;
+  }
+  /* Thin outlined rings */
+  .dx.ring { border-radius: 50%; }
+  .dx.ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+  }
+  .r1 { width: 40vw; max-width: 470px; aspect-ratio: 1; top: 132vh; left: -11vw; color: var(--accent); opacity: 0.26; }
+  .r2 { width: 24vw; max-width: 300px; aspect-ratio: 1; top: 372vh; right: -7vw; color: var(--accent-2); opacity: 0.2; }
+  /* Soft blurred orbs */
+  .dx.orb { border-radius: 50%; filter: blur(38px); }
+  .o1 { width: 30vw; height: 30vw; max-width: 380px; max-height: 380px; top: 252vh; left: 6vw; background: radial-gradient(circle, var(--accent-2), transparent 70%); opacity: 0.34; animation: dxBreathe 16s ease-in-out infinite; }
+  .o2 { width: 26vw; height: 26vw; max-width: 320px; max-height: 320px; top: 520vh; right: 4vw; background: radial-gradient(circle, var(--accent), transparent 70%); opacity: 0.3; animation: dxBreathe 19s ease-in-out infinite 2s; }
+  /* Slowly rotating outlined square */
+  .dx.square { width: 17vw; max-width: 210px; aspect-ratio: 1; top: 205vh; left: 13vw; }
+  .dx.square::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--accent);
+    opacity: 0.3;
+    animation: dxSpin 64s linear infinite;
+  }
+  /* Filled dots */
+  .dx.dot { border-radius: 50%; }
+  .dt1 { width: 12px; height: 12px; top: 72vh; right: 15vw; background: var(--accent-2); }
+  .dt2 { width: 9px; height: 9px; top: 300vh; left: 21vw; background: var(--accent); }
+  .dt3 { width: 10px; height: 10px; top: 468vh; right: 18vw; background: var(--accent-2); opacity: 0.7; }
+  /* Plus marks */
+  .dx.plus { font-family: var(--sans); font-weight: 300; line-height: 1; color: var(--muted); opacity: 0.42; }
+  .px1 { font-size: 2rem; top: 158vh; right: 11vw; }
+  .px2 { font-size: 1.4rem; top: 412vh; left: 7vw; }
+  /* Hairline */
+  .dx.line { width: 1px; height: 14vh; background: linear-gradient(var(--accent), transparent); opacity: 0.5; }
+  .ln1 { top: 232vh; right: 25vw; }
+  /* Tilted arc (two-sided ring border) */
+  .dx.arc {
+    width: 27vw;
+    max-width: 330px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-top-color: var(--accent-2);
+    border-right-color: var(--accent-2);
+    opacity: 0.3;
+    top: 478vh;
+    left: 4vw;
+    transform: translate3d(0, var(--py, 0), 0) rotate(35deg);
+  }
+  @keyframes dxSpin { to { transform: rotate(360deg); } }
+  @keyframes dxBreathe { 0%, 100% { opacity: 0.32; } 50% { opacity: 0.16; } }
 
   /* ── Scenes ── */
   .scene {
@@ -1317,6 +1407,7 @@
     .stats-pin { position: static; height: auto; padding: 14vh 0; }
     .portrait, .ha-layer, .scene-no { transform: none !important; }
     .hero-art .ha-rings, .ha-diamond, .ha-orb, .ha-dot, .ha-plus { animation: none !important; }
+    .dx, .dx::before { animation: none !important; }
   }
   /* Belt-and-braces: if the component never gained `.motion` (JS off / reduced),
      show the static skills list and drop the kinetic marquee. */
@@ -1325,6 +1416,8 @@
   .px-root:not(.motion) .scroll-hint { display: none; }
   .px-root:not(.motion) .stats-scene { min-height: auto; }
   .px-root:not(.motion) .stats-pin { position: static; height: auto; padding: 14vh 0; }
+  .px-root:not(.motion) .dx,
+  .px-root:not(.motion) .dx::before { animation: none !important; }
 
   /* ── Responsive ── */
   @media (max-width: 900px) {

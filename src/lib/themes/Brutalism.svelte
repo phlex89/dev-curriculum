@@ -13,7 +13,7 @@
   const tickerItems = [
     'OPEN TO WORK',
     cvData.role.toUpperCase(),
-    '10+ YEARS',
+    `${new Date().getFullYear() - cvData.keyFigures.startYear}+ YEARS`,
     'VUE / REACT / TYPESCRIPT',
     'DESIGN SYSTEMS',
     cvData.contact.location.toUpperCase(),

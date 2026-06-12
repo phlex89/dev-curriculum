@@ -68,7 +68,7 @@
 
   // Decorative wooden signpost beside the pond (top-right) — non-interactive,
   // just a playful nudge toward the fishing easter egg at the water.
-  const POND_SIGN = { x: 19, y: 3, text: 'AL LAGHETTO SI PESCA! ↗' };
+  const POND_SIGN = { x: 19, y: 1, text: 'AL LAGHETTO SI PESCA! ↗' };
 
   const zoneById = (id: ZoneId) => (id === 'secret' ? SECRET : ZONES.find((z) => z.id === id)!);
 

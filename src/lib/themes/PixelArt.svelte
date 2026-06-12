@@ -76,8 +76,8 @@
   // content; just a playful RPG framing of the numbers).
   const heroStats = [
     { label: 'CLASSE', value: cvData.role },
-    { label: 'ANNI DI AVVENTURA', value: '10+' },
-    { label: 'TECNOLOGIE PADRONEGGIATE', value: String(cvData.skills.length) },
+    { label: 'ANNI DI AVVENTURA', value: String(new Date().getFullYear() - cvData.keyFigures.startYear) },
+    { label: 'PRODOTTI COSTRUITI', value: String(cvData.keyFigures.products) },
     { label: 'GILDE (AZIENDE)', value: String(cvData.experience.length) },
     { label: 'SALE DELLE CONFERENZE', value: String(cvData.conferences.length) },
     { label: 'LINGUE PARLATE', value: String(cvData.languages.length) },
@@ -760,8 +760,6 @@
             {#each cvData.education as ed}
               <div class="book"><p class="job-title">{ed.title}</p><p class="job-co">{ed.institute} · {ed.location} · {ed.period}</p></div>
             {/each}
-            <p class="bag-label">Certificazioni</p>
-            <ul class="hl">{#each cvData.certifications as c}<li>{c.name} — {c.issuer}</li>{/each}</ul>
             <p class="bag-label">Conferenze</p>
             <ul class="hl">{#each cvData.conferences as c}<li>{c.name} — {c.location} ({c.year})</li>{/each}</ul>
 

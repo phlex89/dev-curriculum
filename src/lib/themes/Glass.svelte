@@ -183,7 +183,7 @@
       </div>
     </section>
 
-    <!-- Education & Certifications -->
+    <!-- Education -->
     <section class="panel edu" style="grid-area: edu" use:reveal={{ delay: 250 }} use:tilt={{ max: 2.5 }}>
       <span class="label">Formazione</span>
       {#each cvData.education as edu}
@@ -192,10 +192,6 @@
           <span class="edu-meta">{edu.institute} · {edu.period}</span>
         </div>
       {/each}
-      <span class="label sub">Certificazioni</span>
-      <div class="chips">
-        {#each cvData.certifications as cert}<span class="chip soft">{cert.name}</span>{/each}
-      </div>
     </section>
 
     <!-- Talks / Conferences -->
@@ -459,7 +455,6 @@
     color: var(--g-label);
     margin-bottom: 16px;
   }
-  .label.sub { margin-top: 22px; }
 
   /* ── Hero ──────────────────────────────────────────────────────────── */
   .hero {

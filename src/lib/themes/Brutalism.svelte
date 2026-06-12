@@ -168,11 +168,7 @@
           {/each}
         </div>
         <div class="bru-block">
-          <span class="bru-skill-label">Certifications</span>
-          <ul class="bru-list">
-            {#each cvData.certifications as cert}<li>{cert.name} <em>· {cert.issuer}</em></li>{/each}
-          </ul>
-          <span class="bru-skill-label bru-mt">Talks</span>
+          <span class="bru-skill-label">Talks</span>
           <ul class="bru-list">
             {#each cvData.conferences as conf}<li>{conf.name} <em>· {conf.location} ’{conf.year.slice(-2)}</em></li>{/each}
           </ul>

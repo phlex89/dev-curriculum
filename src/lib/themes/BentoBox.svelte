@@ -155,18 +155,10 @@
       </div>
     </div>
 
-    <!-- Certifications & Talks Box -->
+    <!-- Talks Box -->
     <div class="bento-box cert-box" use:reveal={{ delay: 360 }} use:tilt={{ max: 2 }}>
-      <span class="box-label">Certifications & Talks</span>
+      <span class="box-label">Talks</span>
       <div class="cert-cols">
-        <div class="cert-col">
-          <span class="cert-head">Certificazioni</span>
-          <ul>
-            {#each cvData.certifications as cert}
-              <li>{cert.name}</li>
-            {/each}
-          </ul>
-        </div>
         <div class="cert-col">
           <span class="cert-head">Conferenze</span>
           <ul>
@@ -582,7 +574,7 @@
 
   /* ---- Certifications & Talks ---- */
   .cert-box { grid-area: cert; }
-  .cert-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .cert-cols { display: grid; grid-template-columns: 1fr; gap: 18px; }
   .cert-head {
     display: block;
     font-family: 'Space Grotesk', sans-serif;

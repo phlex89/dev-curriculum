@@ -335,7 +335,7 @@ Gli oggetti sembrano poggiati su una superficie in pelle cucita.
 > salgono a 8dp in hover. **Esperienze** come card con avatar-monogramma colorato (palette Material
 > 500 a rotazione), titolo/azienda/period-chip, highlight con bullet a spunta accent e tech-chip.
 > **Competenze** in chip *tonali* (indaco chiaro). **Studi** a due colonne: Istruzione (icona
-> *school* + chip certificazioni *verified*) e Lingue come **LinearProgress determinato** indaco +
+> *school*) e Lingue come **LinearProgress determinato** indaco +
 > Conferenze con icona *mic*. **Contatti** come bottoni tonali. **FAB accent** circolare fisso
 > (6dp→12dp in hover) con azione primaria *mailto*. **Ripple** autentico (azione `ripple`: cerchio
 > che si espande dal punto del tocco) su tab, icon-button, contatti e FAB. Tipografia **Roboto**
@@ -436,7 +436,7 @@ circolare.
 > Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso) — non l'Orbitron sci-fi del 3D.
 >
 > **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza →
-> Profilo → Esperienza → Competenze/Lingue → Formazione+Certificazioni/Conferenze),
+> Profilo → Esperienza → Competenze/Lingue → Formazione/Conferenze),
 > arioso, scrollabile, max 1080px; mobile a colonna singola. Contenuti **tutti da
 > `cv-data.ts`**. **Cue audio** (`case 'glass'`): **campanella di vetro** cristallina
 > (arpeggio triangle alto + halo sine acuto) — l'opposto del drone scuro del 3D.
@@ -662,7 +662,7 @@ navigazione a numero di pagina** vs riga di comando verde monocromatica. È l'un
 (ciano), `TELEVIDEO` e **orologio broadcast live** (verde, `gio 02 GIU 21:47:31`, `setInterval`).
 **Magazine a pagine numerate**: 100 indice (con **mosaico TV** a blocchi CSS + indice cliccabile +
 gag CONCEAL), 101 profilo, 102 esperienza (→ dettagli 110+), 103 origini, 104 competenze, 105
-lingue, 106 formazione+certificazioni, 107 conferenze, 108 contatti (+download PDF), **777 pagina
+lingue, 106 formazione, 107 conferenze, 108 contatti (+download PDF), **777 pagina
 segreta** (oroscopo del frontend + battuta nascosta). **Doppio binario** di navigazione: digitazione
 **3 cifre** (buffer in header, beep `teletextBeep` per pagina) **+** tastierino on-screen, indice
 cliccabile, **4 tasti FASTEXT colorati** (rosso/verde/giallo/ciano), ◄/► prev-next, tasto **SVELA**
@@ -810,7 +810,7 @@ sezione è messa in scena (entra, si compone, esce) con tempi lunghi ed easing m
 **Contenuti (ridotti — scelta progettuale, come da indicazione).** Si mostra un **sottoinsieme
 curato**: nome/ruolo, una frase-manifesto, **3–4 esperienze di punta** (senza bullet completi),
 un pugno di **numeri-chiave**, le **skill come keyword-wall**, i **contatti**. Formazione/
-certificazioni/conferenze/lingue **non** entrano nel flusso (restano integralmente nelle altre
+conferenze/lingue **non** entrano nel flusso (restano integralmente nelle altre
 ere e nel fallback). La **fonte resta `cv-data.ts`** — si *seleziona*, non si riscrive né si
 inventa.
 

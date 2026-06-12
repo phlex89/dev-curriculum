@@ -357,12 +357,6 @@
                     </ul>
                   </div>
                   <div>
-                    <p class="mini-h">&#127942; Awards &amp; Certifications</p>
-                    <ul class="ball-list dense">
-                      {#each cvData.certifications as cert}
-                        <li>{cert.name} <span class="muted">&middot; {cert.issuer}</span></li>
-                      {/each}
-                    </ul>
                     <p class="mini-h">&#127908; Conferences Attended</p>
                     <ul class="ball-list dense">
                       {#each cvData.conferences as conf}

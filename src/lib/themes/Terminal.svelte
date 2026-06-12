@@ -26,7 +26,7 @@
   const CHAR_MS = 9;
 
   const COMMANDS = ['help', 'man', 'clear', 'sudo', 'matrix', 'neofetch', 'cvfetch', 'ls', 'show', 'cat', 'cv', 'download'];
-  const FILES = ['about.txt', 'contact.txt', 'skills.txt', 'languages.txt', 'certs.txt', 'talks.txt'];
+  const FILES = ['about.txt', 'contact.txt', 'skills.txt', 'languages.txt', 'talks.txt'];
 
   const prefersReduced = () =>
     typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -272,7 +272,6 @@
         addOutput('  cat contact.txt     View contact info');
         addOutput('  cat skills.txt      List my skills by category');
         addOutput('  cat languages.txt   View language proficiency');
-        addOutput('  cat certs.txt       View certifications');
         addOutput('  cat talks.txt       Conferences & seminars attended');
         addOutput('  ls esperienze       List work experiences');
         addOutput('  show exp <id>       Read specific experience (e.g., show exp 0)');
@@ -330,7 +329,7 @@
           });
           addOutput('\nType "show exp <id>" to read details.');
         } else {
-          addOutput('about.txt   contact.txt   skills.txt   languages.txt   certs.txt   talks.txt   esperienze/');
+          addOutput('about.txt   contact.txt   skills.txt   languages.txt   talks.txt   esperienze/');
         }
         break;
 
@@ -386,10 +385,6 @@
         } else if (args[1] === 'languages.txt') {
           cvData.languages.forEach((lang) => {
             addOutput(`${lang.name.padEnd(10)} ${lang.level}${lang.note ? ` (${lang.note})` : ''}`);
-          });
-        } else if (args[1] === 'certs.txt') {
-          cvData.certifications.forEach((cert) => {
-            addOutput(`  - ${cert.name} (${cert.issuer})`);
           });
         } else if (args[1] === 'talks.txt') {
           cvData.conferences.forEach((conf) => {

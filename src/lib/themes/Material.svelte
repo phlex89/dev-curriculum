@@ -355,15 +355,6 @@
                 <span class="meta">{edu.institute} · {edu.location} · {edu.period}</span>
               </div>
             {/each}
-            <h3 class="sub-head">Certificazioni</h3>
-            <div class="chips">
-              {#each cvData.certifications as cert}
-                <span class="chip cert">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.verified} /></svg>
-                  {cert.name}
-                </span>
-              {/each}
-            </div>
           </article>
 
           <article class="card" use:reveal={{ delay: 80 }}>
@@ -829,12 +820,6 @@
   .chip.tonal:hover {
     background: #b3bae0;
   }
-  .chip.cert svg {
-    width: 16px;
-    height: 16px;
-    fill: var(--primary);
-  }
-
   /* ── Skills ─────────────────────────────────────────────────────────────────── */
   .skill-groups {
     display: flex;

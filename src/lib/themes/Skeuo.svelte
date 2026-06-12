@@ -119,12 +119,6 @@
               <span class="when">{edu.location} · {edu.period}</span>
             </div>
           {/each}
-          <div class="seal">
-            <span class="seal-label">Certificazioni</span>
-            <ul>
-              {#each cvData.certifications as cert}<li>{cert.name}</li>{/each}
-            </ul>
-          </div>
         </div>
       </section>
 
@@ -577,25 +571,6 @@
   }
   .diploma-item .inst { font-size: 0.86rem; color: #6c5c41; }
   .diploma-item .when { font-size: 0.78rem; color: #8a7a5c; font-style: italic; }
-
-  .seal {
-    margin-top: 18px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(120, 90, 40, 0.25);
-  }
-  .seal-label {
-    display: block;
-    text-align: center;
-    font-family: Georgia, serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #8a6a2a;
-    margin-bottom: 8px;
-  }
-  .seal ul { margin: 0; padding: 0; list-style: none; text-align: center; }
-  .seal li { font-size: 0.82rem; color: #4a3c26; line-height: 1.7; }
 
   /* Languages gel gauges */
   .gauge-row { margin-bottom: 16px; }

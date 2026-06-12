@@ -345,12 +345,6 @@
             <span class="c-yel"> ({edu.period})</span>
           </p>
         {/each}
-        <p class="c-grn idx-head">CERTIFICAZIONI</p>
-        <ul class="bullets">
-          {#each cvData.certifications as cert}
-            <li><span class="c-yel">▪</span> <span class="c-wht">{cert.name} — {cert.issuer}</span></li>
-          {/each}
-        </ul>
 
       {:else if currentPage === PAGE.TALKS}
         <h1 class="dh c-mag">107 CONFERENZE</h1>

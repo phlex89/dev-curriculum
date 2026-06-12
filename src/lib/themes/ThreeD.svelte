@@ -336,14 +336,6 @@
           </div>
         {/each}
 
-        <h3 style="margin-top: 30px;">Certifications</h3>
-        {#each cvData.certifications as cert}
-          <div class="mini-row">
-            <span>{cert.name}</span>
-            <span class="muted">{cert.issuer}</span>
-          </div>
-        {/each}
-
         <h3 style="margin-top: 30px;">Conferences</h3>
         {#each cvData.conferences as conf}
           <div class="mini-row">

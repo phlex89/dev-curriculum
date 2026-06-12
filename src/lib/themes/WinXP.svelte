@@ -351,12 +351,6 @@
                     <p class="period">{edu.period}</p>
                   </div>
                 {/each}
-                <h3 class="sub">Certificazioni</h3>
-                <ul class="plain-list">
-                  {#each cvData.certifications as cert}
-                    <li>{cert.name} <span class="muted">({cert.issuer})</span></li>
-                  {/each}
-                </ul>
                 <h3 class="sub">Conferenze & Seminari</h3>
                 <ul class="plain-list">
                   {#each cvData.conferences as conf}
@@ -388,11 +382,11 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       class="clippy-container"
-      onclick={(e) => { e.stopPropagation(); window.location.href = `mailto:${cvData.contact.email}?subject=${encodeURIComponent('Opportunità per un Frontend Engineer')}`; }}
+      onclick={(e) => { e.stopPropagation(); window.location.href = `mailto:${cvData.contact.email}?subject=${encodeURIComponent('Opportunità per un Frontend Architect')}`; }}
       title="Scrivimi una mail"
     >
       <div class="clippy-balloon">
-        Sembra che tu stia cercando di assumere un Frontend Engineer.<br><strong>Clicca qui per scrivermi una mail!</strong> ✉️
+        Sembra che tu stia cercando un Frontend Architect.<br><strong>Clicca qui per scrivermi una mail!</strong> ✉️
       </div>
       <svg class="clippy-svg" viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" aria-label="Clippy">
         <defs>

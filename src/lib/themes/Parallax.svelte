@@ -26,14 +26,14 @@
 
   // Words emphasised (terracotta) inside the big serif statements. Presentation
   // over real copy — not invented data.
-  const HL = new Set(['10', 'anni', 'architetture', 'frontend', 'design', 'system', 'scalabili', 'complesse', 'scalabile', 'design system']);
+  const HL = new Set(['15', 'anni', 'architetture', 'frontend', 'design', 'system', 'scalare', 'prodotti', 'team', 'pixel', 'problema']);
   const isHL = (w: string) => HL.has(w.toLowerCase().replace(/[.,;:—–()]/g, ''));
 
   // ── Animated key figures (all derived from cv-data.ts) ──
-  const START_YEAR = 2011;
+  const START_YEAR = cvData.keyFigures.startYear;
   const targetYears = (typeof Date !== 'undefined' ? new Date().getFullYear() : 2026) - START_YEAR;
-  const targetCompanies = cvData.experience.length;
-  const targetTech = cvData.skills.length;
+  const targetProducts = cvData.keyFigures.products;
+  const targetSectors = cvData.keyFigures.sectors;
 
   const sectionNames = ['Intro', 'Profilo', 'Percorso', 'In cifre', 'Competenze', 'Ritratto', 'Contatti'];
 
@@ -52,8 +52,8 @@
   let canAuto = $state(false);
 
   let statYears = $state(0);
-  let statCompanies = $state(0);
-  let statTech = $state(0);
+  let statProducts = $state(0);
+  let statSectors = $state(0);
 
   // Lenis lives at component scope so toggleAuto()/goTo() can reach it.
   let lenis: LenisType | null = null;
@@ -111,8 +111,8 @@
       statsDone = true;
       if (!motion) {
         statYears = targetYears;
-        statCompanies = targetCompanies;
-        statTech = targetTech;
+        statProducts = targetProducts;
+        statSectors = targetSectors;
         return;
       }
       const t0 = performance.now();
@@ -121,8 +121,8 @@
         const p = Math.min(1, (now - t0) / dur);
         const e = 1 - Math.pow(1 - p, 3); // easeOutCubic
         statYears = Math.round(targetYears * e);
-        statCompanies = Math.round(targetCompanies * e);
-        statTech = Math.round(targetTech * e);
+        statProducts = Math.round(targetProducts * e);
+        statSectors = Math.round(targetSectors * e);
         if (p < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);
@@ -462,18 +462,18 @@
           <div class="stats-grid">
             <div class="stat" data-reveal style="--i:0">
               <span class="stat-num display">{statYears}</span>
-              <span class="stat-label">Anni nel frontend</span>
+              <span class="stat-label">Anni di mestiere</span>
               <span class="stat-sub">dal {START_YEAR}</span>
             </div>
             <div class="stat" data-reveal style="--i:1">
-              <span class="stat-num display">{statCompanies}</span>
-              <span class="stat-label">Aziende &amp; team</span>
-              <span class="stat-sub">fintech · IoT · banking</span>
+              <span class="stat-num display">{statProducts}</span>
+              <span class="stat-label">Prodotti sulle mie fondamenta</span>
+              <span class="stat-sub">piattaforme · backoffice · mobile</span>
             </div>
             <div class="stat" data-reveal style="--i:2">
-              <span class="stat-num display">{statTech}</span>
-              <span class="stat-label">Tecnologie &amp; tool</span>
-              <span class="stat-sub">dal pixel al deploy</span>
+              <span class="stat-num display">{statSectors}</span>
+              <span class="stat-label">Settori enterprise</span>
+              <span class="stat-sub">fintech · IoT · banking · media</span>
             </div>
           </div>
         </div>

@@ -81,15 +81,6 @@
     </ul>
   </section>
 
-  <section aria-label="Certificazioni">
-    <h2>Certificazioni</h2>
-    <ul>
-      {#each cvData.certifications as cert}
-        <li>{cert.name} — {cert.issuer}</li>
-      {/each}
-    </ul>
-  </section>
-
   <section aria-label="Conferenze">
     <h2>Conferenze</h2>
     <ul>

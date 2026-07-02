@@ -3,6 +3,7 @@
   import type LenisType from 'lenis';
   import { cvData } from '$lib/cv-data';
   import { magnetic } from '$lib/actions/interactive';
+  import { currentTheme } from '$lib/store';
 
   // ──────────────────────────────────────────────────────────────────────────
   // Parallax / Immersive Scroll — the premium "craft web" era (~2018–today).
@@ -308,17 +309,22 @@
   <div class="px-progress" aria-hidden="true"><i style="transform: scaleY({progress})"></i></div>
 
   <!-- Section index dots (clickable — smooth-scroll to the scene) -->
-  <nav class="px-dots" aria-label="Indice delle sezioni">
-    {#each sectionNames as name, i}
-      <button
-        class="px-dot"
-        class:active={active === i}
-        onclick={() => goTo(i)}
-        aria-label={name}
-        aria-current={active === i ? 'true' : undefined}
-      ><span></span></button>
-    {/each}
-  </nav>
+  <div class="px-side-nav">
+    <nav class="px-dots" aria-label="Indice delle sezioni">
+      {#each sectionNames as name, i}
+        <button
+          class="px-dot"
+          class:active={active === i}
+          onclick={() => goTo(i)}
+          aria-label={name}
+          aria-current={active === i ? 'true' : undefined}
+        ><span></span></button>
+      {/each}
+    </nav>
+    <button type="button" class="px-full-cv" onclick={() => currentTheme.set('bento')}>
+      CV completo <span class="px-full-cv-arrow" aria-hidden="true">→</span>
+    </button>
+  </div>
 
   <!-- Cinematic auto-scroll toggle (hidden under reduced motion) -->
   {#if canAuto}
@@ -1278,13 +1284,19 @@
     background: linear-gradient(180deg, var(--accent), var(--accent-2));
   }
 
-  /* ── Section dots ── */
-  .px-dots {
+  /* ── Section dots + full-CV escape hatch ── */
+  .px-side-nav {
     position: absolute;
     right: 22px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+  .px-dots {
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -1314,6 +1326,31 @@
     box-shadow: 0 0 0 4px rgba(176, 116, 79, 0.16);
   }
   .px-dot:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; border-radius: 50%; }
+
+  /* ── Full-CV escape hatch ── */
+  .px-full-cv {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border: 1px solid var(--accent-2);
+    border-radius: 999px;
+    background: rgba(243, 239, 231, 0.78);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    color: var(--accent-2);
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  }
+  .px-full-cv:hover { background: var(--accent-2); color: var(--bg); transform: translateY(-1px); }
+  .px-full-cv:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+  .px-full-cv-arrow { display: inline-block; transition: transform 0.3s ease; }
+  .px-full-cv:hover .px-full-cv-arrow { transform: translateX(3px); }
 
   /* ── Play / Pause control ── */
   .px-controls {
@@ -1423,12 +1460,17 @@
     .stats-scene .scene-no.ghost { position: static; display: block; text-align: center; margin-bottom: 4vh; }
     .exp-row { grid-template-columns: 1fr; }
     .exp-meta { text-align: left; }
-    .px-dots { right: 12px; }
+    .px-side-nav { right: 12px; }
   }
   @media (max-width: 600px) {
     .scene { padding: 12vh 7vw; }
     .scroll-hint { left: 7vw; }
-    .px-dots { display: none; }
+    .px-side-nav { right: 8px; gap: 14px; }
+    .px-dots { gap: 8px; }
+    .px-dot { width: 16px; height: 16px; }
+    .px-dot span { width: 5px; height: 5px; }
+    .px-full-cv { padding: 0 12px; min-height: 44px; min-width: 44px; font-size: 0.6rem; }
+    .px-controls { top: 14px; left: auto; right: 14px; transform: none; }
     .hero-manifesto { max-width: 100%; }
     .cta-actions { gap: 12px; }
     .cta-btn { padding: 14px 26px; }

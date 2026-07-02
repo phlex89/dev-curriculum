@@ -184,6 +184,7 @@
 
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
     camera.position.z = 15;
+    camera.lookAt(0, 0, -4);
 
     renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -207,6 +208,7 @@
     // Off-centre (upper-right) so the bright focal element doesn't sit behind the
     // content in the middle of the screen.
     knot.position.set(9.5, 4, -7);
+    knot.rotation.set(0.4, 0.9, 0);
     scene.add(knot);
 
     // Floating wireframe accents + orbiting energy rings
@@ -226,6 +228,7 @@
       });
       const mesh = new THREE.Mesh(d.geo, mat);
       mesh.position.set(d.pos[0], d.pos[1], d.pos[2]);
+      mesh.rotation.set(i * 0.6, i * 0.4, 0);
       mesh.userData.sx = 0.0014 + i * 0.0006;
       mesh.userData.sy = 0.0021 + i * 0.0005;
       mesh.userData.bob = 0.6 + i * 0.15;
@@ -250,33 +253,35 @@
     if (energy < 0.001) energy = 0;
     const boost = 1 + energy * 0.3;
 
-    // Swirling nebula drift (very slightly accelerated by scene energy)
-    pointClouds[0].rotation.y += 0.0005 * boost;
-    pointClouds[0].rotation.x = Math.sin(t * 0.25) * 0.08;
-    pointClouds[1].rotation.y -= 0.0007 * boost;
-    pointClouds[2].rotation.x += 0.0004 * boost;
-    pointClouds[2].rotation.z = Math.cos(t * 0.2) * 0.1;
+    if (!reduced) {
+      // Swirling nebula drift (very slightly accelerated by scene energy)
+      pointClouds[0].rotation.y += 0.0005 * boost;
+      pointClouds[0].rotation.x = Math.sin(t * 0.25) * 0.08;
+      pointClouds[1].rotation.y -= 0.0007 * boost;
+      pointClouds[2].rotation.x += 0.0004 * boost;
+      pointClouds[2].rotation.z = Math.cos(t * 0.2) * 0.1;
 
-    // Torus knot: rotate + gentle pulse + slow hue "breathing" (time-based only)
-    knot.rotation.x += 0.0024 * boost;
-    knot.rotation.y += 0.0032 * boost;
-    const s = 1 + Math.sin(t) * 0.04;
-    knot.scale.set(s, s, s);
-    const hue = (knotColor.h + Math.sin(t * 0.05) * 0.04 + 1) % 1;
-    knotMat.color.setHSL(hue, knotColor.s, knotColor.l);
-    knotMat.opacity = 0.3;
+      // Torus knot: rotate + gentle pulse + slow hue "breathing" (time-based only)
+      knot.rotation.x += 0.0024 * boost;
+      knot.rotation.y += 0.0032 * boost;
+      const s = 1 + Math.sin(t) * 0.04;
+      knot.scale.set(s, s, s);
+      const hue = (knotColor.h + Math.sin(t * 0.05) * 0.04 + 1) % 1;
+      knotMat.color.setHSL(hue, knotColor.s, knotColor.l);
+      knotMat.opacity = 0.3;
 
-    // Accents rotate and bob
-    for (const m of shapes) {
-      m.rotation.x += m.userData.sx * boost;
-      m.rotation.y += m.userData.sy * boost;
-      m.position.y = m.userData.baseY + Math.sin(t * m.userData.bob + m.userData.phase) * 0.6;
+      // Accents rotate and bob
+      for (const m of shapes) {
+        m.rotation.x += m.userData.sx * boost;
+        m.rotation.y += m.userData.sy * boost;
+        m.position.y = m.userData.baseY + Math.sin(t * m.userData.bob + m.userData.phase) * 0.6;
+      }
+
+      // Gentle camera parallax following the cursor
+      camera.position.x += (mouseX * 2.2 - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY * 2.2 - camera.position.y) * 0.03;
+      camera.lookAt(0, 0, -4);
     }
-
-    // Gentle camera parallax following the cursor
-    camera.position.x += (mouseX * 2.2 - camera.position.x) * 0.03;
-    camera.position.y += (-mouseY * 2.2 - camera.position.y) * 0.03;
-    camera.lookAt(0, 0, -4);
 
     // Bloom is constant — no energy modulation, so no flashing.
     if (bloomPass) bloomPass.strength = 0.42;

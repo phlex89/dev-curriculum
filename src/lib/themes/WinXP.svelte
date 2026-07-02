@@ -134,6 +134,18 @@
     startMenuOpen = !startMenuOpen;
   }
 
+  function handleGlobalKeydown(e: KeyboardEvent) {
+    if (e.key !== 'Escape') return;
+    if (startMenuOpen) {
+      startMenuOpen = false;
+      return;
+    }
+    const openWindows = windows.filter(w => w.isOpen && !w.minimized);
+    if (openWindows.length === 0) return;
+    const topWin = openWindows.reduce((a, b) => (b.zIndex > a.zIndex ? b : a));
+    closeWindow(topWin.id);
+  }
+
   function handleDesktopClick() {
     clickCount++;
     if (clickCount > 8) {
@@ -191,6 +203,8 @@
   });
 </script>
 
+<svelte:window onkeydown={handleGlobalKeydown} />
+
 {#if bsodActive}
   <div class="bsod">
     <div class="bsod-text">
@@ -227,32 +241,31 @@
   </div>
 {:else}
   <div class="xp-desktop" onclick={handleDesktopClick}>
-    <!-- Icone Desktop (singolo click = seleziona, doppio click = apri) -->
     <div class="desktop-icons">
-      <div class="desktop-icon" class:selected={selectedIcon === 'about'} onclick={(e) => selectIcon(e, 'about')} ondblclick={(e) => { e.stopPropagation(); openWindow('about'); }}>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'about'} onclick={(e) => { selectIcon(e, 'about'); openWindow('about'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('about'); }}>
         <div class="icon-emoji"><XpIcon name="doc" size={40} /></div>
         <span>Risorse del CV</span>
-      </div>
-      <div class="desktop-icon" class:selected={selectedIcon === 'skills'} onclick={(e) => selectIcon(e, 'skills')} ondblclick={(e) => { e.stopPropagation(); openWindow('skills'); }}>
+      </button>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'skills'} onclick={(e) => { selectIcon(e, 'skills'); openWindow('skills'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('skills'); }}>
         <div class="icon-emoji"><XpIcon name="gear" size={40} /></div>
         <span>Skills</span>
-      </div>
-      <div class="desktop-icon" class:selected={selectedIcon === 'exp'} onclick={(e) => selectIcon(e, 'exp')} ondblclick={(e) => { e.stopPropagation(); openWindow('exp'); }}>
+      </button>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'exp'} onclick={(e) => { selectIcon(e, 'exp'); openWindow('exp'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('exp'); }}>
         <div class="icon-emoji"><XpIcon name="folder" size={40} /></div>
         <span>Esperienze</span>
-      </div>
-      <div class="desktop-icon" class:selected={selectedIcon === 'edu'} onclick={(e) => selectIcon(e, 'edu')} ondblclick={(e) => { e.stopPropagation(); openWindow('edu'); }}>
+      </button>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'edu'} onclick={(e) => { selectIcon(e, 'edu'); openWindow('edu'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('edu'); }}>
         <div class="icon-emoji"><XpIcon name="cap" size={40} /></div>
         <span>Formazione</span>
-      </div>
-      <div class="desktop-icon" class:selected={selectedIcon === 'contact'} onclick={(e) => selectIcon(e, 'contact')} ondblclick={(e) => { e.stopPropagation(); openWindow('contact'); }}>
+      </button>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'contact'} onclick={(e) => { selectIcon(e, 'contact'); openWindow('contact'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('contact'); }}>
         <div class="icon-emoji"><XpIcon name="contacts" size={40} /></div>
         <span>Contatti</span>
-      </div>
-      <div class="desktop-icon" class:selected={selectedIcon === 'trash'} onclick={(e) => selectIcon(e, 'trash')} ondblclick={(e) => { e.stopPropagation(); triggerBSOD(); }}>
+      </button>
+      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'trash'} onclick={(e) => { selectIcon(e, 'trash'); triggerBSOD(); }} ondblclick={(e) => { e.stopPropagation(); triggerBSOD(); }}>
         <div class="icon-emoji"><XpIcon name="trash" size={40} /></div>
         <span>Cestino</span>
-      </div>
+      </button>
     </div>
 
     <!-- Finestre -->
@@ -378,12 +391,12 @@
     {/each}
 
     <!-- Clippy (Easter Egg) -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div
+    <button
+      type="button"
       class="clippy-container"
       onclick={(e) => { e.stopPropagation(); window.location.href = `mailto:${cvData.contact.email}?subject=${encodeURIComponent('Opportunità per un Frontend Architect')}`; }}
       title="Scrivimi una mail"
+      aria-label="Scrivimi una mail"
     >
       <div class="clippy-balloon">
         Sembra che tu stia cercando un Frontend Architect.<br><strong>Clicca qui per scrivermi una mail!</strong> ✉️
@@ -424,7 +437,7 @@
           <circle cx="103" cy="40" r="2" fill="#fff" />
         </g>
       </svg>
-    </div>
+    </button>
 
     <!-- Taskbar -->
     <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -437,9 +450,9 @@
 
       <div class="taskbar-windows">
         {#each windows.filter(w => w.isOpen) as win}
-          <div class="taskbar-item {win.zIndex === topZIndex && !win.minimized ? 'active' : ''}" onclick={() => taskbarClick(win.id)}>
+          <button type="button" class="taskbar-item {win.zIndex === topZIndex && !win.minimized ? 'active' : ''}" onclick={() => taskbarClick(win.id)}>
             {#if win.icon}<span class="tb-icon"><XpIcon name={win.icon} size={16} /></span>{/if} {win.title}
-          </div>
+          </button>
         {/each}
       </div>
 
@@ -456,18 +469,18 @@
           </div>
           <div class="start-body">
             <div class="left-panel">
-              <div class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="doc" size={22} /></span> About Me</div>
-              <div class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="gear" size={22} /></span> Skills</div>
-              <div class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder" size={22} /></span> Esperienze</div>
-              <div class="prog-item" onclick={() => openWindow('edu')}><span class="icon"><XpIcon name="cap" size={22} /></span> Formazione</div>
-              <div class="prog-item" onclick={() => openWindow('contact')}><span class="icon"><XpIcon name="contacts" size={22} /></span> Contatti</div>
+              <button type="button" class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="doc" size={22} /></span> About Me</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="gear" size={22} /></span> Skills</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder" size={22} /></span> Esperienze</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('edu')}><span class="icon"><XpIcon name="cap" size={22} /></span> Formazione</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('contact')}><span class="icon"><XpIcon name="contacts" size={22} /></span> Contatti</button>
               <div class="separator"></div>
-              <div class="prog-item" onclick={() => window.open(cvData.contact.linkedin, '_blank')}><span class="icon"><XpIcon name="linkedin" size={22} /></span> LinkedIn</div>
+              <button type="button" class="prog-item" onclick={() => window.open(cvData.contact.linkedin, '_blank')}><span class="icon"><XpIcon name="linkedin" size={22} /></span> LinkedIn</button>
             </div>
             <div class="right-panel">
-              <div class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="computer" size={22} /></span> Il mio PC</div>
-              <div class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder-docs" size={22} /></span> Documenti recenti</div>
-              <div class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="control" size={22} /></span> Pannello di Controllo</div>
+              <button type="button" class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="computer" size={22} /></span> Il mio PC</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder-docs" size={22} /></span> Documenti recenti</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="control" size={22} /></span> Pannello di Controllo</button>
             </div>
           </div>
           <div class="start-footer">
@@ -565,12 +578,24 @@
   }
 
   .desktop-icon {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 80px;
     cursor: pointer;
     text-align: center;
+  }
+
+  .desktop-icon:focus-visible {
+    outline: 1px dotted #fff;
+    outline-offset: 2px;
   }
 
   .desktop-icon span {
@@ -788,6 +813,10 @@
   }
 
   .taskbar-item {
+    appearance: none;
+    font: inherit;
+    margin: 0;
+    text-align: inherit;
     background: linear-gradient(to bottom, #3b74e6, #2d65d9);
     border: 1px solid #1449b8;
     border-radius: 2px;
@@ -807,6 +836,10 @@
   .taskbar-item.active {
     background: linear-gradient(to bottom, #1d4bb8, #1842a6);
     box-shadow: inset 1px 1px 3px rgba(0,0,0,0.3);
+  }
+  .taskbar-item:focus-visible {
+    outline: 1px dotted #fff;
+    outline-offset: -4px;
   }
 
   .tray {
@@ -883,6 +916,14 @@
   }
 
   .prog-item {
+    appearance: none;
+    background: none;
+    border: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    width: 100%;
     padding: 8px 10px;
     font-size: 12px;
     cursor: pointer;
@@ -893,6 +934,10 @@
   .prog-item:hover {
     background-color: var(--xp-blue);
     color: white;
+  }
+  .prog-item:focus-visible {
+    outline: 1px dotted #000;
+    outline-offset: -4px;
   }
   
   .separator {
@@ -918,6 +963,14 @@
   }
 
   .clippy-container {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
     position: absolute;
     bottom: 50px;
     right: 30px;
@@ -928,6 +981,7 @@
     cursor: pointer;
   }
   .clippy-container:hover .clippy-svg { transform: scale(1.06); }
+  .clippy-container:focus-visible { outline: 1px dotted #fff; outline-offset: 4px; }
 
   .clippy-balloon {
     background: #ffffcc;

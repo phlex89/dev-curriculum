@@ -3,6 +3,7 @@
   import { fade } from 'svelte/transition';
   import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
+  import { trackEra } from '$lib/analytics';
   import Timeline from '$lib/components/Timeline.svelte';
   import SeoContent from '$lib/components/SeoContent.svelte';
   import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
@@ -86,6 +87,14 @@
       fxClass = dir;
       fxKey++; // re-mount the overlay so its animation replays
     }
+  });
+
+  // Tag the Clarity session with each era actually shown (covers the initial era
+  // at boot and every swap: Timeline click, keyboard nav, hashchange/back-forward).
+  $effect(() => {
+    const dt = displayedTheme;
+    if (!booted || dt === null) return;
+    trackEra(dt);
   });
 
   function onAudioToggle() {

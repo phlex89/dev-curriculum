@@ -163,6 +163,17 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 **Componente:** `src/lib/components/Timeline.svelte`
 La linea del tempo posizionata in basso (a forma di "pillola di vetro" espandibile) è l'elemento che unisce l'intero progetto. È progettato per essere reattivo e per iniettare CSS globale (`:global`) in base al tema selezionato, così da mimetizzarsi e rispettare i canoni visivi dell'era attiva: diventa un blocco nero e verde monospace nel Terminale, una dialog-box NES indaco con bordo bianco e nodo attivo rosso (font **Press Start 2P**) nella Pixel Art, una pillola **grigio-argento `#c0c0c0` con bevel `outset` (look Netscape/Win95)** e nodo attivo blu navy in Times nel Web 1.0, una barra opaca outset in Windows XP, una pillola in **metallo spazzolato** con nodo attivo "gel" blu nello Skeuomorfismo, una **superficie bianca flat sollevata da ombre di elevazione** con nodo attivo indaco, font **Roboto** e fill indaco→accent nel Material Design, un blocco squadrato a bordo nero spesso con nodo attivo acid-yellow e font **Space Mono** nel Brutalismo, una pillola con font **Space Grotesk** in Modern Flat, una **pillola frosted lattiginosa** (vetro `backdrop-filter: blur+saturate`, bordo-luce, nodo attivo viola, font **Inter**) nel Glassmorphism, una **pillola crema editoriale** con nodo attivo **olive** e font Inter nel Parallax, e una versione neon con font **Orbitron** nel Futuro.
 
+### Sistema di voto delle ere
+I visitatori possono mettere ♥ a ogni era (multi-like, revocabile). Widget flottante
+`src/lib/components/EraVote.svelte` (bottom-right, tematizzato per tutte le ere come
+l'audio-fab), stato client in `src/lib/votes.svelte.ts` (localStorage `cv_votes`, UI
+ottimistica, errori silenziosi), API `src/routes/api/votes/+server.ts` (GET totali /
+POST like-unlike, rate limit per IP) su Upstash Redis (hash `era_votes`, env
+`KV_REST_API_URL`/`KV_REST_API_TOKEN` via integrazione Vercel Marketplace). Logica pura
+testata in `src/lib/server/votes-core.ts` (`npm run test`). Metadati label/icona/anno
+delle ere centralizzati in `src/lib/era-meta.ts` (usati da Timeline e EraVote). Ogni
+like emette anche l'evento Clarity `vote-<era>`.
+
 ## Asset & Performance
 -   **Wallpaper XP**: in `static/wallpapers/` sono presenti 4 risoluzioni del "Bliss" originale (`bliss-1366x768`, `bliss-1920x1080`, `bliss-2560x1440`, `bliss-3840x2160`). La selezione avviene via media query (`min-width` + `min-resolution` per i display HiDPI/retina): viene scaricato **solo** il file che corrisponde al dispositivo.
 -   **Font**: caricate solo 4 famiglie Google Fonts con i pesi strettamente necessari e `display=swap`; il browser scarica i `woff2` solo del tema visualizzato.

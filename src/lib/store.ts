@@ -27,14 +27,16 @@ const persist = (theme: Theme) => {
   }
 };
 
-/** Reflect the active era in the URL hash so a recruiter can share e.g. `#winxp`. */
-const syncHash = (theme: Theme) => {
-  if (typeof location !== 'undefined' && location.hash.slice(1) !== theme) {
-    try {
-      history.replaceState(history.state, '', `#${theme}`);
-    } catch {
-      /* history blocked */
-    }
+/** Reflect the active era in the URL hash so a recruiter can share e.g. `#winxp`.
+ *  `push` adds a session-history entry (user-initiated change, so the browser
+ *  Back button returns to the previous era); `replace` rewrites in place. */
+const writeHash = (theme: Theme, mode: 'push' | 'replace') => {
+  if (typeof location === 'undefined' || location.hash.slice(1) === theme) return;
+  try {
+    if (mode === 'push') history.pushState(history.state, '', `#${theme}`);
+    else history.replaceState(history.state, '', `#${theme}`);
+  } catch {
+    /* history blocked */
   }
 };
 
@@ -46,7 +48,7 @@ const createThemeStore = () => {
     /** User-initiated change: persist + reflect in the URL. */
     set: (theme: Theme) => {
       persist(theme);
-      syncHash(theme);
+      writeHash(theme, 'push');
       _set(theme);
     },
     /** Change coming from the URL itself (hashchange / back-forward): don't rewrite the hash. */
@@ -71,12 +73,12 @@ const createThemeStore = () => {
         }
         if (isTheme(saved)) {
           _set(saved);
-          syncHash(saved);
+          writeHash(saved, 'replace');
           return;
         }
       }
       // Default era — reflect it in the hash so the URL is always shareable.
-      syncHash('bento');
+      writeHash('bento', 'replace');
     }
   };
 };

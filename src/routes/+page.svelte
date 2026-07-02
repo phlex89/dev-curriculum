@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
-  import { trackEra } from '$lib/analytics';
+  import { trackEra, trackEvent } from '$lib/analytics';
   import Timeline from '$lib/components/Timeline.svelte';
   import SeoContent from '$lib/components/SeoContent.svelte';
   import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
@@ -23,8 +23,6 @@
     threed: 'Future 3D · 2026'
   };
 
-  const pageTitle = $derived(`Stefano Tedeschi — CV · ${eraLabels[$currentTheme] ?? 'Time-Machine Resume'}`);
-
   const prefersReduced = () =>
     typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -32,6 +30,15 @@
   // we render nothing, so the visitor never sees the default (bento) flash and the
   // cross-dissolve/time-travel FX don't fire on load — just a clean fade-in.
   let booted = $state(false);
+
+  // Before boot (and in the prerendered HTML) the store still holds the default
+  // era, so serve a neutral era-agnostic title; the per-era title takes over
+  // after hydration resolves the real era.
+  const pageTitle = $derived(
+    booted
+      ? `Stefano Tedeschi — CV · ${eraLabels[$currentTheme] ?? 'Time-Machine Resume'}`
+      : 'Stefano Tedeschi — Frontend Architect · CV interattivo'
+  );
 
   // The era actually on screen. It LAGS `$currentTheme`: when a new era is picked
   // we keep the current one rendered until its (code-split) chunk has loaded, then
@@ -99,7 +106,10 @@
 
   function onAudioToggle() {
     const on = toggleAudio();
-    if (on) playEra($currentTheme); // confirm with the current era's cue
+    if (on) {
+      trackEvent('audio-on');
+      playEra($currentTheme); // confirm with the current era's cue
+    }
   }
 
   onMount(() => {
@@ -139,7 +149,7 @@
 <main class="app-container">
   <!-- Canonical, prerendered CV (single source of truth: cv-data.ts). Always
        mounted and visually hidden (.sr-only): present in the static HTML for
-       crawlers and screen readers, while the eleven eras render the visible UI. -->
+       crawlers and screen readers, while the eras render the visible UI. -->
   <div class="sr-only">
     <SeoContent />
   </div>

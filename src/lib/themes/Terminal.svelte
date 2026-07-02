@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { cvData } from '$lib/cv-data';
+  import { trackEvent, trackTag } from '$lib/analytics';
 
   interface HistoryEntry {
     type: 'command' | 'output' | 'matrix' | 'clear';
@@ -263,6 +264,9 @@
 
     if (!command) return;
 
+    trackEvent('terminal-command');
+    trackTag('terminal-cmd', command);
+
     switch (command) {
       case 'help':
       case 'man':
@@ -285,6 +289,7 @@
       case 'download':
         addOutput('Fetching résumé… stefano-tedeschi-cv.pdf');
         addOutput('Download started. Check your browser downloads.');
+        trackEvent('cv-download');
         downloadCV();
         break;
 
@@ -293,12 +298,14 @@
         break;
 
       case 'sudo':
+        trackEvent('terminal-sudo');
         addOutput('stefano is not in the sudoers file. This incident will be reported.');
         break;
 
       case 'matrix':
         matrixMode = !matrixMode;
         if (matrixMode) {
+          trackEvent('terminal-matrix');
           addOutput('Entering the matrix...');
         } else {
           addOutput('Exiting the matrix...');
@@ -396,6 +403,7 @@
         break;
 
       default:
+        trackEvent('terminal-unknown-cmd');
         addOutput(`bash: ${command}: command not found. Type 'help' for options.`);
     }
   }

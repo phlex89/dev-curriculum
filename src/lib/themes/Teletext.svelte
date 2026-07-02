@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { cvData } from '$lib/cv-data';
   import { teletextBeep } from '$lib/audio';
+  import { trackEvent, trackTag } from '$lib/analytics';
 
   // ── Page map ────────────────────────────────────────────────────────────────
   // A Televideo/Ceefax magazine: every section is a numbered page. The visitor
@@ -92,6 +93,8 @@
     buffer = '';
     revealed = false;
     currentPage = n;
+    trackTag('teletext-page', String(n));
+    if (n === PAGE.SECRET) trackEvent('teletext-777');
     teletextBeep();
     if (!prefersReduced() && wrapperEl) {
       acquiring = true;
@@ -151,11 +154,17 @@
       }
     } else if (e.key === 'r' || e.key === 'R') {
       e.preventDefault();
-      revealed = !revealed;
+      toggleReveal();
     }
   }
 
+  function toggleReveal() {
+    revealed = !revealed;
+    if (revealed) trackEvent('teletext-reveal');
+  }
+
   function downloadCV() {
+    trackEvent('cv-download');
     const link = document.createElement('a');
     link.href = '/cv-stefano-tedeschi.pdf';
     link.download = 'Stefano_Tedeschi_CV.pdf';
@@ -415,7 +424,7 @@
     <div class="nav-keys">
       <button class="navk" onclick={() => step(-1)} aria-label="Pagina precedente">◄</button>
       <button class="navk" onclick={() => step(1)} aria-label="Pagina successiva">►</button>
-      <button class="navk reveal" class:on={revealed} onclick={() => (revealed = !revealed)} aria-pressed={revealed}>SVELA</button>
+      <button class="navk reveal" class:on={revealed} onclick={toggleReveal} aria-pressed={revealed}>SVELA</button>
     </div>
   </div>
 </div>

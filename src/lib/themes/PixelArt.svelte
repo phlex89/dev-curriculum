@@ -17,6 +17,7 @@
   import { onMount } from 'svelte';
   import { cvData } from '$lib/cv-data';
   import { pixelBlip, pixelDiscover, pixelFanfare, pixelCoin, pixelBump, pixelSecret } from '$lib/audio';
+  import { trackEvent, trackTag } from '$lib/analytics';
 
   type ZoneId = 'about' | 'experience' | 'skills' | 'education' | 'contact' | 'cv' | 'secret';
   type Kind = 'house' | 'castle' | 'shop' | 'library' | 'mailbox' | 'chest' | 'shrine';
@@ -234,6 +235,7 @@
     if (questDone && !questShown) {
       questShown = true;
       showQuest = true;
+      trackEvent('pixel-quest-complete');
       pixelFanfare();
       setTimeout(() => (showQuest = false), 4200);
     }
@@ -315,6 +317,7 @@
     if (coins.length === 0 && !secretUnlocked) {
       secretUnlocked = true;
       secretToast = true;
+      trackEvent('pixel-secret-unlock');
       pixelSecret();
       setTimeout(() => (secretToast = false), 4200);
     }
@@ -389,6 +392,7 @@
   function triggerKonami() {
     nightMode = !nightMode;
     konamiToast = true;
+    trackEvent('pixel-konami');
     pixelFanfare();
     setTimeout(() => (konamiToast = false), 2600);
   }
@@ -414,6 +418,7 @@
     fishTimer = setTimeout(() => {
       const catchText = FISH_CATCHES[Math.floor(Math.random() * FISH_CATCHES.length)];
       fishMsg = catchText;
+      trackEvent('pixel-fish-catch');
       if (catchText.includes('DORATO') || catchText.includes('CARTUCCIA')) pixelDiscover();
       else pixelBlip();
       fishTimer = setTimeout(() => (fishing = false), 2400);
@@ -475,6 +480,10 @@
   async function openZone(id: ZoneId) {
     const first = !visited.includes(id);
     if (first) visited = [...visited, id];
+    if (first) {
+      trackEvent('pixel-zone-open');
+      trackTag('pixel-zone', id);
+    }
     activeZone = id;
     held.clear();
     if (first) pixelDiscover();
@@ -562,7 +571,13 @@
     <div class="hud-right">
       {#if !reduced}<div class="hud-box coins" class:done={secretUnlocked}>● {coinsGot}/{COINS_TOTAL}</div>{/if}
       <div class="hud-box quest" class:done={questDone}>★ {visited.filter((id) => id !== 'secret').length}/{ZONES.length}</div>
-      <button class="hud-box menu-btn" onclick={() => (directoryOpen = true)}>MOSTRA TUTTO</button>
+      <button
+        class="hud-box menu-btn"
+        onclick={() => {
+          directoryOpen = true;
+          trackEvent('pixel-show-all');
+        }}>MOSTRA TUTTO</button
+      >
     </div>
   </div>
 

@@ -30,3 +30,9 @@ vite.config.ts.timestamp-*
 
 # Claude Code machine-local settings
 .claude/settings.local.json
+
+# impeccable machine-local cache & config (design docs are versioned)
+.impeccable/hook.cache.json
+.impeccable/config.local.json
+.impeccable/live/sessions/
+.impeccable/live/annotations/

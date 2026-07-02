@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-02T12:40:00+02:00",
+  "title": "Design System: Time-Machine Resume",
+  "extensions": {
+    "colorMeta": {
+      "accent-blue": { "role": "primary", "displayName": "Accent Blue", "canonical": "#0071e3", "tonalRamp": ["oklch(20% 0.09 250)", "oklch(30% 0.12 250)", "oklch(40% 0.14 250)", "oklch(50% 0.16 250)", "oklch(58% 0.17 250)", "oklch(68% 0.14 250)", "oklch(80% 0.09 250)", "oklch(92% 0.04 250)"] },
+      "indigo-warp": { "role": "secondary", "displayName": "Indigo Warp", "canonical": "#4f46e5", "tonalRamp": ["oklch(20% 0.12 277)", "oklch(30% 0.16 277)", "oklch(40% 0.19 277)", "oklch(51% 0.23 277)", "oklch(60% 0.2 277)", "oklch(70% 0.15 277)", "oklch(82% 0.09 277)", "oklch(93% 0.04 277)"] },
+      "cyan-flare": { "role": "secondary", "displayName": "Cyan Flare", "canonical": "#7df9ff", "tonalRamp": ["oklch(25% 0.06 200)", "oklch(40% 0.09 200)", "oklch(55% 0.11 200)", "oklch(70% 0.12 200)", "oklch(80% 0.11 200)", "oklch(90% 0.08 200)", "oklch(94% 0.06 200)", "oklch(97% 0.03 200)"] },
+      "void-black": { "role": "neutral", "displayName": "Void Black", "canonical": "#000000", "tonalRamp": ["oklch(0% 0 0)", "oklch(15% 0 0)", "oklch(30% 0 0)", "oklch(45% 0 0)", "oklch(60% 0 0)", "oklch(75% 0 0)", "oklch(88% 0 0)", "oklch(97% 0 0)"] },
+      "glass-surface": { "role": "neutral", "displayName": "Glass Surface", "canonical": "rgba(255,255,255,0.7)" },
+      "hint-ink": { "role": "neutral", "displayName": "Hint Ink", "canonical": "rgba(20,20,30,0.92)" }
+    },
+    "typographyMeta": {
+      "label": { "displayName": "Timeline Label", "purpose": "Testo della pillola attiva della Timeline; sovrascritto per-era via .theme-X .label-text." },
+      "hint": { "displayName": "Hint Bubble", "purpose": "Tooltip first-visit sopra la Timeline, mostrato una sola volta." }
+    },
+    "shadows": [
+      { "name": "ambient-container", "value": "0 10px 30px rgba(0,0,0,.1)", "purpose": "Timeline a riposo; variante .12 per l'audio FAB." },
+      { "name": "active-glow", "value": "0 4px 15px rgba(0,113,227,.4)", "purpose": "Pillola attiva: l'ombra prende il colore dell'accento." }
+    ],
+    "motion": [
+      { "name": "fade-in-theme", "value": "600ms ease (delay 260ms)", "purpose": "Cross-fade di ingresso del layer d'era." },
+      { "name": "fade-out-theme", "value": "460ms ease", "purpose": "Cross-fade di uscita del layer d'era." },
+      { "name": "bloom-forward", "value": "680ms cubic-bezier(0.22,1,0.36,1)", "purpose": "Viaggio avanti nel tempo (radiale bianco/blu, mix-blend screen)." },
+      { "name": "glitch-back", "value": "520ms steps(8,end)", "purpose": "Viaggio indietro nel tempo (scanline CRT verdi)." },
+      { "name": "pill-spring", "value": "0.4s cubic-bezier(0.175,0.885,0.32,1.275)", "purpose": "Hover/active dei nodi Timeline, molla con overshoot." },
+      { "name": "fill-ease", "value": "0.5s cubic-bezier(0.22,1,0.36,1)", "purpose": "Avanzamento della fill di progresso." },
+      { "name": "sheet-up", "value": "0.32s cubic-bezier(0.22,1,0.36,1)", "purpose": "Apertura era-sheet mobile." }
+    ],
+    "breakpoints": [
+      { "name": "timeline-compact", "value": "600px" },
+      { "name": "audio-fab-reposition", "value": "720px" }
+    ],
+    "zIndex": [
+      { "name": "fx-overlay", "value": 9990 },
+      { "name": "load-bar", "value": 9995 },
+      { "name": "scrim-backdrop", "value": 9998 },
+      { "name": "timeline-and-fab", "value": 9999 },
+      { "name": "era-sheet", "value": 10000 }
+    ]
+  },
+  "components": [
+    {
+      "name": "Timeline Container",
+      "kind": "nav",
+      "refersTo": "timeline-container",
+      "description": "Pillola flottante bottom-center che ospita i 12 nodi-era; skin per-era via class-switch theme-{id}.",
+      "html": "<nav class=\"ds-timeline\"><button class=\"ds-node\">🖥</button><button class=\"ds-node ds-node-active\">📺 1984</button><button class=\"ds-node\">👾</button></nav>",
+      "css": ".ds-timeline { display: inline-flex; gap: 4px; align-items: center; background: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.4); border-radius: 40px; padding: 8px 16px; box-shadow: 0 10px 30px rgba(0,0,0,.1); backdrop-filter: blur(10px); } .ds-node { border: none; background: rgba(0,0,0,.05); border-radius: 30px; padding: 8px 12px; font: 600 0.9rem 'Space Grotesk', -apple-system, sans-serif; cursor: pointer; transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); } .ds-node:hover { background: rgba(0,0,0,.1); } .ds-node:focus-visible { outline: 2px solid #0071e3; outline-offset: 2px; } .ds-node-active { background: #0071e3; color: #fff; padding: 8px 20px; box-shadow: 0 4px 15px rgba(0,113,227,.4); }"
+    },
+    {
+      "name": "Audio FAB",
+      "kind": "button",
+      "refersTo": "audio-fab",
+      "description": "Toggle audio flottante bottom-left, muto di default, skin per-era.",
+      "html": "<button class=\"ds-audio-fab\" aria-label=\"Attiva audio\">🔇</button>",
+      "css": ".ds-audio-fab { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.7); box-shadow: 0 10px 30px rgba(0,0,0,.12); cursor: pointer; font-size: 1rem; transition: transform 0.2s ease; } .ds-audio-fab:hover { transform: scale(1.08); } .ds-audio-fab:focus-visible { outline: 2px solid #0071e3; outline-offset: 2px; }"
+    },
+    {
+      "name": "Load Bar",
+      "kind": "custom",
+      "refersTo": "load-bar",
+      "description": "Barra di caricamento top che appare solo se il chunk dell'era tarda oltre 220ms.",
+      "html": "<div class=\"ds-loadbar\"></div>",
+      "css": ".ds-loadbar { position: relative; height: 3px; width: 100%; background: linear-gradient(90deg, #0071e3, #4f46e5, #7df9ff); border-radius: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Il Museo Vivente della UI",
+    "overview": "Le dodici ere sono sale espositive perfettamente ricostruite; la shell è il corridoio che le collega. Ma è un corridoio camaleonte: quando entri in una sala, la cornice stessa si traveste. L'immersione totale vince sempre sulla riconoscibilità della cornice. La shell nuda (pillola glass su nero, accento #0071e3) esiste solo come stato base da cui ogni era parte.",
+    "keyCharacteristics": [
+      "Timeline pillola flottante, unico elemento persistente cross-era, riskinnata via class-switch theme-{id}",
+      "Transizioni direzionali: bloom in avanti (680ms), glitch CRT all'indietro (520ms)",
+      "Primo paint gated dal flag booted: nessun flash del tema di default",
+      "Audio sintetizzato al volo (Web Audio), opt-in, muto di default",
+      "Doppia modalità Timeline: pillola estesa / stepper compatto con sheet modale",
+      "Layer SEO semantico invisibile che specchia cv-data.ts"
+    ],
+    "rules": [
+      { "name": "The Chameleon Rule", "body": "Ogni era DEVE riskinnare Timeline e audio FAB con un blocco .theme-{id} esplicito. Una nuova era senza skin della shell è incompleta.", "section": "colors" },
+      { "name": "The Subset Rule", "body": "Ogni webfont d'era è self-hosted, font-display swap, subsettato latin con unicode-range (eccezione documentata: Bedstead).", "section": "typography" },
+      { "name": "The One-Float Rule", "body": "La shell ha un solo piano di elevazione: tutto ciò che le appartiene flotta alla stessa quota sopra l'era.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do aggiungere una nuova era in tutti i punti sincronizzati (store.ts, Timeline.svelte, +page.svelte, registry.ts) e verificare npm run check a 0 errori.",
+      "Do gated ogni animazione con prefers-reduced-motion sia lato JS sia lato CSS, con alternativa completa.",
+      "Do avvolgere ogni accesso a localStorage in try/catch.",
+      "Do sintetizzare l'audio con Web Audio API al volo: zero file audio.",
+      "Do rispettare la scala z-index documentata (9990–10000)."
+    ],
+    "donts": [
+      "Don't costruire nulla che somigli a un template CV/portfolio generico (hero + card grid + timeline verticale).",
+      "Don't far diventare la shell una demo tecnica fine a sé stessa.",
+      "Don't introdurre nostalgia da parodia/meme retrò low-effort.",
+      "Don't duplicare ulteriormente le palette per-era della shell (debito noto Timeline/audio-FAB).",
+      "Don't caricare webfont non subsettati o da CDN, né import statici di Three.js/Lenis.",
+      "Don't migrare a CSS custom properties solo metà delle superfici skinnate (Timeline + FAB insieme o niente)."
+    ]
+  }
+}

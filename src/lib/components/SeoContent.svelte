@@ -2,7 +2,7 @@
   /*
    * Canonical, prerender/SSR-safe semantic CV.
    *
-   * The eleven eras render entirely client-side inside `onMount` (behind the
+   * The eras render entirely client-side inside `onMount` (behind the
    * `booted` gate in +page.svelte), so a crawler that doesn't run JS receives an
    * essentially empty <main>. This component mirrors the SAME data (single source
    * of truth: cv-data.ts) as real, indexable HTML that ships in the prerendered
@@ -13,11 +13,17 @@
    * unaffected. Not cloaking — it is a faithful copy of what every era shows.
    */
   import { cvData } from '$lib/cv-data';
+
+  const years = new Date().getFullYear() - cvData.keyFigures.startYear;
 </script>
 
 <article class="seo-cv">
   <header>
     <h1>{cvData.name} — {cvData.role}</h1>
+    <p>
+      {cvData.name} è un {cvData.role} basato a Torino, con {years} anni di esperienza in architetture frontend,
+      design system e component library per piattaforme enterprise in fintech, IoT, banking e media.
+    </p>
     <p>{cvData.tagline}</p>
   </header>
 

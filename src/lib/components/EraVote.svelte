@@ -265,19 +265,6 @@
     opacity: 1;
   }
 
-  @media (max-width: 720px) {
-    .vote-widget {
-      bottom: 96px;
-      right: 14px;
-    }
-    .vote-pill {
-      height: 38px;
-    }
-    .vote-widget.theme-winxp {
-      bottom: 132px;
-    }
-  }
-
   .vote-widget.theme-terminal {
     font-family: 'Courier New', Courier, monospace;
     --vote-bg: #000;
@@ -419,5 +406,18 @@
     --vote-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     --vote-blur: blur(16px);
     --vote-bar: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 720px) {
+    .vote-widget {
+      bottom: 96px;
+      right: 14px;
+    }
+    .vote-pill {
+      height: 38px;
+    }
+    .vote-widget.theme-winxp {
+      bottom: 132px;
+    }
   }
 </style>

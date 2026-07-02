@@ -49,6 +49,10 @@
   let displayedTheme = $state<Theme | null>(null);
   let loadingTheme = $state<Theme | null>(null); // chunk in flight, for the loading cue
 
+  const liveAnnounce = $derived(
+    booted && displayedTheme ? `Ora visualizzi l’era ${eraLabels[displayedTheme] ?? displayedTheme}` : ''
+  );
+
   // Directional time-travel transition: glitch going back, bloom going forward.
   let fxClass = $state<'fx-back' | 'fx-forward' | null>(null);
   let fxKey = $state(0);
@@ -154,6 +158,8 @@
   <div class="sr-only">
     <SeoContent />
   </div>
+
+  <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">{liveAnnounce}</div>
 
   <!-- Thin top bar while a not-yet-cached era chunk is loading. The CSS fade-in
        delay means it only ever shows for genuinely slow (uncached) navigations;

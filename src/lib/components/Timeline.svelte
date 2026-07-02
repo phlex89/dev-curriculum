@@ -216,6 +216,7 @@
               onfocus={() => prefetchTheme(theme.id)}
               onkeydown={(e) => handleKeydown(e, i)}
               aria-label="{theme.year} - {theme.label}"
+              title="{theme.year} - {theme.label}"
             >
               <div class="node-pill">
                 <span class="icon">{theme.icon}</span>

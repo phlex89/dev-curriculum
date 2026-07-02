@@ -273,5 +273,151 @@
     .vote-pill {
       height: 38px;
     }
+    .vote-widget.theme-winxp {
+      bottom: 132px;
+    }
+  }
+
+  .vote-widget.theme-terminal {
+    font-family: 'Courier New', Courier, monospace;
+    --vote-bg: #000;
+    --vote-border: 1px solid #00ff00;
+    --vote-color: #00ff00;
+    --vote-accent: #00ff00;
+    --vote-radius: 0;
+    --vote-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    --vote-blur: none;
+    --vote-bar: #002200;
+  }
+
+  .vote-widget.theme-teletext {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    text-transform: uppercase;
+    --vote-bg: #000;
+    --vote-border: 2px solid #ffff00;
+    --vote-color: #ffff00;
+    --vote-accent: #00ffff;
+    --vote-radius: 0;
+    --vote-shadow: none;
+    --vote-blur: none;
+    --vote-bar: #0000ff;
+  }
+
+  .vote-widget.theme-pixel {
+    font-family: 'Press Start 2P', 'JetBrains Mono', monospace;
+    --vote-bg: #1c1c2e;
+    --vote-border: 3px solid #fcfcfc;
+    --vote-color: #fcfcfc;
+    --vote-accent: #d82800;
+    --vote-radius: 0;
+    --vote-shadow: 3px 3px 0 #000;
+    --vote-blur: none;
+    --vote-bar: #6b6bff;
+  }
+  .vote-widget.theme-pixel .vote-count { font-size: 0.6rem; }
+  .vote-widget.theme-pixel .vote-ranking li { font-size: 0.5rem; }
+  .vote-widget.theme-pixel .rank-fill { background: #fcd800; }
+
+  .vote-widget.theme-web1 {
+    font-family: 'Times New Roman', Times, serif;
+    --vote-bg: #c0c0c0;
+    --vote-border: 2px outset #f5f5f5;
+    --vote-color: #000080;
+    --vote-accent: #ff0000;
+    --vote-radius: 0;
+    --vote-shadow: 1px 1px 0 #808080, 2px 2px 4px rgba(0, 0, 0, 0.4);
+    --vote-blur: none;
+    --vote-bar: #fff;
+  }
+  .vote-widget.theme-web1 .rank-fill { background: #000080; }
+
+  .vote-widget.theme-winxp {
+    bottom: 40px;
+    font-family: Tahoma, 'Segoe UI', sans-serif;
+    --vote-bg: #ece9d8;
+    --vote-border: 2px outset #fff;
+    --vote-color: #000;
+    --vote-accent: #0058e6;
+    --vote-radius: 0;
+    --vote-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    --vote-blur: none;
+    --vote-bar: #a9a9a9;
+  }
+
+  .vote-widget.theme-skeuo {
+    font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, sans-serif;
+    --vote-bg: linear-gradient(180deg, #fcfcfd, #c9c9ce);
+    --vote-border: 1px solid #9a9aa0;
+    --vote-color: #4a4a50;
+    --vote-accent: #2f6fd0;
+    --vote-radius: 30px;
+    --vote-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 0 #8d8d92, 0 6px 14px rgba(0, 0, 0, 0.4);
+    --vote-blur: none;
+    --vote-bar: rgba(0, 0, 0, 0.18);
+  }
+
+  .vote-widget.theme-material {
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --vote-bg: #fff;
+    --vote-border: none;
+    --vote-color: rgba(0, 0, 0, 0.6);
+    --vote-accent: #ff4081;
+    --vote-radius: 8px;
+    --vote-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    --vote-blur: none;
+    --vote-bar: rgba(0, 0, 0, 0.12);
+  }
+  .vote-widget.theme-material .vote-count { border-left: 1px solid rgba(0, 0, 0, 0.12); }
+  .vote-widget.theme-material .rank-fill { background: #3f51b5; }
+
+  .vote-widget.theme-brutalism {
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    --vote-bg: #f3efe2;
+    --vote-border: 3px solid #0c0c0c;
+    --vote-color: #0c0c0c;
+    --vote-accent: #0c0c0c;
+    --vote-radius: 0;
+    --vote-shadow: 4px 4px 0 #0c0c0c;
+    --vote-blur: none;
+    --vote-bar: #fff;
+  }
+  .vote-widget.theme-brutalism .vote-heart.liked { background: #e9ff1a; }
+  .vote-widget.theme-brutalism .vote-heart.liked .heart-glyph { color: #0c0c0c; }
+
+  .vote-widget.theme-parallax {
+    font-family: 'Inter', -apple-system, sans-serif;
+    --vote-bg: rgba(243, 239, 231, 0.85);
+    --vote-border: 1px solid rgba(40, 38, 34, 0.16);
+    --vote-color: #6b6a4b;
+    --vote-accent: #b05c3f;
+    --vote-radius: 30px;
+    --vote-shadow: 0 10px 30px rgba(40, 38, 34, 0.12);
+    --vote-blur: blur(10px);
+    --vote-bar: rgba(40, 38, 34, 0.1);
+  }
+
+  .vote-widget.theme-glass {
+    font-family: 'Inter', -apple-system, sans-serif;
+    --vote-bg: rgba(255, 255, 255, 0.45);
+    --vote-border: 1px solid rgba(255, 255, 255, 0.6);
+    --vote-color: #4338ca;
+    --vote-accent: #7c74ff;
+    --vote-radius: 30px;
+    --vote-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 24px rgba(31, 38, 135, 0.18);
+    --vote-blur: blur(18px) saturate(180%);
+    --vote-bar: rgba(255, 255, 255, 0.5);
+  }
+
+  .vote-widget.theme-threed {
+    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+    --vote-bg: rgba(10, 8, 28, 0.62);
+    --vote-border: 1px solid rgba(125, 249, 255, 0.35);
+    --vote-color: #fff;
+    --vote-accent: #00ffff;
+    --vote-radius: 30px;
+    --vote-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --vote-blur: blur(16px);
+    --vote-bar: rgba(255, 255, 255, 0.2);
   }
 </style>

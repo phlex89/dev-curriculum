@@ -5,6 +5,7 @@
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
   import { trackEra, trackEvent } from '$lib/analytics';
   import Timeline from '$lib/components/Timeline.svelte';
+  import EraVote from '$lib/components/EraVote.svelte';
   import SeoContent from '$lib/components/SeoContent.svelte';
   import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
 
@@ -195,6 +196,7 @@
   <div class="timeline-scrim theme-{$currentTheme}" aria-hidden="true"></div>
 
   <Timeline />
+  <EraVote />
 </main>
 
 <style>

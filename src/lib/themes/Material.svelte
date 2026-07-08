@@ -428,7 +428,7 @@
     --on-primary: #ffffff;
     --text: rgba(0, 0, 0, 0.87);
     --text-2: rgba(0, 0, 0, 0.6);
-    --text-3: rgba(0, 0, 0, 0.38);
+    --text-3: rgba(0, 0, 0, 0.6);
     --divider: rgba(0, 0, 0, 0.12);
     /* Material elevation shadows (dp) */
     --elev-2: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
@@ -543,8 +543,8 @@
   .icon-btn {
     position: relative;
     overflow: hidden;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;

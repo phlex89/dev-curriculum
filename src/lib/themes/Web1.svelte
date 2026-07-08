@@ -389,8 +389,8 @@
                 <div class="card-body">
                   <p>Drop me a line and let me know you were here! <span class="blink mailheart" aria-hidden="true">&#10084;</span></p>
                   <form class="gb-form" onsubmit={signGuestbook}>
-                    <label>Your Name: <input type="text" bind:value={nameInput} maxlength="40" placeholder="CoolSurfer97" /></label>
-                    <label>Message: <textarea bind:value={msgInput} rows="2" maxlength="160" placeholder="Great homepage!!!"></textarea></label>
+                    <label for="gb-name">Your Name: <input id="gb-name" name="name" type="text" bind:value={nameInput} maxlength="40" placeholder="CoolSurfer97" /></label>
+                    <label for="gb-msg">Message: <textarea id="gb-msg" name="message" bind:value={msgInput} rows="2" maxlength="160" placeholder="Great homepage!!!"></textarea></label>
                     <button type="submit" class="gb-submit">Sign Guestbook</button>
                   </form>
                   <div class="gb-entries">
@@ -935,7 +935,7 @@
 
   /* Footer */
   .ftr { text-align: center; color: #cfe3ff; margin-top: 14px; }
-  .ftr a { color: #ffd700; }
+  .ftr a, .ftr a:link, .ftr a:visited { color: #ffe14d; }
   .ftr-meta { font-size: 0.84rem; margin: 4px 0; color: #aebfe8; }
   .ftr-meta b { color: #fff; }
 

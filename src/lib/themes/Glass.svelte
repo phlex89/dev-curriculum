@@ -118,13 +118,13 @@
 
     <!-- About -->
     <section class="panel about" style="grid-area: about" use:reveal={{ delay: 70 }} use:tilt={{ max: 2.5 }}>
-      <span class="label">Profilo</span>
+      <h2 class="label">Profilo</h2>
       <p class="summary">{cvData.summary}</p>
     </section>
 
     <!-- Experience -->
     <section class="panel exp" style="grid-area: exp" use:reveal={{ delay: 120 }} use:tilt={{ max: 1.8 }}>
-      <span class="label">Esperienza</span>
+      <h2 class="label">Esperienza</h2>
       <div class="exp-list">
         {#each cvData.experience as exp}
           <article class="exp-item">
@@ -154,7 +154,7 @@
 
     <!-- Skills -->
     <section class="panel skills" style="grid-area: skills" use:reveal={{ delay: 170 }} use:tilt={{ max: 2.5 }}>
-      <span class="label">Competenze</span>
+      <h2 class="label">Competenze</h2>
       <div class="skill-groups">
         {#each cvData.skillGroups as group}
           <div class="skill-group">
@@ -169,7 +169,7 @@
 
     <!-- Languages -->
     <section class="panel lang" style="grid-area: lang" use:reveal={{ delay: 210 }} use:tilt={{ max: 2.5 }}>
-      <span class="label">Lingue</span>
+      <h2 class="label">Lingue</h2>
       <div class="lang-list">
         {#each cvData.languages as lang}
           <div class="lang-item">
@@ -185,7 +185,7 @@
 
     <!-- Education -->
     <section class="panel edu" style="grid-area: edu" use:reveal={{ delay: 250 }} use:tilt={{ max: 2.5 }}>
-      <span class="label">Formazione</span>
+      <h2 class="label">Formazione</h2>
       {#each cvData.education as edu}
         <div class="edu-item">
           <strong>{edu.title}</strong>
@@ -196,7 +196,7 @@
 
     <!-- Talks / Conferences -->
     <section class="panel talks" style="grid-area: talks" use:reveal={{ delay: 290 }} use:tilt={{ max: 2.5 }}>
-      <span class="label">Conferenze</span>
+      <h2 class="label">Conferenze</h2>
       <div class="talk-list">
         {#each cvData.conferences as conf}
           <div class="talk-item">
@@ -226,7 +226,7 @@
     --g-tagline: #4a4a5e;
     --g-summary: #3a3a4c;
     --g-muted: #6b6b80;
-    --g-meta: #8484a0;
+    --g-meta: #5c5c78;
     --g-label: #7c74cc;
     --g-dot: #9b8bff;
     --g-panel-bg: rgba(255, 255, 255, 0.45);
@@ -453,7 +453,7 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--g-label);
-    margin-bottom: 16px;
+    margin: 0 0 16px;
   }
 
   /* ── Hero ──────────────────────────────────────────────────────────── */
@@ -668,8 +668,8 @@
       top: 14px;
       left: 14px;
       right: auto;
-      width: 38px;
-      height: 38px;
+      width: 44px;
+      height: 44px;
       font-size: 1rem;
     }
   }

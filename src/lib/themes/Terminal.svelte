@@ -277,6 +277,7 @@
         addOutput('  cat skills.txt      List my skills by category');
         addOutput('  cat languages.txt   View language proficiency');
         addOutput('  cat talks.txt       Conferences & seminars attended');
+        addOutput('  cat education.txt   Education & training');
         addOutput('  ls esperienze       List work experiences');
         addOutput('  show exp <id>       Read specific experience (e.g., show exp 0)');
         addOutput('  show early          Read my early career (2011-2015)');
@@ -397,6 +398,11 @@
           cvData.conferences.forEach((conf) => {
             addOutput(`  - ${conf.name} — ${conf.location} (${conf.year})`);
           });
+        } else if (args[1] === 'education.txt') {
+          cvData.education.forEach((edu) => {
+            addOutput(`${edu.title}`);
+            addOutput(`  ${edu.institute} — ${edu.location} (${edu.period})`);
+          });
         } else {
           addOutput(`cat: ${args[1]}: No such file or directory`);
         }
@@ -473,7 +479,7 @@
     <button onclick={() => runSuggested('ls esperienze')}>[ list exp ]</button>
     <button onclick={() => runSuggested('show exp 0')}>[ latest exp ]</button>
     <button onclick={() => runSuggested('show early')}>[ early ]</button>
-    <button onclick={() => runSuggested('cat certs.txt')}>[ certs ]</button>
+    <button onclick={() => runSuggested('cat education.txt')}>[ education ]</button>
     <button onclick={() => runSuggested('cat talks.txt')}>[ talks ]</button>
     <button onclick={() => runSuggested('neofetch')}>[ neofetch ]</button>
     <button onclick={() => runSuggested('download')}>[ download cv ]</button>

@@ -552,7 +552,7 @@
     --bg-deep: #ece5d8;
     --ink: #1a1714;
     --ink-soft: #4a443c;
-    --muted: #8a8074;
+    --muted: #6a6154;
     --line: rgba(26, 23, 20, 0.14);
     --accent: #7d7a4f; /* desaturated olive */
     --accent-2: #b0744f; /* terracotta */

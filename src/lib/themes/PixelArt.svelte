@@ -1303,8 +1303,8 @@
     bottom: 96px;
     z-index: 58;
     display: grid;
-    grid-template-columns: repeat(3, 38px);
-    grid-template-rows: repeat(3, 38px);
+    grid-template-columns: repeat(3, 44px);
+    grid-template-rows: repeat(3, 44px);
     gap: 2px;
   }
   .dpad .d {
@@ -1418,22 +1418,22 @@
   @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
 
   .role { font-size: 0.58rem; color: #5cf0a0; margin: 0 0 10px; }
-  .tagline { font-size: 0.52rem; color: #9db8ff; line-height: 1.7; margin: 0 0 12px; }
-  .summary { font-size: 0.5rem; line-height: 1.9; margin: 0 0 8px; }
+  .tagline { font-size: 0.58rem; color: #9db8ff; line-height: 1.7; margin: 0 0 12px; }
+  .summary { font-size: 0.6rem; line-height: 1.9; margin: 0 0 8px; }
 
   .rooms { display: flex; flex-direction: column; gap: 14px; }
   .room { border: 3px solid #2b39ff; padding: 12px; background: #20203a; }
   .room-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
   .floor { font-size: 0.5rem; color: #fcd800; }
-  .period { font-size: 0.46rem; color: #9db8ff; }
-  .job-title { font-size: 0.56rem; color: #fcfcfc; margin: 0 0 6px; line-height: 1.6; }
-  .job-co { font-size: 0.48rem; color: #5cf0a0; margin: 0 0 8px; line-height: 1.6; }
-  .job-desc { font-size: 0.48rem; line-height: 1.9; margin: 0 0 8px; }
+  .period { font-size: 0.54rem; color: #9db8ff; }
+  .job-title { font-size: 0.6rem; color: #fcfcfc; margin: 0 0 6px; line-height: 1.6; }
+  .job-co { font-size: 0.56rem; color: #5cf0a0; margin: 0 0 8px; line-height: 1.6; }
+  .job-desc { font-size: 0.58rem; line-height: 1.9; margin: 0 0 8px; }
   .hl { margin: 0 0 8px; padding-left: 16px; }
-  .hl li { font-size: 0.46rem; line-height: 2; margin-bottom: 4px; }
+  .hl li { font-size: 0.56rem; line-height: 2; margin-bottom: 4px; }
 
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { font-size: 0.44rem; background: #1c1c2e; border: 2px solid #fcfcfc; padding: 4px 6px; line-height: 1.4; }
+  .tag { font-size: 0.52rem; background: #1c1c2e; border: 2px solid #fcfcfc; padding: 4px 6px; line-height: 1.4; }
   .tag.powerup { border-color: #fcd800; color: #fcd800; }
 
   .bags { display: flex; flex-direction: column; gap: 14px; }
@@ -1442,7 +1442,7 @@
   .book { border-left: 4px solid #2b39ff; padding-left: 10px; margin-bottom: 10px; }
 
   .links { display: flex; flex-direction: column; gap: 10px; }
-  .link { font-size: 0.5rem; color: #9db8ff; text-decoration: none; border: 2px solid #2b39ff; padding: 10px; line-height: 1.6; word-break: break-word; }
+  .link { font-size: 0.56rem; color: #9db8ff; text-decoration: none; border: 2px solid #2b39ff; padding: 10px; line-height: 1.6; word-break: break-word; }
   .link:hover { background: #2b39ff; color: #fcfcfc; }
 
   .quest-note { font-size: 0.54rem; color: #fcd800; line-height: 1.7; margin: 12px 0; }
@@ -1547,8 +1547,8 @@
   /* ── Secret zone "hero stat sheet" ───────────────────────────────────── */
   .stats { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 14px; }
   .stat { display: flex; justify-content: space-between; gap: 12px; border-bottom: 2px dotted #2b39ff; padding-bottom: 6px; }
-  .stat-label { font-size: 0.46rem; color: #9db8ff; line-height: 1.6; }
-  .stat-value { font-size: 0.46rem; color: #fcd800; text-align: right; line-height: 1.6; }
+  .stat-label { font-size: 0.56rem; color: #9db8ff; line-height: 1.6; }
+  .stat-value { font-size: 0.56rem; color: #fcd800; text-align: right; line-height: 1.6; }
 
   @media (max-width: 600px) {
     .hud { padding: 8px; flex-direction: column; gap: 8px; }

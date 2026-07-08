@@ -19,6 +19,19 @@
 >   della Timeline (`src/lib/components/Timeline.svelte`).
 > - Ogni animazione passa dal filtro `prefers-reduced-motion`.
 
+> **Deroghe di contrasto documentate** (baseline WCAG AA, vedi `PRODUCT.md`). Dove la
+> fedeltà d'epoca lo impone, il contrasto può scendere sotto AA — ma solo come scelta
+> consapevole, elencata qui:
+> - **Windows XP** — i pulsanti di titlebar (min/max/chiudi ~21px) e il testo della
+>   taskbar riproducono le misure e i colori reali di Luna: ingrandirli o scurirli
+>   romperebbe il chrome. Deroga voluta sulle *chrome*, non sui contenuti del CV.
+> - **Pixel Art** — Press Start 2P è un font a blocchi: il corpo del dialogo NES ha un
+>   **pavimento di leggibilità di `0.56rem`** (alzato dai ~7px originari). Andare oltre
+>   sfonderebbe il riquadro; sotto quel valore no.
+> - **Televideo** — il blu puro `#00f` è alzato a `#6c7bff` per superare AA su nero.
+>
+> Tutto ciò che **non** è in questo elenco deve rispettare AA (testo normale ≥4.5:1).
+
 ---
 
 ## Quadro d'insieme
@@ -666,7 +679,7 @@ lingue, 106 formazione, 107 conferenze, 108 contatti (+download PDF), **777 pagi
 segreta** (oroscopo del frontend + battuta nascosta). **Doppio binario** di navigazione: digitazione
 **3 cifre** (buffer in header, beep `teletextBeep` per pagina) **+** tastierino on-screen, indice
 cliccabile, **4 tasti FASTEXT colorati** (rosso/verde/giallo/ciano), ◄/► prev-next, tasto **SVELA**
-(`R`) per il reveal televideo. **8 colori puri** su nero (blu alzato a `#5a6bff` per leggibilità),
+(`R`) per il reveal televideo. **8 colori puri** su nero (blu alzato a `#6c7bff` per leggibilità),
 **titoli a doppia altezza**, **barra rainbow** a mosaico come separatore. Font **Bedstead** (ricostruzione
 del char-ROM SAA5050 di Ceefax/Televideo, **pubblico dominio**, self-hostato/subsettato `~7KB`, range peso
 `400 700` per evitare il faux-bold; fallback JetBrains Mono — è l'unica era con webfont perché nessun SO ha

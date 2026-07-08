@@ -430,7 +430,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(215, 236, 220, 0.7);
+    color: rgba(215, 236, 220, 0.95);
     margin-bottom: 8px;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
   }

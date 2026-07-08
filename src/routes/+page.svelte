@@ -57,6 +57,7 @@
   let fxClass = $state<'fx-back' | 'fx-forward' | null>(null);
   let fxKey = $state(0);
   let prevIdx = -1;
+  let lastFxAt = 0;
 
   // Load the selected era's chunk, THEN reveal it. Watching the store covers every
   // entry point: Timeline click, keyboard nav, deep-link/back-forward hashchange.
@@ -95,9 +96,18 @@
 
     playEra(dt); // no-op unless the visitor opted into audio
 
-    if (!prefersReduced()) {
+    // Rapid stepping (holding ◄/► or fast clicks) shouldn't pay a full 680ms bloom
+    // per hop: if swaps arrive faster than the FX lasts, swap instantly and let the
+    // travel feel reactive. A settled hop after a pause still gets the full effect.
+    const now = Date.now();
+    const rapid = now - lastFxAt < 320;
+    lastFxAt = now;
+
+    if (!prefersReduced() && !rapid) {
       fxClass = dir;
       fxKey++; // re-mount the overlay so its animation replays
+    } else if (rapid) {
+      fxClass = null; // cancel any in-flight overlay so the swap reads as immediate
     }
   });
 

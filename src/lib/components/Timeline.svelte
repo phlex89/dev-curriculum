@@ -51,8 +51,9 @@
       /* storage blocked */
     }
     if (!seen) {
+      // Persist the nudge until the visitor actually travels: a 6s auto-dismiss
+      // meant anyone who paused to read never discovered the other eras.
       showHint = true;
-      setTimeout(dismissHint, 6000);
     }
 
     recomputeLayout();
@@ -164,7 +165,7 @@
 <div class="timeline-wrapper theme-{$currentTheme}" style="--fill: {fillFraction}">
   {#if showHint}
     <div class="timeline-hint" role="status">
-      Sei in <strong>{activeTheme.year} · {activeTheme.label}</strong>. Viaggia nel tempo <span class="hint-arrow">→</span>
+      <strong>{activeTheme.year} · {activeTheme.label}</strong> — una di <strong>{themes.length} ere</strong>. Viaggia nel tempo <span class="hint-arrow">→</span>
     </div>
   {/if}
   {#if isMobile}

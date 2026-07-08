@@ -518,7 +518,7 @@
   .c-red { color: #ff0000; }
   .c-grn { color: #00ff00; }
   .c-yel { color: #ffff00; }
-  .c-blu { color: #5a6bff; } /* lifted from pure #00f for legibility on black */
+  .c-blu { color: #6c7bff; } /* lifted from pure #00f for legibility on black */
   .c-mag { color: #ff00ff; }
   .c-cyn { color: #00ffff; }
   .c-wht { color: #ffffff; }
@@ -670,8 +670,9 @@
   .key {
     font: inherit;
     font-weight: 700;
-    width: 42px;
-    height: 32px;
+    width: 100%;
+    min-width: 44px;
+    height: 44px;
     background: #11111a;
     color: #00ffff;
     border: 1px solid #2a2a44;
@@ -690,6 +691,7 @@
     color: #00ff00;
     border: 1px solid #2a2a44;
     padding: 7px 14px;
+    min-height: 44px;
     cursor: pointer;
     font-size: 0.85rem;
     letter-spacing: 0.05em;

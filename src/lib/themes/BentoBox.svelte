@@ -100,8 +100,7 @@
       <span class="box-label">Core Stack</span>
       <div class="marquee-container">
         <div class="marquee">
-          {#each cvData.skills as skill}<span>{skill}</span> • {/each}
-          {#each cvData.skills as skill}<span>{skill}</span> • {/each}
+          <span class="mseq">{#each cvData.skills as skill}<span class="sk">{skill}</span> • {/each}</span><span class="mseq dup" aria-hidden="true">{#each cvData.skills as skill}<span class="sk">{skill}</span> • {/each}</span>
         </div>
       </div>
     </div>
@@ -344,13 +343,13 @@
     width: 116px;
     height: 116px;
     border-radius: 50%;
-    background: conic-gradient(from 220deg, #4f46e5, #8b5cf6, #ec4899, #f59e0b, #4f46e5);
+    background: var(--accent);
     margin-bottom: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 4px;
-    box-shadow: 0 12px 28px rgba(79, 70, 229, 0.32);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
   }
 
   .avatar-placeholder {
@@ -490,7 +489,7 @@
     animation-play-state: paused;
   }
 
-  .marquee span {
+  .marquee .sk {
     color: var(--text-main);
     margin: 0 6px 0 18px;
   }
@@ -498,6 +497,18 @@
   @keyframes scroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+  }
+
+  /* Reduced motion: the scroll stops and the skills become a static,
+     wrapped, fully readable list (the duplicate loop copy is dropped). */
+  @media (prefers-reduced-motion: reduce) {
+    .skills-box { overflow: visible; }
+    .marquee-container { white-space: normal; overflow: visible; }
+    .marquee-container::before,
+    .marquee-container::after { display: none; }
+    .marquee { display: block; animation: none; white-space: normal; }
+    .marquee .dup { display: none; }
+    .marquee .sk { display: inline-block; margin: 0 14px 4px 0; }
   }
 
   /* ---- Experience ---- */

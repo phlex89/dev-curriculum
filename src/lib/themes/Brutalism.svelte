@@ -367,9 +367,14 @@
 
   /* ░░ SECTION SCAFFOLD ░░ */
   .bru-section {
-    margin-bottom: 54px;
+    margin-bottom: 42px;
     /* Skip layout/paint for sections scrolled out of view; `auto` remembers each
-       section's real height after first render so scrolling back never jumps. */
+       section's real height after first render so scrolling back never jumps.
+       Its paint containment clips at the padding box, so reserve 12px of
+       right/bottom padding (offset by margins) as paint room for the 8px hard
+       shadows + 4px hover translate — otherwise they get cut at the edge. */
+    padding: 0 12px 12px 0;
+    margin-right: -12px;
     content-visibility: auto;
     contain-intrinsic-size: auto 400px;
   }

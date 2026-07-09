@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData } from '$lib/i18n';
   import { tilt, reveal } from '$lib/actions/interactive';
+
+  const cvData = getCvData();
 
   let darkMode = $state(false);
   let avatarFailed = $state(false);
@@ -159,7 +161,7 @@
       <span class="box-label">Talks</span>
       <div class="cert-cols">
         <div class="cert-col">
-          <span class="cert-head">Conferenze</span>
+          <span class="cert-head">Conferences</span>
           <ul>
             {#each cvData.conferences as conf}
               <li>{conf.name} <span class="muted">· {conf.location} ’{conf.year.slice(-2)}</span></li>

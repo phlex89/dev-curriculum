@@ -2,8 +2,11 @@
   import { onMount } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { draggable } from '$lib/actions/draggable';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import XpIcon from './winxp/XpIcon.svelte';
+
+  const cvData = getCvData();
+  const t = getUi().winxp;
 
   type WindowContent = 'about' | 'experiences' | 'skills' | 'contact' | 'education' | 'error' | 'clippy';
 
@@ -26,10 +29,10 @@
   let windows = $state<WindowState[]>([
     { id: 'about', title: 'About Me', content: 'about', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 80, y: 56, icon: 'doc' },
     { id: 'skills', title: 'Skills', content: 'skills', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 470, y: 44, icon: 'gear' },
-    { id: 'exp', title: 'Esperienze', content: 'experiences', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 250, y: 168, icon: 'folder' },
-    { id: 'edu', title: 'Formazione', content: 'education', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 560, y: 138, icon: 'cap' },
-    { id: 'contact', title: 'Contatti', content: 'contact', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 360, y: 92, icon: 'contacts' },
-    { id: 'error', title: 'Errore', content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 330, y: 176, icon: '' }
+    { id: 'exp', title: t.expLabel, content: 'experiences', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 250, y: 168, icon: 'folder' },
+    { id: 'edu', title: t.eduLabel, content: 'education', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 560, y: 138, icon: 'cap' },
+    { id: 'contact', title: t.contactLabel, content: 'contact', isOpen: false, minimized: false, maximized: false, zIndex: 10, x: 360, y: 92, icon: 'contacts' },
+    { id: 'error', title: t.errorTitle, content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 330, y: 176, icon: '' }
   ]);
 
   const prefersReduced = () =>
@@ -234,7 +237,7 @@
         <span class="boot-product">Windows<span class="boot-xp">xp</span></span>
       </div>
     </div>
-    <div class="boot-loader" aria-label="Avvio in corso">
+    <div class="boot-loader" aria-label={t.startingUp}>
       <div class="boot-blocks"><i></i><i></i><i></i></div>
     </div>
     <div class="boot-copy">Copyright © Stefano Tedeschi</div>
@@ -244,7 +247,7 @@
     <div class="desktop-icons">
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'about'} onclick={(e) => { selectIcon(e, 'about'); openWindow('about'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('about'); }}>
         <div class="icon-emoji"><XpIcon name="doc" size={40} /></div>
-        <span>Risorse del CV</span>
+        <span>{t.cvResources}</span>
       </button>
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'skills'} onclick={(e) => { selectIcon(e, 'skills'); openWindow('skills'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('skills'); }}>
         <div class="icon-emoji"><XpIcon name="gear" size={40} /></div>
@@ -252,19 +255,19 @@
       </button>
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'exp'} onclick={(e) => { selectIcon(e, 'exp'); openWindow('exp'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('exp'); }}>
         <div class="icon-emoji"><XpIcon name="folder" size={40} /></div>
-        <span>Esperienze</span>
+        <span>{t.expLabel}</span>
       </button>
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'edu'} onclick={(e) => { selectIcon(e, 'edu'); openWindow('edu'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('edu'); }}>
         <div class="icon-emoji"><XpIcon name="cap" size={40} /></div>
-        <span>Formazione</span>
+        <span>{t.eduLabel}</span>
       </button>
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'contact'} onclick={(e) => { selectIcon(e, 'contact'); openWindow('contact'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('contact'); }}>
         <div class="icon-emoji"><XpIcon name="contacts" size={40} /></div>
-        <span>Contatti</span>
+        <span>{t.contactLabel}</span>
       </button>
       <button type="button" class="desktop-icon" class:selected={selectedIcon === 'trash'} onclick={(e) => { selectIcon(e, 'trash'); triggerBSOD(); }} ondblclick={(e) => { e.stopPropagation(); triggerBSOD(); }}>
         <div class="icon-emoji"><XpIcon name="trash" size={40} /></div>
-        <span>Cestino</span>
+        <span>{t.trash}</span>
       </button>
     </div>
 
@@ -283,11 +286,11 @@
           <div class="titlebar" ondblclick={() => toggleMaximize(win.id)}>
             <div class="title-text">{#if win.icon}<span class="win-icon"><XpIcon name={win.icon} size={16} /></span>{/if} {win.title}</div>
             <div class="title-buttons">
-              <button class="win-btn min-btn" aria-label="Minimizza" title="Minimizza" onclick={() => minimizeWindow(win.id)}>
+              <button class="win-btn min-btn" aria-label={t.minimize} title={t.minimize} onclick={() => minimizeWindow(win.id)}>
                 <svg viewBox="0 0 10 10" width="10" height="10"><rect x="1" y="7" width="8" height="2" fill="currentColor"/></svg>
               </button>
               {#if !isMobile}
-                <button class="win-btn max-btn" aria-label="Ingrandisci" title="Ingrandisci" onclick={() => toggleMaximize(win.id)}>
+                <button class="win-btn max-btn" aria-label={t.maximize} title={t.maximize} onclick={() => toggleMaximize(win.id)}>
                   {#if win.maximized}
                     <svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="1.5" width="6" height="6"/><rect x="1.5" y="3.5" width="6" height="6" fill="#3268d6"/></svg>
                   {:else}
@@ -295,7 +298,7 @@
                   {/if}
                 </button>
               {/if}
-              <button class="win-btn close-btn" aria-label="Chiudi" title="Chiudi" onclick={() => closeWindow(win.id)}>
+              <button class="win-btn close-btn" aria-label={t.close} title={t.close} onclick={() => closeWindow(win.id)}>
                 <svg viewBox="0 0 10 10" width="10" height="10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1.5" y1="1.5" x2="8.5" y2="8.5"/><line x1="8.5" y1="1.5" x2="1.5" y2="8.5"/></svg>
               </button>
             </div>
@@ -308,7 +311,7 @@
                 <p><strong>Location:</strong> {cvData.contact.location}</p>
                 <p class="tagline">{cvData.tagline}</p>
                 <p>{cvData.summary}</p>
-                <h3 class="sub">Lingue</h3>
+                <h3 class="sub">{t.languages}</h3>
                 <ul class="lang-list">
                   {#each cvData.languages as lang}
                     <li><strong>{lang.name}:</strong> {lang.level}{lang.note ? ` — ${lang.note}` : ''}</li>
@@ -364,7 +367,7 @@
                     <p class="period">{edu.period}</p>
                   </div>
                 {/each}
-                <h3 class="sub">Conferenze & Seminari</h3>
+                <h3 class="sub">{t.conferences}</h3>
                 <ul class="plain-list">
                   {#each cvData.conferences as conf}
                     <li>{conf.name} — {conf.location} <span class="muted">({conf.year})</span></li>
@@ -375,13 +378,13 @@
               <div class="contact-content">
                 <p><strong>Email:</strong> <a href="mailto:{cvData.contact.email}">{cvData.contact.email}</a></p>
                 <p><strong>Phone:</strong> {cvData.contact.phone}</p>
-                <p><strong>LinkedIn:</strong> <a href="{cvData.contact.linkedin}" target="_blank">Profilo</a></p>
+                <p><strong>LinkedIn:</strong> <a href="{cvData.contact.linkedin}" target="_blank">{t.linkedinProfile}</a></p>
                 <p><strong>Website:</strong> <a href="{cvData.contact.website}" target="_blank">{cvData.contact.website}</a></p>
               </div>
             {:else if win.content === 'error'}
               <div class="error-content">
                 <div class="error-icon">❌</div>
-                <div class="error-text">Impossibile eliminare l'esperienza. È troppo preziosa.</div>
+                <div class="error-text">{t.errorMessage}</div>
                 <button class="xp-button" onclick={() => closeWindow('error')}>OK</button>
               </div>
             {/if}
@@ -394,12 +397,12 @@
     <button
       type="button"
       class="clippy-container"
-      onclick={(e) => { e.stopPropagation(); window.location.href = `mailto:${cvData.contact.email}?subject=${encodeURIComponent('Opportunità per un Frontend Architect')}`; }}
-      title="Scrivimi una mail"
-      aria-label="Scrivimi una mail"
+      onclick={(e) => { e.stopPropagation(); window.location.href = `mailto:${cvData.contact.email}?subject=${encodeURIComponent(t.mailSubject)}`; }}
+      title={t.mailMe}
+      aria-label={t.mailMe}
     >
       <div class="clippy-balloon">
-        Sembra che tu stia cercando un Frontend Architect.<br><strong>Clicca qui per scrivermi una mail!</strong> ✉️
+        {t.clippyText}<br><strong>{t.clippyCta}</strong> ✉️
       </div>
       <svg class="clippy-svg" viewBox="0 0 140 190" xmlns="http://www.w3.org/2000/svg" aria-label="Clippy">
         <defs>
@@ -471,16 +474,16 @@
             <div class="left-panel">
               <button type="button" class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="doc" size={22} /></span> About Me</button>
               <button type="button" class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="gear" size={22} /></span> Skills</button>
-              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder" size={22} /></span> Esperienze</button>
-              <button type="button" class="prog-item" onclick={() => openWindow('edu')}><span class="icon"><XpIcon name="cap" size={22} /></span> Formazione</button>
-              <button type="button" class="prog-item" onclick={() => openWindow('contact')}><span class="icon"><XpIcon name="contacts" size={22} /></span> Contatti</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder" size={22} /></span> {t.expLabel}</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('edu')}><span class="icon"><XpIcon name="cap" size={22} /></span> {t.eduLabel}</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('contact')}><span class="icon"><XpIcon name="contacts" size={22} /></span> {t.contactLabel}</button>
               <div class="separator"></div>
               <button type="button" class="prog-item" onclick={() => window.open(cvData.contact.linkedin, '_blank')}><span class="icon"><XpIcon name="linkedin" size={22} /></span> LinkedIn</button>
             </div>
             <div class="right-panel">
-              <button type="button" class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="computer" size={22} /></span> Il mio PC</button>
-              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder-docs" size={22} /></span> Documenti recenti</button>
-              <button type="button" class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="control" size={22} /></span> Pannello di Controllo</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('about')}><span class="icon"><XpIcon name="computer" size={22} /></span> {t.myComputer}</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('exp')}><span class="icon"><XpIcon name="folder-docs" size={22} /></span> {t.recentDocs}</button>
+              <button type="button" class="prog-item" onclick={() => openWindow('skills')}><span class="icon"><XpIcon name="control" size={22} /></span> {t.controlPanel}</button>
             </div>
           </div>
           <div class="start-footer">

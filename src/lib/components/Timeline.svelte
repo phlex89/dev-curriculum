@@ -3,8 +3,11 @@
   import { currentTheme, type Theme } from '../store';
   import { prefetchTheme } from '../themes/registry';
   import { ERA_META } from '../era-meta';
+  import { lang } from '../i18n';
+  import { ui } from '../translations';
 
-  const themes = ERA_META;
+  const t = $derived(ui[$lang].timeline);
+  const themes = $derived(ERA_META.map((m) => ({ ...m, label: ui[$lang].shared.eraNames[m.id] ?? m.label })));
 
   const HINT_KEY = 'cv_seen_timeline';
 
@@ -165,15 +168,15 @@
 <div class="timeline-wrapper theme-{$currentTheme}" style="--fill: {fillFraction}">
   {#if showHint}
     <div class="timeline-hint" role="status">
-      <strong>{activeTheme.year} · {activeTheme.label}</strong> — una di <strong>{themes.length} ere</strong>. Viaggia nel tempo <span class="hint-arrow">→</span>
+      <strong>{activeTheme.year} · {activeTheme.label}</strong> — {t.hintOneOf} <strong>{t.hintEras(themes.length)}</strong>. {t.hintCta} <span class="hint-arrow">→</span>
     </div>
   {/if}
   {#if isMobile}
     <!-- Compact stepper: ◄ prev | current (opens sheet) | ► next.
          Reuses .timeline-container / .node-pill / .timeline-stop.active so every
          era's per-theme skin applies for free, no new per-theme CSS needed. -->
-    <div class="timeline-container timeline-stepper" role="group" aria-label="Linea del tempo: scegli l'era">
-      <button class="step-arrow" onclick={() => step(-1)} disabled={atStart} aria-label="Era precedente">
+    <div class="timeline-container timeline-stepper" role="group" aria-label={t.navLabel}>
+      <button class="step-arrow" onclick={() => step(-1)} disabled={atStart} aria-label={t.prevEra}>
         <span class="node-pill" aria-hidden="true">‹</span>
       </button>
 
@@ -182,7 +185,7 @@
         onclick={openSheet}
         aria-haspopup="dialog"
         aria-expanded={sheetOpen}
-        aria-label="Era attuale: {activeTheme.year} · {activeTheme.label}. Tocca per scegliere un'altra era"
+        aria-label={t.currentEra(`${activeTheme.year} · ${activeTheme.label}`)}
       >
         <span class="node-pill">
           <span class="icon">{activeTheme.icon}</span>
@@ -195,12 +198,12 @@
         </span>
       </button>
 
-      <button class="step-arrow" onclick={() => step(1)} disabled={atEnd} aria-label="Era successiva">
+      <button class="step-arrow" onclick={() => step(1)} disabled={atEnd} aria-label={t.nextEra}>
         <span class="node-pill" aria-hidden="true">›</span>
       </button>
     </div>
   {:else}
-    <nav class="timeline-container" bind:this={extendedNav} aria-label="Linea del tempo: scegli l'era">
+    <nav class="timeline-container" bind:this={extendedNav} aria-label={t.navLabel}>
       <div class="timeline-track"></div>
       <div class="timeline-fill"></div>
       <ul class="timeline-stops" role="tablist" aria-orientation="horizontal">
@@ -233,11 +236,11 @@
   {/if}
 
   {#if isMobile && sheetOpen}
-    <button class="era-sheet-backdrop" aria-label="Chiudi l'elenco delle ere" onclick={closeSheet}></button>
-    <div class="era-sheet timeline-container" role="dialog" aria-modal="true" aria-label="Scegli l'era">
+    <button class="era-sheet-backdrop" aria-label={t.closeList} onclick={closeSheet}></button>
+    <div class="era-sheet timeline-container" role="dialog" aria-modal="true" aria-label={t.chooseEra}>
       <header class="era-sheet-head">
-        <span>Scegli l'era</span>
-        <button class="sheet-close" onclick={closeSheet} aria-label="Chiudi" bind:this={sheetCloseBtn}>✕</button>
+        <span>{t.chooseEra}</span>
+        <button class="sheet-close" onclick={closeSheet} aria-label={t.close} bind:this={sheetCloseBtn}>✕</button>
       </header>
       <ul class="era-list">
         {#each themes as theme}

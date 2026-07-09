@@ -15,9 +15,12 @@
   // CSS-drawn assets.
   // ──────────────────────────────────────────────────────────────────────────
   import { onMount } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { pixelBlip, pixelDiscover, pixelFanfare, pixelCoin, pixelBump, pixelSecret } from '$lib/audio';
   import { trackEvent, trackTag } from '$lib/analytics';
+
+  const cvData = getCvData();
+  const t = getUi().pixel;
 
   type ZoneId = 'about' | 'experience' | 'skills' | 'education' | 'contact' | 'cv' | 'secret';
   type Kind = 'house' | 'castle' | 'shop' | 'library' | 'mailbox' | 'chest' | 'shrine';
@@ -40,12 +43,12 @@
   // Zones laid out as a left→right journey, alternating top/bottom so the road
   // can snake between them. Order follows the CV narrative.
   const ZONES: Zone[] = [
-    { id: 'about', name: 'CASA', sub: 'Profilo', kind: 'house', x: 4, y: 4, intro: `Sono ${cvData.name}.` },
-    { id: 'experience', name: 'CASTELLO', sub: 'Esperienze', kind: 'castle', x: 8, y: 12, intro: 'Le sale del castello: un piano per ogni avventura.' },
-    { id: 'skills', name: 'BOTTEGA', sub: 'Competenze', kind: 'shop', x: 12, y: 4, intro: 'Benvenuto in bottega! Ecco il mio inventario.' },
-    { id: 'education', name: 'BIBLIOTECA', sub: 'Formazione', kind: 'library', x: 16, y: 12, intro: 'Tomi, diplomi e conferenze raccolti nel tempo.' },
-    { id: 'contact', name: 'POSTA', sub: 'Contatti', kind: 'mailbox', x: 18, y: 5, intro: 'Manda un messaggio: scegli il canale.' },
-    { id: 'cv', name: 'SCRIGNO', sub: 'Scarica CV', kind: 'chest', x: 21, y: 10, intro: 'Uno scrigno! Dentro: il mio curriculum.' }
+    { id: 'about', name: t.zones.about.name, sub: t.zones.about.sub, kind: 'house', x: 4, y: 4, intro: t.zones.about.intro(cvData.name) },
+    { id: 'experience', name: t.zones.experience.name, sub: t.zones.experience.sub, kind: 'castle', x: 8, y: 12, intro: t.zones.experience.intro },
+    { id: 'skills', name: t.zones.skills.name, sub: t.zones.skills.sub, kind: 'shop', x: 12, y: 4, intro: t.zones.skills.intro },
+    { id: 'education', name: t.zones.education.name, sub: t.zones.education.sub, kind: 'library', x: 16, y: 12, intro: t.zones.education.intro },
+    { id: 'contact', name: t.zones.contact.name, sub: t.zones.contact.sub, kind: 'mailbox', x: 18, y: 5, intro: t.zones.contact.intro },
+    { id: 'cv', name: t.zones.cv.name, sub: t.zones.cv.sub, kind: 'chest', x: 21, y: 10, intro: t.zones.cv.intro }
   ];
 
   // Hidden bonus zone — an RPG "hero stat sheet" that materialises in the grove
@@ -53,12 +56,12 @@
   // of the ★ n/6 quest count.
   const SECRET: Zone = {
     id: 'secret',
-    name: 'PERGAMENA',
-    sub: 'Scheda Eroe',
+    name: t.secret.name,
+    sub: t.secret.sub,
     kind: 'shrine',
     x: 12,
     y: 8,
-    intro: 'Una pergamena segreta! Ecco la scheda dell’eroe…'
+    intro: t.secret.intro
   };
 
   // Coins scattered along the road; gathering all of them reveals the secret zone.
@@ -69,20 +72,20 @@
 
   // Decorative wooden signpost beside the pond (top-right) — non-interactive,
   // just a playful nudge toward the fishing easter egg at the water.
-  const POND_SIGN = { x: 19, y: 1, text: 'AL LAGHETTO SI PESCA! ↗' };
+  const POND_SIGN = { x: 19, y: 1, text: t.pondSign };
 
   const zoneById = (id: ZoneId) => (id === 'secret' ? SECRET : ZONES.find((z) => z.id === id)!);
 
   // Stat sheet for the secret zone — derived from the real CV data (no fabricated
   // content; just a playful RPG framing of the numbers).
   const heroStats = [
-    { label: 'CLASSE', value: cvData.role },
-    { label: 'ANNI DI AVVENTURA', value: String(new Date().getFullYear() - cvData.keyFigures.startYear) },
-    { label: 'PRODOTTI COSTRUITI', value: String(cvData.keyFigures.products) },
-    { label: 'GILDE (AZIENDE)', value: String(cvData.experience.length) },
-    { label: 'SALE DELLE CONFERENZE', value: String(cvData.conferences.length) },
-    { label: 'LINGUE PARLATE', value: String(cvData.languages.length) },
-    { label: 'ERE ATTRAVERSATE', value: '7' }
+    { label: t.heroStats.class, value: cvData.role },
+    { label: t.heroStats.years, value: String(new Date().getFullYear() - cvData.keyFigures.startYear) },
+    { label: t.heroStats.products, value: String(cvData.keyFigures.products) },
+    { label: t.heroStats.guilds, value: String(cvData.experience.length) },
+    { label: t.heroStats.conferences, value: String(cvData.conferences.length) },
+    { label: t.heroStats.languages, value: String(cvData.languages.length) },
+    { label: t.heroStats.eras, value: '7' }
   ];
 
   // ── Terrain grid ────────────────────────────────────────────────────────────
@@ -398,28 +401,19 @@
   }
 
   // ── Fishing (easter egg at the pond) ─────────────────────────────────────
-  const FISH_CATCHES = [
-    'Hai pescato un BUG! 🐛',
-    'Una vecchia FLOPPY DISK… 💾',
-    'Uno stivale logoro. 👢',
-    'Un PESCE DORATO! ✨',
-    'Niente… solo alghe. 🌿',
-    'Una CARTUCCIA NES! 🎮',
-    'Un commit perduto nel tempo. 🕓',
-    'Una lattina arrugginita. 🥫'
-  ];
+  const FISH_CATCHES = t.fishCatches;
 
   function tryFish() {
     if (fishing || !facingWater) return;
     fishing = true;
-    fishMsg = 'Lancio la lenza…';
+    fishMsg = t.fishCasting;
     pixelBlip();
     if (fishTimer) clearTimeout(fishTimer);
     fishTimer = setTimeout(() => {
       const catchText = FISH_CATCHES[Math.floor(Math.random() * FISH_CATCHES.length)];
       fishMsg = catchText;
       trackEvent('pixel-fish-catch');
-      if (catchText.includes('DORATO') || catchText.includes('CARTUCCIA')) pixelDiscover();
+      if (catchText.includes('✨') || catchText.includes('🎮')) pixelDiscover();
       else pixelBlip();
       fishTimer = setTimeout(() => (fishing = false), 2400);
     }, 1100);
@@ -576,7 +570,7 @@
         onclick={() => {
           directoryOpen = true;
           trackEvent('pixel-show-all');
-        }}>MOSTRA TUTTO</button
+        }}>{t.showAll}</button
       >
     </div>
   </div>
@@ -661,7 +655,7 @@
       {#if nightMode}<div class="night-overlay" aria-hidden="true"></div>{/if}
 
       {#if showHint}
-        <div class="controls-hint">↑ ↓ ← → / WASD · segui la strada da sinistra a destra</div>
+        <div class="controls-hint">{t.controlsHint}</div>
       {/if}
 
       {#if fishing}
@@ -685,13 +679,13 @@
   {:else}
     <!-- ── Reduced-motion fallback: static zone directory ───────────────── -->
     <div class="static-village">
-      <p class="village-lead">VILLAGGIO DI STEFANO — scegli una zona da visitare:</p>
+      <p class="village-lead">{t.villageLead}</p>
       <div class="zone-grid">
         {#each ZONES as z}
           <button class="zone-card" onclick={() => openZone(z.id)}>
             <span class="zc-name">{z.name}</span>
             <span class="zc-sub">{z.sub}</span>
-            {#if visited.includes(z.id)}<span class="zc-done">✓ visitata</span>{/if}
+            {#if visited.includes(z.id)}<span class="zc-done">{t.visited}</span>{/if}
           </button>
         {/each}
       </div>
@@ -700,17 +694,17 @@
 
   <!-- ── Zone directory overlay (always available — dual track) ────────── -->
   {#if directoryOpen}
-    <div class="overlay" role="dialog" aria-modal="true" aria-label="Tutte le zone">
-      <button class="backdrop" aria-label="Chiudi" onclick={() => (directoryOpen = false)}></button>
+    <div class="overlay" role="dialog" aria-modal="true" aria-label={t.allZones}>
+      <button class="backdrop" aria-label={t.close} onclick={() => (directoryOpen = false)}></button>
       <div class="nes-panel directory">
-        <div class="panel-bar"><span>MAPPA DEL VILLAGGIO</span><button class="x" onclick={() => (directoryOpen = false)} aria-label="Chiudi">✕</button></div>
+        <div class="panel-bar"><span>{t.villageMap}</span><button class="x" onclick={() => (directoryOpen = false)} aria-label={t.close}>✕</button></div>
         <div class="panel-body">
           <div class="zone-grid">
             {#each ZONES as z}
               <button class="zone-card" onclick={() => openFromDirectory(z.id)}>
                 <span class="zc-name">{z.name}</span>
                 <span class="zc-sub">{z.sub}</span>
-                {#if visited.includes(z.id)}<span class="zc-done">✓ visitata</span>{/if}
+                {#if visited.includes(z.id)}<span class="zc-done">{t.visited}</span>{/if}
               </button>
             {/each}
           </div>
@@ -722,9 +716,9 @@
   <!-- ── Zone content (NES dialog box) ─────────────────────────────────── -->
   {#if currentZone}
     <div class="overlay" role="dialog" aria-modal="true" aria-label={currentZone.name}>
-      <button class="backdrop" aria-label="Chiudi" onclick={closeZone}></button>
+      <button class="backdrop" aria-label={t.close} onclick={closeZone}></button>
       <div class="nes-panel dialog" onclick={() => (skipType = true)} role="presentation">
-        <div class="panel-bar"><span>{currentZone.name} · {currentZone.sub}</span><button class="x" onclick={closeZone} aria-label="Chiudi">✕</button></div>
+        <div class="panel-bar"><span>{currentZone.name} · {currentZone.sub}</span><button class="x" onclick={closeZone} aria-label={t.close}>✕</button></div>
         <div class="panel-body">
           <p class="intro">{typed}<span class="caret">▋</span></p>
 
@@ -737,7 +731,7 @@
             <div class="rooms">
               {#each cvData.experience as exp, i}
                 <div class="room">
-                  <div class="room-head"><span class="floor">PIANO {cvData.experience.length - i}</span><span class="period">{exp.period}</span></div>
+                  <div class="room-head"><span class="floor">{t.floor(cvData.experience.length - i)}</span><span class="period">{exp.period}</span></div>
                   <p class="job-title">{exp.title}</p>
                   <p class="job-co">{exp.company}{exp.sector ? ` · ${exp.sector}` : ''}</p>
                   <p class="job-desc">{exp.description}</p>
@@ -748,7 +742,7 @@
                 </div>
               {/each}
               <div class="room">
-                <div class="room-head"><span class="floor">FONDAMENTA</span><span class="period">{cvData.earlyCareer.period}</span></div>
+                <div class="room-head"><span class="floor">{t.foundations}</span><span class="period">{cvData.earlyCareer.period}</span></div>
                 <p class="job-title">{cvData.earlyCareer.title}</p>
                 <p class="job-desc">{cvData.earlyCareer.description}</p>
                 <ul class="hl">{#each cvData.earlyCareer.highlights as h}<li>{h}</li>{/each}</ul>
@@ -765,41 +759,41 @@
                 </div>
               {/each}
               <div class="bag">
-                <p class="bag-label">Lingue</p>
+                <p class="bag-label">{t.languages}</p>
                 <div class="tags">{#each cvData.languages as l}<span class="tag">{l.name}: {l.level}</span>{/each}</div>
               </div>
             </div>
 
           {:else if currentZone.id === 'education'}
-            <p class="bag-label">Formazione</p>
+            <p class="bag-label">{t.education}</p>
             {#each cvData.education as ed}
               <div class="book"><p class="job-title">{ed.title}</p><p class="job-co">{ed.institute} · {ed.location} · {ed.period}</p></div>
             {/each}
-            <p class="bag-label">Conferenze</p>
+            <p class="bag-label">{t.conferences}</p>
             <ul class="hl">{#each cvData.conferences as c}<li>{c.name} — {c.location} ({c.year})</li>{/each}</ul>
 
           {:else if currentZone.id === 'contact'}
             <div class="links">
               <a class="link" href="mailto:{cvData.contact.email}">✉ {cvData.contact.email}</a>
-              <a class="link" href={cvData.contact.linkedin} target="_blank" rel="noopener noreferrer">in · LinkedIn (nuova scheda)</a>
-              <a class="link" href={cvData.contact.website} target="_blank" rel="noopener noreferrer">🌐 {cvData.contact.website} (nuova scheda)</a>
+              <a class="link" href={cvData.contact.linkedin} target="_blank" rel="noopener noreferrer">{t.linkedin}</a>
+              <a class="link" href={cvData.contact.website} target="_blank" rel="noopener noreferrer">{t.website(cvData.contact.website)}</a>
               <a class="link" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">☎ {cvData.contact.phone}</a>
               <p class="job-co">📍 {cvData.contact.location}</p>
             </div>
 
           {:else if currentZone.id === 'cv'}
-            <p class="summary">Apri lo scrigno e porta via il tesoro: il curriculum completo in PDF.</p>
-            {#if questDone}<p class="quest-note">★ QUEST COMPLETE — hai esplorato tutto il villaggio!</p>{/if}
-            <button class="cv-btn" onclick={downloadCV}>⬇ SCARICA IL CV (PDF)</button>
+            <p class="summary">{t.cvLead}</p>
+            {#if questDone}<p class="quest-note">{t.questNote}</p>{/if}
+            <button class="cv-btn" onclick={downloadCV}>{t.downloadCv}</button>
 
           {:else if currentZone.id === 'secret'}
-            <p class="role">★ Hai trovato la zona segreta! ★</p>
+            <p class="role">{t.secretFound}</p>
             <div class="stats">
               {#each heroStats as s}
                 <div class="stat"><span class="stat-label">{s.label}</span><span class="stat-value">{s.value}</span></div>
               {/each}
             </div>
-            <p class="quest-note">“Dal pixel al deploy”: ogni livello di questa mappa è una tappa vera del percorso.</p>
+            <p class="quest-note">{t.secretQuote}</p>
           {/if}
         </div>
       </div>
@@ -808,15 +802,15 @@
 
   <!-- ── Quest complete banner ─────────────────────────────────────────── -->
   {#if showQuest}
-    <div class="quest-banner" role="status"><span>QUEST COMPLETE!</span><small>Hai visitato tutte le zone</small></div>
+    <div class="quest-banner" role="status"><span>{t.questBanner}</span><small>{t.questBannerSub}</small></div>
   {/if}
 
   <!-- ── Easter-egg toasts ─────────────────────────────────────────────── -->
   {#if konamiToast}
-    <div class="egg-toast konami" role="status"><span>✦ CHEAT ATTIVATO ✦</span><small>{nightMode ? 'Modalità notte ON · +30 vite' : 'Modalità notte OFF'}</small></div>
+    <div class="egg-toast konami" role="status"><span>{t.cheatTitle}</span><small>{nightMode ? t.nightOn : t.nightOff}</small></div>
   {/if}
   {#if secretToast}
-    <div class="egg-toast secret" role="status"><span>✦ ZONA SEGRETA ✦</span><small>Una pergamena è apparsa nel cuore del villaggio</small></div>
+    <div class="egg-toast secret" role="status"><span>{t.secretTitle}</span><small>{t.secretToastSub}</small></div>
   {/if}
 </div>
 

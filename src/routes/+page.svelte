@@ -2,27 +2,18 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
+  import { lang } from '$lib/i18n';
+  import { ui } from '$lib/translations';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
   import { trackEra, trackEvent } from '$lib/analytics';
   import Timeline from '$lib/components/Timeline.svelte';
   import EraVote from '$lib/components/EraVote.svelte';
+  import LanguageSwitch from '$lib/components/LanguageSwitch.svelte';
   import SeoContent from '$lib/components/SeoContent.svelte';
   import { themeLoaders, prefetchTheme } from '$lib/themes/registry';
 
-  const eraLabels: Record<string, string> = {
-    terminal: 'Terminale · 1980s',
-    teletext: 'Televideo · 1984',
-    pixel: 'Pixel Art · 1988',
-    web1: 'Web 1.0 · 1996',
-    winxp: 'Windows XP · 2001',
-    skeuo: 'Skeuomorphism · 2010',
-    material: 'Material Design · 2014',
-    bento: 'Modern Flat · 2015',
-    brutalism: 'Brutalism · 2017',
-    parallax: 'Parallax · 2018',
-    glass: 'Glassmorphism · 2020',
-    threed: 'Future 3D · 2026'
-  };
+  const t = $derived(ui[$lang].shared);
+  const eraLabels = $derived(t.eraTitles);
 
   const prefersReduced = () =>
     typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -37,8 +28,8 @@
   // after hydration resolves the real era.
   const pageTitle = $derived(
     booted
-      ? `Stefano Tedeschi — CV · ${eraLabels[$currentTheme] ?? 'Time-Machine Resume'}`
-      : 'Stefano Tedeschi — Frontend Architect · CV interattivo'
+      ? `Stefano Tedeschi — CV · ${eraLabels[$currentTheme] ?? t.pageTitleSuffix}`
+      : t.pageTitleNeutral
   );
 
   // The era actually on screen. It LAGS `$currentTheme`: when a new era is picked
@@ -50,7 +41,7 @@
   let loadingTheme = $state<Theme | null>(null); // chunk in flight, for the loading cue
 
   const liveAnnounce = $derived(
-    booted && displayedTheme ? `Ora visualizzi l’era ${eraLabels[displayedTheme] ?? displayedTheme}` : ''
+    booted && displayedTheme ? t.nowViewing(eraLabels[displayedTheme] ?? displayedTheme) : ''
   );
 
   // Directional time-travel transition: glitch going back, bloom going forward.
@@ -129,6 +120,7 @@
 
   onMount(() => {
     currentTheme.init(); // resolves the real era synchronously (URL hash / saved pref)
+    lang.init(); // resolves the language (?lang= / saved pref / browser) before first paint
     initAudio();
 
     // Sync prevIdx + displayedTheme to the resolved era so unlocking `booted` doesn't
@@ -179,7 +171,9 @@
   {/if}
 
   {#if booted && displayedTheme}
-    {#key displayedTheme}
+    <!-- Keyed on era AND language: switching language remounts the era, which
+         re-reads getCvData()/getUi() at init — no per-theme reactivity needed. -->
+    {#key `${displayedTheme}:${$lang}`}
       <div class="theme-layer" in:fade={{ duration: 600, delay: 260 }} out:fade={{ duration: 460 }}>
         {#await themeLoaders[displayedTheme]() then mod}
           {@const ThemeComponent = mod.default}
@@ -201,8 +195,8 @@
     class:on={$audioEnabled}
     onclick={onAudioToggle}
     aria-pressed={$audioEnabled}
-    aria-label={$audioEnabled ? 'Disattiva i suoni d’epoca' : 'Attiva i suoni d’epoca'}
-    title={$audioEnabled ? 'Suoni: attivi' : 'Suoni: muto'}
+    aria-label={$audioEnabled ? t.audioOff : t.audioOn}
+    title={$audioEnabled ? t.audioTitleOn : t.audioTitleOff}
   >
     <span class="audio-icon">{$audioEnabled ? '🔊' : '🔇'}</span>
   </button>
@@ -213,6 +207,7 @@
 
   <Timeline />
   <EraVote />
+  <LanguageSwitch />
 </main>
 
 <style>

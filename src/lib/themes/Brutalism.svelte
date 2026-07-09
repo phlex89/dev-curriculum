@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { cvData } from '$lib/cv-data';
+  import { getCvData } from '$lib/i18n';
+
+  const cvData = getCvData();
 
   // Brutalism (2017–2020): raw, anti-design, intentional. A "view-source" punk-zine
   // CV — newsprint paper, ink-black hairlines turned into 4px slabs, hard offset

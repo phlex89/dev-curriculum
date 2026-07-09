@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { reveal } from '$lib/actions/interactive';
+
+  const cvData = getCvData();
+  const t = getUi().material;
 
   // Era 2014–2017: the "great flattening". Google Material Design + iOS 7 wipe out
   // skeuomorphic texture. Depth is no longer an imitation of the real world but a
@@ -74,11 +77,11 @@
 
   // ── Tabs: sliding ink-bar + scroll-spy ───────────────────────────────────────
   const SECTIONS = [
-    { id: 'about', label: 'Profilo' },
-    { id: 'experience', label: 'Esperienza' },
-    { id: 'skills', label: 'Competenze' },
-    { id: 'education', label: 'Studi' },
-    { id: 'contact', label: 'Contatti' }
+    { id: 'about', label: t.tabProfile },
+    { id: 'experience', label: t.tabExperience },
+    { id: 'skills', label: t.tabSkills },
+    { id: 'education', label: t.tabStudies },
+    { id: 'contact', label: t.tabContacts }
   ];
 
   const TAB_H = 48; // sticky tab-strip height, used as the scroll offset
@@ -196,7 +199,7 @@
   const contacts = [
     { label: 'LinkedIn', icon: ICON.linkedin, href: cvData.contact.linkedin, ext: true },
     { label: 'Email', icon: ICON.email, href: `mailto:${cvData.contact.email}`, ext: false },
-    { label: 'Sito web', icon: ICON.public, href: cvData.contact.website, ext: true }
+    { label: t.website, icon: ICON.public, href: cvData.contact.website, ext: true }
   ];
 </script>
 
@@ -221,7 +224,7 @@
             {cvData.contact.location}
           </span>
         </div>
-        <nav class="app-bar-actions" aria-label="Contatti rapidi">
+        <nav class="app-bar-actions" aria-label={t.quickContacts}>
           {#each contacts as c}
             <a
               class="icon-btn ripple"
@@ -244,7 +247,7 @@
          (horizontally scrollable on mobile) tabs. These navigate to in-page sections,
          so it's a nav landmark with aria-current, not a tab/tabpanel widget. -->
     <div class="tab-bar">
-      <nav class="tab-strip" aria-label="Sezioni del curriculum">
+      <nav class="tab-strip" aria-label={t.resumeSections}>
         {#each SECTIONS as s}
           <button
             class="tab ripple"
@@ -265,13 +268,13 @@
     <main class="mat-content">
       <!-- Profilo -->
       <section id="about" data-section="about" class="card" use:reveal={{ delay: 0 }}>
-        <h2 class="card-head"><span class="head-rule"></span>Profilo</h2>
+        <h2 class="card-head"><span class="head-rule"></span>{t.profile}</h2>
         <p class="body-text">{cvData.summary}</p>
       </section>
 
       <!-- Esperienza -->
       <section id="experience" data-section="experience" class="block">
-        <h2 class="section-title">Esperienza</h2>
+        <h2 class="section-title">{t.experience}</h2>
         <div class="exp-list">
           {#each cvData.experience as exp, i}
             <article class="card exp-card" use:reveal={{ delay: Math.min(i * 60, 240) }}>
@@ -308,7 +311,7 @@
               </span>
               <div class="exp-head">
                 <h3 class="title">{cvData.earlyCareer.title}</h3>
-                <p class="company">Le origini</p>
+                <p class="company">{t.origins}</p>
               </div>
               <span class="period">{cvData.earlyCareer.period}</span>
             </div>
@@ -330,7 +333,7 @@
 
       <!-- Competenze -->
       <section id="skills" data-section="skills" class="card" use:reveal={{ delay: 0 }}>
-        <h2 class="card-head"><span class="head-rule"></span>Competenze</h2>
+        <h2 class="card-head"><span class="head-rule"></span>{t.skills}</h2>
         <div class="skill-groups">
           {#each cvData.skillGroups as group}
             <div class="skill-group">
@@ -345,10 +348,10 @@
 
       <!-- Studi: istruzione + lingue + conferenze -->
       <section id="education" data-section="education" class="block">
-        <h2 class="section-title">Studi &amp; competenze trasversali</h2>
+        <h2 class="section-title">{t.studiesAndSoftSkills}</h2>
         <div class="two-col">
           <article class="card" use:reveal={{ delay: 0 }}>
-            <h2 class="card-head"><svg class="head-ico" viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.school} /></svg>Istruzione</h2>
+            <h2 class="card-head"><svg class="head-ico" viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.school} /></svg>{t.education}</h2>
             {#each cvData.education as edu}
               <div class="list-item">
                 <strong>{edu.title}</strong>
@@ -358,7 +361,7 @@
           </article>
 
           <article class="card" use:reveal={{ delay: 80 }}>
-            <h2 class="card-head"><svg class="head-ico" viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.language} /></svg>Lingue</h2>
+            <h2 class="card-head"><svg class="head-ico" viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.language} /></svg>{t.languages}</h2>
             {#each cvData.languages as lang}
               <div class="lang-row">
                 <div class="lang-top">
@@ -370,7 +373,7 @@
                 </div>
               </div>
             {/each}
-            <h3 class="sub-head">Conferenze</h3>
+            <h3 class="sub-head">{t.conferences}</h3>
             <ul class="conf-list">
               {#each cvData.conferences as conf}
                 <li>
@@ -385,7 +388,7 @@
 
       <!-- Contatti -->
       <section id="contact" data-section="contact" class="card" use:reveal={{ delay: 0 }}>
-        <h2 class="card-head"><span class="head-rule"></span>Contatti</h2>
+        <h2 class="card-head"><span class="head-rule"></span>{t.contacts}</h2>
         <div class="contact-grid">
           {#each contacts as c}
             <a
@@ -411,7 +414,7 @@
   </div>
 
   <!-- Floating Action Button (accent, 6dp → 12dp on hover) — primary action: write me. -->
-  <a class="fab ripple" href="mailto:{cvData.contact.email}" aria-label="Scrivimi una email" title="Scrivimi" use:ripple>
+  <a class="fab ripple" href="mailto:{cvData.contact.email}" aria-label={t.emailMe} title={t.writeMe} use:ripple>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.email} /></svg>
   </a>
 </div>

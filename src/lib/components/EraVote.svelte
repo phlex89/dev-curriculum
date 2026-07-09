@@ -3,17 +3,22 @@
   import { currentTheme } from '../store';
   import { ERA_META } from '../era-meta';
   import { initVotes, loadTotals, toggleVote, votesState } from '../votes.svelte';
+  import { lang } from '../i18n';
+  import { ui } from '../translations';
 
   let open = $state(false);
   let widget = $state<HTMLElement | undefined>();
 
+  const t = $derived(ui[$lang].vote);
+  const meta = $derived(ERA_META.map((m) => ({ ...m, label: ui[$lang].shared.eraNames[m.id] ?? m.label })));
+
   const liked = $derived(votesState.liked.includes($currentTheme));
   const count = $derived(votesState.totals?.[$currentTheme] ?? null);
-  const activeMeta = $derived(ERA_META.find((e) => e.id === $currentTheme));
+  const activeMeta = $derived(meta.find((e) => e.id === $currentTheme));
 
   const ranking = $derived(
     votesState.totals
-      ? ERA_META.map((e) => ({ ...e, votes: votesState.totals?.[e.id] ?? 0 })).sort(
+      ? meta.map((e) => ({ ...e, votes: votesState.totals?.[e.id] ?? 0 })).sort(
           (a, b) => b.votes - a.votes
         )
       : []
@@ -44,8 +49,8 @@
 
 <div class="vote-widget theme-{$currentTheme}" bind:this={widget}>
   {#if open}
-    <div class="vote-panel" role="dialog" aria-label="Classifica delle ere">
-      <p class="vote-panel-title">Le ere più amate</p>
+    <div class="vote-panel" role="dialog" aria-label={t.panelLabel}>
+      <p class="vote-panel-title">{t.panelTitle}</p>
       {#if ranking.length}
         <ol class="vote-ranking">
           {#each ranking as row (row.id)}
@@ -61,9 +66,9 @@
           {/each}
         </ol>
       {:else if votesState.totalsFailed}
-        <p class="vote-panel-empty">Classifica non disponibile in questo momento.</p>
+        <p class="vote-panel-empty">{t.empty}</p>
       {:else}
-        <p class="vote-panel-empty">Classifica in caricamento…</p>
+        <p class="vote-panel-empty">{t.loading}</p>
       {/if}
     </div>
   {/if}
@@ -73,10 +78,8 @@
       class:liked
       onclick={() => toggleVote($currentTheme)}
       aria-pressed={liked}
-      aria-label={liked
-        ? `Togli il mi piace all'era ${activeMeta?.label}`
-        : `Metti mi piace all'era ${activeMeta?.label}`}
-      title={liked ? 'Ti piace questa era' : 'Vota questa era'}
+      aria-label={liked ? t.unlike(activeMeta?.label ?? '') : t.like(activeMeta?.label ?? '')}
+      title={liked ? t.likedTitle : t.likeTitle}
     >
       <span class="heart-glyph" aria-hidden="true">♥</span>
     </button>
@@ -84,8 +87,8 @@
       class="vote-count"
       onclick={togglePanel}
       aria-expanded={open}
-      aria-label="Vedi la classifica delle ere"
-      title="Classifica delle ere"
+      aria-label={t.showRanking}
+      title={t.rankingTitle}
     >
       {count ?? '★'}
     </button>

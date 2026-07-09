@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import type LenisType from 'lenis';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { magnetic } from '$lib/actions/interactive';
   import { currentTheme } from '$lib/store';
+
+  const cvData = getCvData();
+  const t = getUi().parallax;
 
   // ──────────────────────────────────────────────────────────────────────────
   // Parallax / Immersive Scroll — the premium "craft web" era (~2018–today).
@@ -19,7 +22,7 @@
   // ──────────────────────────────────────────────────────────────────────────
 
   // ── Curated content (source of truth stays cv-data.ts — we select, never invent) ──
-  const heroKicker = `${cvData.role} · Portfolio`;
+  const heroKicker = t.heroKicker(cvData.role);
   const profileStatement = cvData.summary.split('. ')[0] + '.';
   const experiences = cvData.experience; // editorial "index" rows (no bullet lists)
   const skillsRowA = cvData.skills.filter((_, i) => i % 2 === 0);
@@ -27,7 +30,7 @@
 
   // Words emphasised (terracotta) inside the big serif statements. Presentation
   // over real copy — not invented data.
-  const HL = new Set(['15', 'anni', 'architetture', 'frontend', 'design', 'system', 'scalare', 'prodotti', 'team', 'pixel', 'problema']);
+  const HL = new Set(t.highlightWords);
   const isHL = (w: string) => HL.has(w.toLowerCase().replace(/[.,;:—–()]/g, ''));
 
   // ── Animated key figures (all derived from cv-data.ts) ──
@@ -36,7 +39,7 @@
   const targetProducts = cvData.keyFigures.products;
   const targetSectors = cvData.keyFigures.sectors;
 
-  const sectionNames = ['Intro', 'Profilo', 'Percorso', 'In cifre', 'Competenze', 'Ritratto', 'Contatti'];
+  const sectionNames = t.sectionNames;
 
   // ── element refs / reactive UI state ──
   let root = $state<HTMLElement>();
@@ -310,7 +313,7 @@
 
   <!-- Section index dots (clickable — smooth-scroll to the scene) -->
   <div class="px-side-nav">
-    <nav class="px-dots" aria-label="Indice delle sezioni">
+    <nav class="px-dots" aria-label={t.sectionsNavLabel}>
       {#each sectionNames as name, i}
         <button
           class="px-dot"
@@ -322,7 +325,7 @@
       {/each}
     </nav>
     <button type="button" class="px-full-cv" onclick={() => currentTheme.set('bento')}>
-      CV completo <span class="px-full-cv-arrow" aria-hidden="true">→</span>
+      {t.fullCv} <span class="px-full-cv-arrow" aria-hidden="true">→</span>
     </button>
   </div>
 
@@ -331,7 +334,7 @@
     <div class="px-controls">
       <button class="px-play" onclick={toggleAuto} aria-pressed={auto}>
         <span class="px-play-ico" aria-hidden="true">{auto ? '❚❚' : '▶'}</span>
-        {auto ? 'Pausa' : 'Play'}
+        {auto ? t.pause : t.play}
       </button>
     </div>
   {/if}
@@ -423,7 +426,7 @@
           </p>
         </div>
         <div class="scroll-hint" data-reveal>
-          <span class="sh-label">Scorri</span>
+          <span class="sh-label">{t.scrollHint}</span>
           <span class="sh-line" aria-hidden="true"></span>
         </div>
       </section>
@@ -431,7 +434,7 @@
       <!-- ── SCENE 2 · PROFILO / MANIFESTO ──────────────────────────────── -->
       <section class="scene statement-scene" bind:this={sectionEls[1]}>
         <span class="scene-no" data-parallax="0.22" aria-hidden="true">01</span>
-        <p class="kicker center" data-reveal>Profilo</p>
+        <p class="kicker center" data-reveal>{t.profileKicker}</p>
         <h2 class="display statement">
           {@render maskText(profileStatement, '')}
         </h2>
@@ -442,7 +445,7 @@
       <section class="scene exp-scene" bind:this={sectionEls[2]}>
         <div class="scene-head">
           <span class="scene-no inline" aria-hidden="true">02</span>
-          <p class="kicker" data-reveal>Percorso</p>
+          <p class="kicker" data-reveal>{t.journeyKicker}</p>
         </div>
         <ul class="exp-index">
           {#each experiences as exp, i}
@@ -468,18 +471,18 @@
           <div class="stats-grid">
             <div class="stat" data-reveal style="--i:0">
               <span class="stat-num display">{statYears}</span>
-              <span class="stat-label">Anni di mestiere</span>
-              <span class="stat-sub">dal {START_YEAR}</span>
+              <span class="stat-label">{t.statYearsLabel}</span>
+              <span class="stat-sub">{t.statYearsSub(START_YEAR)}</span>
             </div>
             <div class="stat" data-reveal style="--i:1">
               <span class="stat-num display">{statProducts}</span>
-              <span class="stat-label">Prodotti sulle mie fondamenta</span>
-              <span class="stat-sub">piattaforme · backoffice · mobile</span>
+              <span class="stat-label">{t.statProductsLabel}</span>
+              <span class="stat-sub">{t.statProductsSub}</span>
             </div>
             <div class="stat" data-reveal style="--i:2">
               <span class="stat-num display">{statSectors}</span>
-              <span class="stat-label">Settori enterprise</span>
-              <span class="stat-sub">fintech · IoT · banking · media</span>
+              <span class="stat-label">{t.statSectorsLabel}</span>
+              <span class="stat-sub">{t.statSectorsSub}</span>
             </div>
           </div>
         </div>
@@ -489,7 +492,7 @@
       <section class="scene skills-scene" bind:this={sectionEls[4]}>
         <div class="scene-head">
           <span class="scene-no inline" aria-hidden="true">04</span>
-          <p class="kicker" data-reveal>Competenze</p>
+          <p class="kicker" data-reveal>{t.skillsKicker}</p>
         </div>
         <div class="marquee" aria-hidden="true">
           <div class="mq-track a">
@@ -520,20 +523,20 @@
 
       <!-- ── SCENE 7 · CONTATTI (CTA + magnetic buttons) ────────────────── -->
       <section class="scene cta-scene" bind:this={sectionEls[6]}>
-        <p class="kicker center" data-reveal>Lavoriamo insieme</p>
+        <p class="kicker center" data-reveal>{t.ctaKicker}</p>
         <h2 class="display cta-title">
-          {@render maskText('Parliamone.', 'huge')}
+          {@render maskText(t.ctaTitle, 'huge')}
         </h2>
         <p class="cta-loc" data-reveal><span class="dot">◍</span> {cvData.contact.location}</p>
         <div class="cta-actions" data-reveal>
           <a class="cta-btn primary" href="mailto:{cvData.contact.email}" use:magnetic={{ strength: 0.35 }} data-cursor>
-            <span class="cta-btn-in">Scrivimi</span>
+            <span class="cta-btn-in">{t.ctaEmail}</span>
           </a>
           <a class="cta-btn" href={cvData.contact.linkedin} target="_blank" rel="noopener" use:magnetic={{ strength: 0.35 }} data-cursor>
-            <span class="cta-btn-in">LinkedIn</span>
+            <span class="cta-btn-in">{t.ctaLinkedin}</span>
           </a>
           <a class="cta-btn" href={cvData.contact.website} target="_blank" rel="noopener" use:magnetic={{ strength: 0.35 }} data-cursor>
-            <span class="cta-btn-in">Sito</span>
+            <span class="cta-btn-in">{t.ctaWebsite}</span>
           </a>
         </div>
         <p class="cta-email" data-reveal>{cvData.contact.email}</p>

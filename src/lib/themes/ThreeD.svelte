@@ -2,8 +2,10 @@
   import { onMount } from 'svelte';
   import { quintOut } from 'svelte/easing';
   import type * as THREE_NS from 'three';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData } from '$lib/i18n';
   import { tilt } from '$lib/actions/interactive';
+
+  const cvData = getCvData();
 
   // `three` (and its post-processing add-ons) are loaded dynamically so the
   // ~150KB WebGL bundle is only fetched when a visitor actually enters this era.

@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { tilt, reveal } from '$lib/actions/interactive';
+
+  const cvData = getCvData();
+  const t = getUi().glass;
 
   // The luminous-present glassmorphism era (macOS Big Sur / Windows 11 / iOS).
   // Deliberately the LIGHT, airy opposite of the dark neon WebGL 3D era: pastel
@@ -71,8 +74,8 @@
     type="button"
     onclick={toggleDark}
     aria-pressed={dark}
-    aria-label={dark ? 'Passa all’aspetto chiaro' : 'Passa all’aspetto scuro'}
-    title={dark ? 'Aspetto chiaro' : 'Aspetto scuro'}
+    aria-label={dark ? t.switchToLight : t.switchToDark}
+    title={dark ? t.lightAppearance : t.darkAppearance}
   >
     <span class="mode-icon" aria-hidden="true">{dark ? '☀' : '☾'}</span>
   </button>
@@ -118,13 +121,13 @@
 
     <!-- About -->
     <section class="panel about" style="grid-area: about" use:reveal={{ delay: 70 }} use:tilt={{ max: 2.5 }}>
-      <h2 class="label">Profilo</h2>
+      <h2 class="label">{t.profile}</h2>
       <p class="summary">{cvData.summary}</p>
     </section>
 
     <!-- Experience -->
     <section class="panel exp" style="grid-area: exp" use:reveal={{ delay: 120 }} use:tilt={{ max: 1.8 }}>
-      <h2 class="label">Esperienza</h2>
+      <h2 class="label">{t.experience}</h2>
       <div class="exp-list">
         {#each cvData.experience as exp}
           <article class="exp-item">
@@ -154,7 +157,7 @@
 
     <!-- Skills -->
     <section class="panel skills" style="grid-area: skills" use:reveal={{ delay: 170 }} use:tilt={{ max: 2.5 }}>
-      <h2 class="label">Competenze</h2>
+      <h2 class="label">{t.skills}</h2>
       <div class="skill-groups">
         {#each cvData.skillGroups as group}
           <div class="skill-group">
@@ -169,7 +172,7 @@
 
     <!-- Languages -->
     <section class="panel lang" style="grid-area: lang" use:reveal={{ delay: 210 }} use:tilt={{ max: 2.5 }}>
-      <h2 class="label">Lingue</h2>
+      <h2 class="label">{t.languages}</h2>
       <div class="lang-list">
         {#each cvData.languages as lang}
           <div class="lang-item">
@@ -185,7 +188,7 @@
 
     <!-- Education -->
     <section class="panel edu" style="grid-area: edu" use:reveal={{ delay: 250 }} use:tilt={{ max: 2.5 }}>
-      <h2 class="label">Formazione</h2>
+      <h2 class="label">{t.education}</h2>
       {#each cvData.education as edu}
         <div class="edu-item">
           <strong>{edu.title}</strong>
@@ -196,7 +199,7 @@
 
     <!-- Talks / Conferences -->
     <section class="panel talks" style="grid-area: talks" use:reveal={{ delay: 290 }} use:tilt={{ max: 2.5 }}>
-      <h2 class="label">Conferenze</h2>
+      <h2 class="label">{t.conferences}</h2>
       <div class="talk-list">
         {#each cvData.conferences as conf}
           <div class="talk-item">

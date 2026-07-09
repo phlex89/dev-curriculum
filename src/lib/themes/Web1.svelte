@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { web1Modem } from '$lib/audio';
+
+  const cvData = getCvData();
+  const t = getUi().web1;
 
   // Web 1.0 / HTML puro (mid-'90s): a GeoCities personal homepage served from a
   // static server in 1996, framed inside a maximised Netscape Navigator 3 window.
@@ -166,7 +169,7 @@
         </button>
       {/each}
     </div>
-    <button class="nn-throbber" onclick={onThrobber} title="Connect" aria-label="Netscape — connetti al modem">
+    <button class="nn-throbber" onclick={onThrobber} title="Connect" aria-label={t.modemAria}>
       <span class="nn-n">N</span>
       <span class="nn-comet" aria-hidden="true"></span>
     </button>
@@ -207,7 +210,7 @@
         <!-- Hit counter + prize gag -->
         <div class="counter-row">
           <span class="counter-label">You are visitor number</span>
-          <span class="counter" aria-label="visitatore numero 0013337">
+          <span class="counter" aria-label={t.visitorAria}>
             {#each counterDigits as d}<span class="digit">{d}</span>{/each}
           </span>
           <span class="counter-label">since Oct 1996</span>

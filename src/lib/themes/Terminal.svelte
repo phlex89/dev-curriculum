@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData } from '$lib/i18n';
   import { trackEvent, trackTag } from '$lib/analytics';
+
+  const cvData = getCvData();
 
   interface HistoryEntry {
     type: 'command' | 'output' | 'matrix' | 'clear';

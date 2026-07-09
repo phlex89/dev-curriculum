@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { teletextBeep } from '$lib/audio';
   import { trackEvent, trackTag } from '$lib/analytics';
+
+  const cvData = getCvData();
+  const t = getUi().teletext;
 
   // ── Page map ────────────────────────────────────────────────────────────────
   // A Televideo/Ceefax magazine: every section is a numbered page. The visitor
@@ -25,14 +28,14 @@
 
   // The clickable / listed index (cover page).
   const INDEX: { n: number; label: string; color: string }[] = [
-    { n: PAGE.PROFILE, label: 'PROFILO', color: 'grn' },
-    { n: PAGE.EXP, label: 'ESPERIENZA', color: 'cyn' },
-    { n: PAGE.ORIGINS, label: 'LE ORIGINI', color: 'cyn' },
-    { n: PAGE.SKILLS, label: 'COMPETENZE', color: 'yel' },
-    { n: PAGE.LANGS, label: 'LINGUE', color: 'yel' },
-    { n: PAGE.EDU, label: 'FORMAZIONE', color: 'mag' },
-    { n: PAGE.TALKS, label: 'CONFERENZE', color: 'mag' },
-    { n: PAGE.CONTACT, label: 'CONTATTI', color: 'red' }
+    { n: PAGE.PROFILE, label: t.profile, color: 'grn' },
+    { n: PAGE.EXP, label: t.experience, color: 'cyn' },
+    { n: PAGE.ORIGINS, label: t.origins, color: 'cyn' },
+    { n: PAGE.SKILLS, label: t.skills, color: 'yel' },
+    { n: PAGE.LANGS, label: t.languages, color: 'yel' },
+    { n: PAGE.EDU, label: t.education, color: 'mag' },
+    { n: PAGE.TALKS, label: t.conferences, color: 'mag' },
+    { n: PAGE.CONTACT, label: t.contacts, color: 'red' }
   ];
 
   const expPages = cvData.experience.map((_, i) => EXP_BASE + i);
@@ -43,10 +46,10 @@
 
   // The four coloured FASTEXT keys at the foot of the screen.
   const FASTEXT: { color: string; n: number; label: string }[] = [
-    { color: 'red', n: PAGE.PROFILE, label: 'PROFILO' },
-    { color: 'grn', n: PAGE.EXP, label: 'ESPERIENZA' },
-    { color: 'yel', n: PAGE.SKILLS, label: 'COMPETENZE' },
-    { color: 'cyn', n: PAGE.CONTACT, label: 'CONTATTI' }
+    { color: 'red', n: PAGE.PROFILE, label: t.profile },
+    { color: 'grn', n: PAGE.EXP, label: t.experience },
+    { color: 'yel', n: PAGE.SKILLS, label: t.skills },
+    { color: 'cyn', n: PAGE.CONTACT, label: t.contacts }
   ];
 
   // ── Reactive state ────────────────────────────────────────────────────────
@@ -67,8 +70,8 @@
     typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ── Live broadcast clock (Televideo headers always carry one) ───────────────
-  const GIORNI = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'];
-  const MESI = ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'];
+  const GIORNI = t.days;
+  const MESI = t.months;
   const p2 = (n: number) => String(n).padStart(2, '0');
 
   function tickClock() {
@@ -200,7 +203,7 @@
     <header class="ttx-header">
       <span class="hdr-page">P{headerNum}</span>
       <span class="hdr-name">STEFANO TEDESCHI</span>
-      <span class="hdr-svc">TELEVIDEO</span>
+      <span class="hdr-svc">{t.service}</span>
       <span class="hdr-clock">{clock}</span>
     </header>
 
@@ -208,9 +211,9 @@
       {#if !found}
         <!-- Decoder still hunting for a page that isn't in the carousel -->
         <h1 class="dh c-red">P{currentPage}</h1>
-        <p class="c-wht">PAGINA NON DISPONIBILE</p>
-        <p class="c-cyn">Il decoder non trova questa pagina nel ciclo.</p>
-        <p class="c-yel">Digita <b>100</b> per l'indice, oppure scegli una voce qui sotto.</p>
+        <p class="c-wht">{t.pageUnavailable}</p>
+        <p class="c-cyn">{t.decoderMiss}</p>
+        <p class="c-yel">{t.notFoundHintA}<b>100</b>{t.notFoundHintB}</p>
         <ul class="index-list">
           {#each INDEX as it}
             <li>
@@ -242,7 +245,7 @@
 
         <div class="rainbow-bar" aria-hidden="true"></div>
 
-        <p class="c-grn idx-head">INDICE DELLE PAGINE</p>
+        <p class="c-grn idx-head">{t.pageIndex}</p>
         <ul class="index-list">
           {#each INDEX as it}
             <li>
@@ -256,12 +259,12 @@
         </ul>
 
         <p class="c-cyn hint">
-          Digita un numero di pagina (es. <b>101</b>) o usa i tasti colorati in basso.
-          <span class="conceal" class:revealed>★ Curiosità: prova la pagina segreta <b>777</b> →</span>
+          {t.coverHintA}<b>101</b>{t.coverHintB}
+          <span class="conceal" class:revealed>{t.coverSecretA}<b>777</b>{t.coverSecretB}</span>
         </p>
 
       {:else if currentPage === PAGE.PROFILE}
-        <h1 class="dh c-grn">101 PROFILO</h1>
+        <h1 class="dh c-grn">101 {t.profile}</h1>
         <p class="c-yel role">{cvData.role}</p>
         <p class="c-cyn tagline">{cvData.tagline}</p>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
@@ -269,8 +272,8 @@
         <p class="c-mag where">📍 {cvData.contact.location}</p>
 
       {:else if currentPage === PAGE.EXP}
-        <h1 class="dh c-cyn">102 ESPERIENZA</h1>
-        <p class="c-yel">Seleziona un ruolo (pagine {EXP_BASE}–{EXP_BASE + cvData.experience.length - 1}):</p>
+        <h1 class="dh c-cyn">102 {t.experience}</h1>
+        <p class="c-yel">{t.selectRole(EXP_BASE, EXP_BASE + cvData.experience.length - 1)}</p>
         <ul class="index-list">
           {#each cvData.experience as exp, i}
             <li>
@@ -284,7 +287,7 @@
             </li>
           {/each}
         </ul>
-        <p class="c-cyn hint">Le origini (2011–2015): pagina <b>103</b>.</p>
+        <p class="c-cyn hint">{t.expOriginsHintA}<b>103</b>{t.expOriginsHintB}</p>
 
       {:else if expPages.includes(currentPage)}
         {@const exp = cvData.experience[currentPage - EXP_BASE]}
@@ -303,11 +306,11 @@
             <span class="chip c-{['grn', 'cyn', 'yel', 'mag'][i % 4]}">{tech}</span>
           {/each}
         </p>
-        <p class="c-cyn hint">◄ / ► per scorrere · <b>102</b> per l'elenco</p>
+        <p class="c-cyn hint">{t.expDetailHintA}<b>102</b>{t.expDetailHintB}</p>
 
       {:else if currentPage === PAGE.ORIGINS}
         {@const ec = cvData.earlyCareer}
-        <h1 class="dh c-cyn">103 LE ORIGINI</h1>
+        <h1 class="dh c-cyn">103 {t.origins}</h1>
         <p class="c-yel role">{ec.title}</p>
         <p class="c-grn meta">{ec.period}</p>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
@@ -324,7 +327,7 @@
         </p>
 
       {:else if currentPage === PAGE.SKILLS}
-        <h1 class="dh c-yel">104 COMPETENZE</h1>
+        <h1 class="dh c-yel">104 {t.skills}</h1>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
         {#each cvData.skillGroups as group}
           <p class="skill-line">
@@ -334,7 +337,7 @@
         {/each}
 
       {:else if currentPage === PAGE.LANGS}
-        <h1 class="dh c-yel">105 LINGUE</h1>
+        <h1 class="dh c-yel">105 {t.languages}</h1>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
         {#each cvData.languages as lang}
           <p class="lang-line">
@@ -345,7 +348,7 @@
         {/each}
 
       {:else if currentPage === PAGE.EDU}
-        <h1 class="dh c-mag">106 FORMAZIONE</h1>
+        <h1 class="dh c-mag">106 {t.education}</h1>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
         {#each cvData.education as edu}
           <p class="edu-line">
@@ -356,7 +359,7 @@
         {/each}
 
       {:else if currentPage === PAGE.TALKS}
-        <h1 class="dh c-mag">107 CONFERENZE</h1>
+        <h1 class="dh c-mag">107 {t.conferences}</h1>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
         <ul class="index-list">
           {#each cvData.conferences as conf}
@@ -369,34 +372,32 @@
         </ul>
 
       {:else if currentPage === PAGE.CONTACT}
-        <h1 class="dh c-red">108 CONTATTI</h1>
+        <h1 class="dh c-red">108 {t.contacts}</h1>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
-        <p class="contact-line"><span class="c-cyn">EMAIL</span> <a class="c-yel" href="mailto:{cvData.contact.email}">{cvData.contact.email}</a></p>
-        <p class="contact-line"><span class="c-cyn">TEL</span>   <a class="c-yel" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">{cvData.contact.phone}</a></p>
-        <p class="contact-line"><span class="c-cyn">WEB</span>   <a class="c-yel" href={cvData.contact.website} target="_blank" rel="noopener">{cvData.contact.website}</a></p>
-        <p class="contact-line"><span class="c-cyn">LINK</span>  <a class="c-yel" href={cvData.contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></p>
-        <p class="contact-line"><span class="c-cyn">LUOGO</span> <span class="c-wht">{cvData.contact.location}</span></p>
+        <p class="contact-line"><span class="c-cyn">{t.email}</span> <a class="c-yel" href="mailto:{cvData.contact.email}">{cvData.contact.email}</a></p>
+        <p class="contact-line"><span class="c-cyn">{t.tel}</span>   <a class="c-yel" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">{cvData.contact.phone}</a></p>
+        <p class="contact-line"><span class="c-cyn">{t.web}</span>   <a class="c-yel" href={cvData.contact.website} target="_blank" rel="noopener">{cvData.contact.website}</a></p>
+        <p class="contact-line"><span class="c-cyn">{t.link}</span>  <a class="c-yel" href={cvData.contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></p>
+        <p class="contact-line"><span class="c-cyn">{t.location}</span> <span class="c-wht">{cvData.contact.location}</span></p>
         <div class="rainbow-bar thin" aria-hidden="true"></div>
-        <button class="dl-btn" onclick={downloadCV}>▼ SCARICA CV (PDF)</button>
+        <button class="dl-btn" onclick={downloadCV}>{t.downloadCv}</button>
 
       {:else if currentPage === PAGE.SECRET}
-        <h1 class="dh c-mag">777 PAGINA SEGRETA</h1>
+        <h1 class="dh c-mag">777 {t.secretPage}</h1>
         <div class="rainbow-bar" aria-hidden="true"></div>
-        <p class="c-yel role">OROSCOPO DEL FRONTEND ★</p>
+        <p class="c-yel role">{t.horoscopeTitle}</p>
         <p class="c-wht body">
-          Le stelle indicano refactoring in arrivo. Un design system condiviso porterà
-          fortuna. Diffida dei <span class="c-red">!important</span>. La tua giornata
-          fortunata è il <span class="c-cyn">deploy del venerdì</span> (coraggioso).
+          {t.horoscopeA}<span class="c-red">!important</span>{t.horoscopeB}<span class="c-cyn">{t.horoscopeFriday}</span>{t.horoscopeC}
         </p>
         <p class="c-grn">
-          <span class="conceal" class:revealed>Premi <b>R</b> e hai trovato la battuta nascosta: «funziona sul mio computer». 😎</span>
+          <span class="conceal" class:revealed>{t.secretJokeA}<b>R</b>{t.secretJokeB}</span>
         </p>
-        <p class="c-cyn hint">Premi <b>R</b> per svelare/nascondere · <b>100</b> per tornare all'indice</p>
+        <p class="c-cyn hint">{t.secretHintA}<b>R</b>{t.secretHintB}<b>100</b>{t.secretHintC}</p>
       {/if}
     </div>
 
     <!-- FASTEXT colour bar -->
-    <div class="fastext" role="group" aria-label="Tasti rapidi colorati">
+    <div class="fastext" role="group" aria-label={t.fastextAria}>
       {#each FASTEXT as f}
         <button class="fx-key fx-{f.color}" onclick={() => goto(f.n)}>{f.label}</button>
       {/each}
@@ -404,27 +405,27 @@
 
     <!-- Status row -->
     <div class="status-row">
-      <span class="c-cyn">100 INDICE</span>
-      <span class="c-wht">◄ ► PAGINE</span>
-      <span class="c-yel">R = SVELA</span>
+      <span class="c-cyn">{t.statusIndex}</span>
+      <span class="c-wht">{t.statusPages}</span>
+      <span class="c-yel">{t.statusReveal}</span>
       <span class="c-grn">P{headerNum}</span>
     </div>
   </div>
 
   <!-- Dual-track controls below the screen: keypad + nav (touch-friendly) -->
   <div class="deck">
-    <div class="keypad" role="group" aria-label="Tastierino numerico pagine">
+    <div class="keypad" role="group" aria-label={t.keypadAria}>
       {#each ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as d}
-        <button class="key" onclick={() => pushDigit(d)} aria-label="Cifra {d}">{d}</button>
+        <button class="key" onclick={() => pushDigit(d)} aria-label={t.digit(d)}>{d}</button>
       {/each}
-      <button class="key key-fn" onclick={() => (buffer = buffer.slice(0, -1))} aria-label="Cancella cifra">←</button>
-      <button class="key" onclick={() => pushDigit('0')} aria-label="Cifra 0">0</button>
-      <button class="key key-fn" onclick={() => goto(PAGE.COVER)} aria-label="Indice 100">100</button>
+      <button class="key key-fn" onclick={() => (buffer = buffer.slice(0, -1))} aria-label={t.deleteDigit}>←</button>
+      <button class="key" onclick={() => pushDigit('0')} aria-label={t.digit('0')}>0</button>
+      <button class="key key-fn" onclick={() => goto(PAGE.COVER)} aria-label={t.indexAria}>100</button>
     </div>
     <div class="nav-keys">
-      <button class="navk" onclick={() => step(-1)} aria-label="Pagina precedente">◄</button>
-      <button class="navk" onclick={() => step(1)} aria-label="Pagina successiva">►</button>
-      <button class="navk reveal" class:on={revealed} onclick={toggleReveal} aria-pressed={revealed}>SVELA</button>
+      <button class="navk" onclick={() => step(-1)} aria-label={t.prevPage}>◄</button>
+      <button class="navk" onclick={() => step(1)} aria-label={t.nextPage}>►</button>
+      <button class="navk reveal" class:on={revealed} onclick={toggleReveal} aria-pressed={revealed}>{t.reveal}</button>
     </div>
   </div>
 </div>

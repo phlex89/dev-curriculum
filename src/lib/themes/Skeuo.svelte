@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { cvData } from '$lib/cv-data';
+  import { getCvData, getUi } from '$lib/i18n';
   import { tilt, reveal } from '$lib/actions/interactive';
+
+  const cvData = getCvData();
+  const t = getUi().skeuo;
 
   let avatarFailed = $state(false);
 
@@ -62,7 +65,7 @@
 
     <!-- Skills — gel chips on a felt panel, grouped -->
     <section class="felt-panel" use:reveal={{ delay: 140 }}>
-      <h2 class="emboss-head">Competenze</h2>
+      <h2 class="emboss-head">{t.skills}</h2>
       <div class="skill-groups">
         {#each groups as group}
           <div class="skill-group">
@@ -79,7 +82,7 @@
 
     <!-- Experience — leather-bound address book -->
     <section class="leather-book" use:reveal={{ delay: 200 }}>
-      <h2 class="leather-head">Esperienza</h2>
+      <h2 class="leather-head">{t.experience}</h2>
       <div class="entries">
         {#each cvData.experience as exp}
           <article class="entry">
@@ -111,7 +114,7 @@
       <!-- Education + Certifications — framed diplomas -->
       <section class="frame" use:reveal={{ delay: 240 }} use:tilt={{ max: 2 }}>
         <div class="frame-inner">
-          <h2 class="diploma-head">Istruzione</h2>
+          <h2 class="diploma-head">{t.education}</h2>
           {#each cvData.education as edu}
             <div class="diploma-item">
               <strong>{edu.title}</strong>
@@ -125,7 +128,7 @@
       <!-- Languages — glossy gel gauges -->
       <section class="frame languages" use:reveal={{ delay: 300 }} use:tilt={{ max: 2 }}>
         <div class="frame-inner">
-          <h2 class="diploma-head">Lingue</h2>
+          <h2 class="diploma-head">{t.languages}</h2>
           {#each cvData.languages as lang}
             <div class="gauge-row">
               <div class="gauge-top">
@@ -137,7 +140,7 @@
               </div>
             </div>
           {/each}
-          <h2 class="diploma-head talks-head">Conferenze</h2>
+          <h2 class="diploma-head talks-head">{t.conferences}</h2>
           <ul class="talks">
             {#each cvData.conferences as conf}
               <li>{conf.name} <span class="when">· {conf.location} ’{conf.year.slice(-2)}</span></li>
@@ -156,7 +159,7 @@
         <span class="gel-ico">@</span><span class="gel-label">Email</span>
       </a>
       <a class="gel-btn website" href={cvData.contact.website} target="_blank" rel="noopener">
-        <span class="gel-ico">🌐</span><span class="gel-label">Sito web</span>
+        <span class="gel-ico">🌐</span><span class="gel-label">{t.website}</span>
       </a>
     </section>
   </div>

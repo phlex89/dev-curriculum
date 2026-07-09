@@ -11,7 +11,7 @@
   // — buildings are real buttons (click to open) and a persistent "MOSTRA TUTTO"
   // directory lists every zone. Under prefers-reduced-motion the map/camera are
   // dropped entirely and the zones render as a static button directory. Pixel grid
-  // is tile/16 (finer than a classic tile/8) for crisper sprites. Only original
+  // is tile/32 (finer than a classic tile/8) for crisper sprites. Only original
   // CSS-drawn assets.
   // ──────────────────────────────────────────────────────────────────────────
   import { onMount } from 'svelte';
@@ -36,19 +36,19 @@
     intro: string;
   }
 
-  const MAP_W = 24;
-  const MAP_H = 16;
-  const STEP_MS = 150;
+  const MAP_W = 48;
+  const MAP_H = 32;
+  const STEP_MS = 50;
 
   // Zones laid out as a left→right journey, alternating top/bottom so the road
   // can snake between them. Order follows the CV narrative.
   const ZONES: Zone[] = [
-    { id: 'about', name: t.zones.about.name, sub: t.zones.about.sub, kind: 'house', x: 4, y: 4, intro: t.zones.about.intro(cvData.name) },
-    { id: 'experience', name: t.zones.experience.name, sub: t.zones.experience.sub, kind: 'castle', x: 8, y: 12, intro: t.zones.experience.intro },
-    { id: 'skills', name: t.zones.skills.name, sub: t.zones.skills.sub, kind: 'shop', x: 12, y: 4, intro: t.zones.skills.intro },
-    { id: 'education', name: t.zones.education.name, sub: t.zones.education.sub, kind: 'library', x: 16, y: 12, intro: t.zones.education.intro },
-    { id: 'contact', name: t.zones.contact.name, sub: t.zones.contact.sub, kind: 'mailbox', x: 18, y: 5, intro: t.zones.contact.intro },
-    { id: 'cv', name: t.zones.cv.name, sub: t.zones.cv.sub, kind: 'chest', x: 21, y: 10, intro: t.zones.cv.intro }
+    { id: 'about', name: t.zones.about.name, sub: t.zones.about.sub, kind: 'house', x: 8, y: 8, intro: t.zones.about.intro(cvData.name) },
+    { id: 'experience', name: t.zones.experience.name, sub: t.zones.experience.sub, kind: 'castle', x: 16, y: 24, intro: t.zones.experience.intro },
+    { id: 'skills', name: t.zones.skills.name, sub: t.zones.skills.sub, kind: 'shop', x: 24, y: 8, intro: t.zones.skills.intro },
+    { id: 'education', name: t.zones.education.name, sub: t.zones.education.sub, kind: 'library', x: 32, y: 24, intro: t.zones.education.intro },
+    { id: 'contact', name: t.zones.contact.name, sub: t.zones.contact.sub, kind: 'mailbox', x: 36, y: 10, intro: t.zones.contact.intro },
+    { id: 'cv', name: t.zones.cv.name, sub: t.zones.cv.sub, kind: 'chest', x: 42, y: 20, intro: t.zones.cv.intro }
   ];
 
   // Hidden bonus zone — an RPG "hero stat sheet" that materialises in the grove
@@ -59,20 +59,20 @@
     name: t.secret.name,
     sub: t.secret.sub,
     kind: 'shrine',
-    x: 12,
-    y: 8,
+    x: 24,
+    y: 16,
     intro: t.secret.intro
   };
 
   // Coins scattered along the road; gathering all of them reveals the secret zone.
   const COIN_SPOTS: { x: number; y: number }[] = [
-    { x: 3, y: 8 }, { x: 6, y: 8 }, { x: 10, y: 8 }, { x: 14, y: 8 }, { x: 18, y: 8 }, { x: 19, y: 8 }
+    { x: 6, y: 16 }, { x: 12, y: 16 }, { x: 20, y: 16 }, { x: 28, y: 16 }, { x: 36, y: 16 }, { x: 38, y: 16 }
   ];
   const COINS_TOTAL = COIN_SPOTS.length;
 
   // Decorative wooden signpost beside the pond (top-right) — non-interactive,
   // just a playful nudge toward the fishing easter egg at the water.
-  const POND_SIGN = { x: 19, y: 1, text: t.pondSign };
+  const POND_SIGN = { x: 38, y: 2, text: t.pondSign };
 
   const zoneById = (id: ZoneId) => (id === 'secret' ? SECRET : ZONES.find((z) => z.id === id)!);
 
@@ -97,70 +97,91 @@
     for (let y = 0; y < MAP_H; y++) {
       const row: Tile[] = [];
       for (let x = 0; x < MAP_W; x++) {
-        const border = x === 0 || y === 0 || x === MAP_W - 1 || y === MAP_H - 1;
+        const border = x <= 1 || y <= 1 || x >= MAP_W - 2 || y >= MAP_H - 2;
         row.push(border ? 'tree' : (x + y) % 2 === 0 ? 'grass' : 'grass2');
       }
       g.push(row);
     }
     const set = (x: number, y: number, t: Tile) => {
-      if (x > 0 && y > 0 && x < MAP_W - 1 && y < MAP_H - 1) g[y][x] = t;
+      if (x > 1 && y > 1 && x < MAP_W - 2 && y < MAP_H - 2) g[y][x] = t;
     };
 
     // ── Winding road: a single continuous serpentine left→right, passing the
-    //    approach tile of each zone in order. Drawn segment-by-segment between
-    //    corner waypoints (each shares its turning tile with the next).
+    //    approach block of each zone in order. Drawn segment-by-segment between
+    //    corner waypoints (each shares its turning tile with the next); every
+    //    segment is brushed 2 tiles wide so corners close on themselves.
     const road: [number, number][] = [
-      [2, 8],  // entrance (hero spawn)
-      [4, 8],  // ┐
-      [4, 5],  // ┘ pass below CASA (4,4)
-      [6, 5],  // ┐
-      [6, 11], // ┘ descend
-      [8, 11], // pass above CASTELLO (8,12)
-      [10, 11], // ┐
-      [10, 5], // ┘ climb
-      [12, 5], // pass below BOTTEGA (12,4)
-      [14, 5], // ┐
-      [14, 11], // ┘ descend
-      [16, 11], // pass above BIBLIOTECA (16,12)
-      [18, 11], // ┐
-      [18, 6], // ┘ climb
-      [19, 6], // pass below POSTA (19,5)
-      [19, 9], // ┐
-      [21, 9]  // ┘ reach above SCRIGNO (21,10)
+      [4, 16],  // entrance (hero spawn)
+      [8, 16],  // ┐
+      [8, 10],  // ┘ pass below CASA (8,8)
+      [12, 10], // ┐
+      [12, 22], // ┘ descend
+      [16, 22], // pass above CASTELLO (16,24)
+      [20, 22], // ┐
+      [20, 10], // ┘ climb
+      [24, 10], // pass below BOTTEGA (24,8)
+      [28, 10], // ┐
+      [28, 22], // ┘ descend
+      [32, 22], // pass above BIBLIOTECA (32,24)
+      [36, 22], // ┐
+      [36, 12], // ┘ climb
+      [38, 12], // pass below POSTA (36,10)
+      [38, 18], // ┐
+      [42, 18]  // ┘ reach above SCRIGNO (42,20)
     ];
     for (let i = 0; i < road.length - 1; i++) {
       const [x1, y1] = road[i];
       const [x2, y2] = road[i + 1];
       if (x1 === x2) {
-        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) set(x1, y, 'path');
+        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+          set(x1, y, 'path');
+          set(x1 + 1, y, 'path');
+        }
       } else {
-        for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) set(x, y1, 'path');
+        for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+          set(x, y1, 'path');
+          set(x, y1 + 1, 'path');
+        }
       }
     }
 
     // Decorative pond (top-right corner, clear of the road and the POSTA sign)
-    for (const [x, y] of [[20, 1], [21, 1], [22, 1], [20, 2], [21, 2], [22, 2], [20, 3], [21, 3], [22, 3]]) set(x, y, 'water');
+    for (let y = 2; y <= 7; y++) for (let x = 40; x <= 45; x++) set(x, y, 'water');
     // Scattered trees (all off-road, framing the scene)
     for (const [x, y] of [
-      [2, 3], [2, 5], [2, 11], [7, 2], [10, 2], [13, 2], [16, 2],
-      [22, 5], [22, 8], [22, 12], [8, 3], [11, 8], [15, 8], [17, 8],
-      [4, 13], [9, 13], [13, 13], [5, 13]
+      [4, 6], [4, 10], [4, 22], [14, 4], [20, 4], [26, 4], [32, 4],
+      [44, 10], [44, 16], [44, 24], [16, 6], [22, 16], [30, 16], [34, 16],
+      [8, 26], [18, 26], [26, 26], [10, 26]
     ])
       set(x, y, 'tree');
     // Flowers (walkable flavour, dotted along the road)
-    for (const [x, y] of [[5, 4], [11, 4], [17, 5], [7, 12], [15, 12], [20, 8], [3, 9]]) set(x, y, 'flower');
-    // Plaza under each building
-    for (const z of ZONES) set(z.x, z.y, 'path');
+    for (const [x, y] of [[10, 8], [22, 8], [34, 10], [14, 24], [30, 24], [40, 16], [6, 18]]) set(x, y, 'flower');
+    // Plaza under each building (2×2 block, corner at z.x/z.y)
+    for (const z of ZONES) {
+      set(z.x, z.y, 'path');
+      set(z.x + 1, z.y, 'path');
+      set(z.x, z.y + 1, 'path');
+      set(z.x + 1, z.y + 1, 'path');
+    }
     return g;
   }
 
   const grid = buildGrid();
-  const zoneAt = (x: number, y: number) => ZONES.find((z) => z.x === x && z.y === y);
+  // Every zone/shrine now occupies a 2×2 block anchored at (z.x, z.y).
+  const inBlock = (z: { x: number; y: number }, x: number, y: number) =>
+    x >= z.x && x <= z.x + 1 && y >= z.y && y <= z.y + 1;
+  // Hero is orthogonally adjacent to a block's ring (not diagonally, not inside).
+  const heroAdjacentTo = (z: { x: number; y: number }) => {
+    const inX = hero.x >= z.x && hero.x <= z.x + 1;
+    const inY = hero.y >= z.y && hero.y <= z.y + 1;
+    return (inY && (hero.x === z.x - 1 || hero.x === z.x + 2)) || (inX && (hero.y === z.y - 1 || hero.y === z.y + 2));
+  };
+  const zoneAt = (x: number, y: number) => ZONES.find((z) => inBlock(z, x, y));
   function walkable(x: number, y: number): boolean {
     if (x < 0 || y < 0 || x >= MAP_W || y >= MAP_H) return false;
     if (BLOCKED.includes(grid[y][x])) return false;
     if (zoneAt(x, y)) return false; // buildings are solid
-    if (secretUnlocked && x === SECRET.x && y === SECRET.y) return false; // so is the shrine
+    if (secretUnlocked && inBlock(SECRET, x, y)) return false; // so is the shrine
     return true;
   }
 
@@ -173,7 +194,7 @@
   let viewW = $state(960);
   let viewH = $state(600);
 
-  let hero = $state({ x: 2, y: 8 });
+  let hero = $state({ x: 4, y: 16 });
   let face = $state<Facing>('right');
   let stepFrame = $state(false);
 
@@ -207,7 +228,7 @@
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
   let fishTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const tile = $derived(reduced ? 48 : Math.max(30, Math.min(52, Math.floor(Math.min(viewW / 13, viewH / 11)))));
+  const tile = $derived(reduced ? 24 : Math.max(15, Math.min(26, Math.floor(Math.min(viewW / 26, viewH / 22)))));
   const worldW = $derived(MAP_W * tile);
   const worldH = $derived(MAP_H * tile);
 
@@ -313,7 +334,7 @@
 
   // ── Coins → secret zone ─────────────────────────────────────────────────
   function collectCoinAt(x: number, y: number) {
-    const i = coins.findIndex((c) => c.x === x && c.y === y);
+    const i = coins.findIndex((c) => inBlock(c, x, y));
     if (i === -1) return;
     coins = coins.filter((_, j) => j !== i);
     pixelCoin();
@@ -329,7 +350,7 @@
   function checkAdjacency() {
     const now: ZoneId[] = [];
     for (const z of visibleZones) {
-      if (Math.abs(z.x - hero.x) + Math.abs(z.y - hero.y) === 1) now.push(z.id);
+      if (heroAdjacentTo(z)) now.push(z.id);
     }
     // Trigger on the not-adjacent → adjacent transition only.
     const fresh = now.find((id) => !prevAdjacent.includes(id));
@@ -456,7 +477,7 @@
       tryFish();
       return;
     }
-    const adj = visibleZones.find((z) => Math.abs(z.x - hero.x) + Math.abs(z.y - hero.y) === 1);
+    const adj = visibleZones.find((z) => heroAdjacentTo(z));
     if (adj) openZone(adj.id);
   }
   function pressB() {
@@ -498,7 +519,7 @@
         break;
       }
       typed = text.slice(0, i);
-      await delay(22);
+      await delay(13);
     }
   }
 
@@ -580,7 +601,7 @@
     <div class="viewport">
       <div
         class="world"
-        style="--tile:{tile}px; --px:{tile / 16}px; width:{worldW}px; height:{worldH}px; transform: translate({-camX}px, {-camY}px);"
+        style="--tile:{tile}px; --px:{tile / 32}px; --step:{STEP_MS}ms; width:{worldW}px; height:{worldH}px; transform: translate({-camX}px, {-camY}px);"
       >
         {#each grid as row, y}
           {#each row as t, x}
@@ -645,9 +666,13 @@
             <span class="h-arm l"></span>
             <span class="h-arm r"></span>
             <span class="h-body"></span>
+            <span class="h-body-shade"></span>
             <span class="h-belt"></span>
+            <span class="h-buckle"></span>
             <span class="h-leg l"></span>
             <span class="h-leg r"></span>
+            <span class="h-boot l"></span>
+            <span class="h-boot r"></span>
           </span>
         </div>
       </div>
@@ -818,7 +843,7 @@
   /* ─── NES palette ───────────────────────────────────────────────────────
      grass #00A800/#008000 · path #C84C0C · water #5C94FC · coin #FCD800
      hero red #D82800 / cap green #1F9E3A · UI white #FCFCFC · sky/ink #1C1C2E
-     Pixel grid is tile/16 (--px) — twice as fine as a classic tile/8.        */
+     Pixel grid is tile/32 (--px) — twice as fine as a classic tile/8.        */
   .pixel-wrapper {
     width: 100%;
     height: 100vh;
@@ -870,7 +895,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    transition: transform 150ms linear;
+    transition: transform var(--step) linear;
     image-rendering: pixelated;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -884,59 +909,76 @@
   .tile.grass::after {
     content: '';
     position: absolute;
-    left: calc(var(--px) * 4);
-    top: calc(var(--px) * 5);
-    width: var(--px);
-    height: var(--px);
+    left: calc(var(--px) * 8);
+    top: calc(var(--px) * 10);
+    width: calc(var(--px) * 2);
+    height: calc(var(--px) * 2);
     background: #008000;
     box-shadow:
-      calc(var(--px) * 8) calc(var(--px) * 4) #008000,
-      calc(var(--px) * 5) calc(var(--px) * 10) #38c456,
-      calc(var(--px) * 11) calc(var(--px) * 9) #008000;
+      calc(var(--px) * 16) calc(var(--px) * 8) #008000,
+      calc(var(--px) * 10) calc(var(--px) * 20) #38c456,
+      calc(var(--px) * 22) calc(var(--px) * 18) #008000,
+      calc(var(--px) * 5) calc(var(--px) * 27) #38c456,
+      calc(var(--px) * 27) calc(var(--px) * 13) #008000;
   }
   .tile.grass2 { background: #089808; }
   .tile.grass2::after {
     content: '';
     position: absolute;
-    left: calc(var(--px) * 3);
-    top: calc(var(--px) * 8);
-    width: var(--px);
-    height: var(--px);
+    left: calc(var(--px) * 6);
+    top: calc(var(--px) * 16);
+    width: calc(var(--px) * 2);
+    height: calc(var(--px) * 2);
     background: #006c00;
     box-shadow:
-      calc(var(--px) * 9) calc(var(--px) * 3) #006c00,
-      calc(var(--px) * 12) calc(var(--px) * 10) #2cb44a,
-      calc(var(--px) * 6) calc(var(--px) * 12) #006c00;
+      calc(var(--px) * 18) calc(var(--px) * 6) #006c00,
+      calc(var(--px) * 24) calc(var(--px) * 20) #2cb44a,
+      calc(var(--px) * 12) calc(var(--px) * 24) #006c00,
+      calc(var(--px) * 3) calc(var(--px) * 27) #2cb44a,
+      calc(var(--px) * 27) calc(var(--px) * 15) #006c00;
   }
 
   /* Dirt road — warm base, lighter top edge, scattered pebbles */
-  .tile.path { background: #c84c0c; box-shadow: inset 0 0 0 calc(var(--px) * 1.5) #b03c08, inset 0 calc(var(--px) * 1.5) 0 #e06820; }
+  .tile.path { background: #c84c0c; box-shadow: inset 0 0 0 calc(var(--px) * 3) #b03c08, inset 0 calc(var(--px) * 3) 0 #e06820; }
   .tile.path::after {
     content: '';
     position: absolute;
-    left: calc(var(--px) * 3);
-    top: calc(var(--px) * 4);
-    width: var(--px);
-    height: var(--px);
+    left: calc(var(--px) * 6);
+    top: calc(var(--px) * 8);
+    width: calc(var(--px) * 2);
+    height: calc(var(--px) * 2);
     background: #a83408;
     box-shadow:
-      calc(var(--px) * 8) calc(var(--px) * 2) #e06820,
-      calc(var(--px) * 4) calc(var(--px) * 9) #a83408,
-      calc(var(--px) * 11) calc(var(--px) * 11) #e06820,
-      calc(var(--px) * 12) calc(var(--px) * 5) #a83408;
+      calc(var(--px) * 16) calc(var(--px) * 4) #e06820,
+      calc(var(--px) * 8) calc(var(--px) * 18) #a83408,
+      calc(var(--px) * 22) calc(var(--px) * 22) #e06820,
+      calc(var(--px) * 24) calc(var(--px) * 10) #a83408,
+      calc(var(--px) * 13) calc(var(--px) * 27) #e06820,
+      calc(var(--px) * 3) calc(var(--px) * 25) #a83408,
+      calc(var(--px) * 27) calc(var(--px) * 15) #e06820;
   }
 
   /* Water — banded shading + ripple highlights */
-  .tile.water { background: #5c94fc; box-shadow: inset 0 calc(var(--px) * 2) 0 #78a8fc, inset 0 calc(var(--px) * -2) 0 #3868c0; }
-  .tile.water::after {
+  .tile.water { background: #5c94fc; box-shadow: inset 0 calc(var(--px) * 4) 0 #78a8fc, inset 0 calc(var(--px) * -4) 0 #3868c0; }
+  .tile.water::before {
     content: '';
     position: absolute;
     left: calc(var(--px) * 3);
-    top: calc(var(--px) * 6);
-    width: calc(var(--px) * 5);
-    height: var(--px);
+    top: calc(var(--px) * 5);
+    width: calc(var(--px) * 6);
+    height: calc(var(--px) * 1);
     background: #bcd4fc;
-    box-shadow: calc(var(--px) * 7) calc(var(--px) * 4) #bcd4fc, calc(var(--px) * -1) calc(var(--px) * 5) #bcd4fc;
+    box-shadow: calc(var(--px) * 16) calc(var(--px) * 3) #dcecff, calc(var(--px) * 11) calc(var(--px) * 9) #bcd4fc;
+  }
+  .tile.water::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--px) * 6);
+    top: calc(var(--px) * 12);
+    width: calc(var(--px) * 10);
+    height: calc(var(--px) * 2);
+    background: #bcd4fc;
+    box-shadow: calc(var(--px) * 14) calc(var(--px) * 8) #bcd4fc, calc(var(--px) * -2) calc(var(--px) * 10) #bcd4fc;
   }
 
   /* Flowers — walkable; a couple of little blooms on grass */
@@ -944,17 +986,18 @@
   .tile.flower::after {
     content: '';
     position: absolute;
-    left: calc(var(--px) * 6);
-    top: calc(var(--px) * 6);
-    width: calc(var(--px) * 2);
-    height: calc(var(--px) * 2);
+    left: calc(var(--px) * 12);
+    top: calc(var(--px) * 12);
+    width: calc(var(--px) * 4);
+    height: calc(var(--px) * 4);
     background: #fcd800;
     box-shadow:
-      calc(var(--px) * 2) 0 #fc7460,
-      calc(var(--px) * -2) 0 #fc7460,
-      0 calc(var(--px) * 2) #fc7460,
-      0 calc(var(--px) * -2) #fc7460,
-      calc(var(--px) * 4) calc(var(--px) * 4) #f850a0;
+      calc(var(--px) * 4) 0 #fc7460,
+      calc(var(--px) * -4) 0 #fc7460,
+      0 calc(var(--px) * 4) #fc7460,
+      0 calc(var(--px) * -4) #fc7460,
+      calc(var(--px) * 8) calc(var(--px) * 8) #f850a0,
+      inset 0 0 0 calc(var(--px) * 1) #e0a800;
   }
 
   /* Trees — trunk (::before) + layered canopy (::after) */
@@ -963,30 +1006,31 @@
     content: '';
     position: absolute;
     left: 50%;
-    bottom: calc(var(--px) * 1);
+    bottom: calc(var(--px) * 2);
     transform: translateX(-50%);
-    width: calc(var(--px) * 3);
-    height: calc(var(--px) * 5);
+    width: calc(var(--px) * 6);
+    height: calc(var(--px) * 10);
     background: #6a3b10;
-    box-shadow: inset calc(var(--px) * -1) 0 0 #4a2608;
+    box-shadow: inset calc(var(--px) * -2) 0 0 #4a2608, inset calc(var(--px) * 1) 0 0 #7c4a18;
   }
   .tile.tree::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: calc(var(--px) * 4);
+    bottom: calc(var(--px) * 8);
     transform: translateX(-50%);
-    width: calc(var(--px) * 12);
-    height: calc(var(--px) * 12);
+    width: calc(var(--px) * 24);
+    height: calc(var(--px) * 24);
     background: #1d8a2c;
-    box-shadow: inset 0 calc(var(--px) * -2) 0 #0d5a1c, inset 0 calc(var(--px) * 3) 0 #2cb44a;
+    box-shadow: inset 0 calc(var(--px) * -4) 0 #0d5a1c, inset 0 calc(var(--px) * 6) 0 #2cb44a, inset calc(var(--px) * -5) calc(var(--px) * -3) 0 #14691f;
   }
 
   /* ── Zones (buildings) ───────────────────────────────────────────────── */
   .zone {
+    --px: calc(var(--tile) / 16);
     position: absolute;
-    width: var(--tile);
-    height: var(--tile);
+    width: calc(var(--tile) * 2);
+    height: calc(var(--tile) * 2);
     background: none;
     border: none;
     padding: 0;
@@ -995,7 +1039,7 @@
   }
   .sign {
     position: absolute;
-    bottom: calc(100% + var(--tile) * 0.9);
+    bottom: calc(100% + var(--tile) * 1.8);
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -1014,32 +1058,32 @@
   .sign.visited { color: #fcd800; border-color: #fcd800; }
 
   /* Decorative wooden signpost by the pond (board on a short post) */
-  .signpost { position: absolute; width: var(--tile); height: var(--tile); z-index: 4; pointer-events: none; }
+  .signpost { --px: calc(var(--tile) / 16); position: absolute; width: var(--tile); height: var(--tile); z-index: 4; pointer-events: none; }
   .signpost > span { position: absolute; image-rendering: pixelated; }
   .post-pole {
     left: 50%;
     bottom: 0;
     transform: translateX(-50%);
-    width: calc(var(--px) * 3);
-    height: calc(var(--px) * 10);
+    width: calc(var(--px) * 6);
+    height: calc(var(--px) * 20);
     background: #7a5224;
-    box-shadow: inset 0 0 0 var(--px) #5e3c18, inset calc(var(--px) * -1) 0 0 #6e481f;
+    box-shadow: inset 0 0 0 calc(var(--px) * 2) #5e3c18, inset calc(var(--px) * -2) 0 0 #6e481f;
   }
   .sign.wood {
-    bottom: calc(var(--px) * 8);
+    bottom: calc(var(--px) * 16);
     background: #7a5224;
     border-color: #d2a05a;
     color: #ffe6b0;
-    box-shadow: 2px 2px 0 #000, inset 0 calc(var(--px) * 2) 0 #9c6c33;
+    box-shadow: 2px 2px 0 #000, inset 0 calc(var(--px) * 4) 0 #9c6c33;
     font-size: 0.58rem;
   }
   .bubble {
     position: absolute;
-    bottom: calc(100% + var(--tile) * 1.45);
+    bottom: calc(100% + var(--tile) * 2.9);
     left: 50%;
     transform: translateX(-50%);
-    width: calc(var(--px) * 8);
-    height: calc(var(--px) * 8);
+    width: calc(var(--px) * 16);
+    height: calc(var(--px) * 16);
     background: #fcd800;
     color: #1c1c2e;
     border: 2px solid #1c1c2e;
@@ -1052,7 +1096,7 @@
   }
   @keyframes bob {
     0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(calc(var(--px) * -3)); }
+    50% { transform: translateX(-50%) translateY(calc(var(--px) * -6)); }
   }
   @media (prefers-reduced-motion: reduce) {
     .bubble { animation: none; }
@@ -1064,87 +1108,97 @@
     left: 50%;
     bottom: 0;
     transform: translateX(-50%);
-    width: calc(var(--px) * 26);
-    height: calc(var(--px) * 30);
+    width: calc(var(--px) * 52);
+    height: calc(var(--px) * 60);
   }
   .building > span { position: absolute; image-rendering: pixelated; }
 
   /* House — warm cottage: pitched roof, chimney, framed windows */
   .b-house .roof {
-    bottom: calc(var(--px) * 13);
-    left: calc(var(--px) * 1);
+    bottom: calc(var(--px) * 26);
+    left: calc(var(--px) * 2);
     width: 0;
     height: 0;
-    border-left: calc(var(--px) * 12) solid transparent;
-    border-right: calc(var(--px) * 12) solid transparent;
-    border-bottom: calc(var(--px) * 9) solid #c0341a;
-    filter: drop-shadow(0 calc(var(--px) * -1) 0 #e05030);
+    border-left: calc(var(--px) * 24) solid transparent;
+    border-right: calc(var(--px) * 24) solid transparent;
+    border-bottom: calc(var(--px) * 18) solid #c0341a;
+    filter: drop-shadow(0 calc(var(--px) * -2) 0 #e05030);
   }
-  .b-house .chimney { bottom: calc(var(--px) * 18); left: calc(var(--px) * 16); width: calc(var(--px) * 3); height: calc(var(--px) * 6); background: #8a3010; box-shadow: inset 0 0 0 var(--px) #5a2008; }
-  .b-house .wall { bottom: 0; left: calc(var(--px) * 4); width: calc(var(--px) * 18); height: calc(var(--px) * 13); background: #f0a040; box-shadow: inset 0 0 0 var(--px) #b06010, inset 0 calc(var(--px) * -2) 0 #d4842c; }
-  .b-house .door { bottom: 0; left: calc(var(--px) * 10); width: calc(var(--px) * 6); height: calc(var(--px) * 8); background: #6a3410; box-shadow: inset 0 0 0 var(--px) #4a2208, inset calc(var(--px) * -2) 0 0 #7c421a; }
-  .b-house .win { bottom: calc(var(--px) * 8); width: calc(var(--px) * 4); height: calc(var(--px) * 4); background: #5c94fc; box-shadow: inset 0 0 0 var(--px) #e8d8b0, inset calc(var(--px) * 1.5) 0 0 #3868c0; }
-  .b-house .win.l { left: calc(var(--px) * 5.5); }
-  .b-house .win.r { left: calc(var(--px) * 12.5); }
+  .b-house .chimney { bottom: calc(var(--px) * 36); left: calc(var(--px) * 32); width: calc(var(--px) * 6); height: calc(var(--px) * 12); background: #8a3010; box-shadow: inset 0 0 0 calc(var(--px) * 2) #5a2008; }
+  .b-house .wall { bottom: 0; left: calc(var(--px) * 8); width: calc(var(--px) * 36); height: calc(var(--px) * 26); background: #f0a040; box-shadow: inset 0 0 0 calc(var(--px) * 2) #b06010, inset 0 calc(var(--px) * -4) 0 #d4842c, inset 0 calc(var(--px) * 3) 0 #a85808; }
+  .b-house .door { bottom: 0; left: calc(var(--px) * 20); width: calc(var(--px) * 12); height: calc(var(--px) * 16); background: #6a3410; box-shadow: inset 0 0 0 calc(var(--px) * 2) #4a2208, inset calc(var(--px) * -4) 0 0 #7c421a; }
+  .b-house .door::after { content: ''; position: absolute; right: calc(var(--px) * 2); top: calc(var(--px) * 7); width: calc(var(--px) * 2); height: calc(var(--px) * 2); background: #fcd800; }
+  .b-house .win { bottom: calc(var(--px) * 16); width: calc(var(--px) * 8); height: calc(var(--px) * 8); background: #5c94fc; box-shadow: inset 0 0 0 calc(var(--px) * 2) #e8d8b0, inset calc(var(--px) * 3) 0 0 #3868c0; }
+  .b-house .win::before { content: ''; position: absolute; left: 0; top: calc(var(--px) * 3); width: calc(var(--px) * 8); height: calc(var(--px) * 1); background: #e8d8b0; }
+  .b-house .win::after { content: ''; position: absolute; left: calc(var(--px) * 3); top: 0; width: calc(var(--px) * 1); height: calc(var(--px) * 8); background: #e8d8b0; }
+  .b-house .win.l { left: calc(var(--px) * 11); }
+  .b-house .win.r { left: calc(var(--px) * 25); }
 
   /* Castle — twin towers, crenellated keep, portcullis gate, pennant */
-  .b-castle { height: calc(var(--px) * 30); }
-  .b-castle .keep { bottom: 0; left: calc(var(--px) * 5); width: calc(var(--px) * 16); height: calc(var(--px) * 20); background: #9aa0ac; box-shadow: inset 0 0 0 var(--px) #6c7280, inset 0 calc(var(--px) * -3) 0 #80868f; }
-  .b-castle .tower { bottom: 0; width: calc(var(--px) * 6); height: calc(var(--px) * 24); background: #aab0bc; box-shadow: inset 0 0 0 var(--px) #6c7280, inset 0 calc(var(--px) * 2) 0 #5c6068; }
+  .b-castle { height: calc(var(--px) * 60); }
+  .b-castle .keep { bottom: 0; left: calc(var(--px) * 10); width: calc(var(--px) * 32); height: calc(var(--px) * 40); background: #9aa0ac; box-shadow: inset 0 0 0 calc(var(--px) * 2) #6c7280, inset 0 calc(var(--px) * -6) 0 #80868f; }
+  .b-castle .keep::before { content: ''; position: absolute; left: calc(var(--px) * 2); top: calc(var(--px) * 8); width: calc(var(--px) * 28); height: calc(var(--px) * 1); background: #6c7280; box-shadow: 0 calc(var(--px) * 10) #6c7280, 0 calc(var(--px) * 20) #6c7280; }
+  .b-castle .keep::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); top: calc(var(--px) * 11); width: calc(var(--px) * 3); height: calc(var(--px) * 10); background: #3a3e48; }
+  .b-castle .tower { bottom: 0; width: calc(var(--px) * 12); height: calc(var(--px) * 48); background: #aab0bc; box-shadow: inset 0 0 0 calc(var(--px) * 2) #6c7280, inset 0 calc(var(--px) * 4) 0 #5c6068; }
   .b-castle .tower.l { left: 0; }
-  .b-castle .tower.r { left: calc(var(--px) * 20); }
-  .b-castle .merlons { bottom: calc(var(--px) * 20); left: calc(var(--px) * 5); width: calc(var(--px) * 16); height: calc(var(--px) * 3); background: repeating-linear-gradient(90deg, #aab0bc 0 calc(var(--px) * 3), transparent calc(var(--px) * 3) calc(var(--px) * 5)); }
-  .b-castle .gate { bottom: 0; left: calc(var(--px) * 10); width: calc(var(--px) * 6); height: calc(var(--px) * 10); background: repeating-linear-gradient(90deg, #2a1c44 0 calc(var(--px) * 1.5), #160e2c calc(var(--px) * 1.5) calc(var(--px) * 2)); box-shadow: inset 0 0 0 var(--px) #160e2c; }
-  .b-castle .flag { bottom: calc(var(--px) * 25); left: calc(var(--px) * 11); width: calc(var(--px) * 6); height: calc(var(--px) * 3); background: #d82800; box-shadow: inset calc(var(--px) * 1) 0 0 #fcfcfc; }
+  .b-castle .tower.r { left: calc(var(--px) * 40); }
+  .b-castle .merlons { bottom: calc(var(--px) * 40); left: calc(var(--px) * 10); width: calc(var(--px) * 32); height: calc(var(--px) * 6); background: repeating-linear-gradient(90deg, #aab0bc 0 calc(var(--px) * 6), transparent calc(var(--px) * 6) calc(var(--px) * 10)); box-shadow: inset 0 calc(var(--px) * -1) 0 #6c7280; }
+  .b-castle .gate { bottom: 0; left: calc(var(--px) * 20); width: calc(var(--px) * 12); height: calc(var(--px) * 20); background: repeating-linear-gradient(90deg, #2a1c44 0 calc(var(--px) * 3), #160e2c calc(var(--px) * 3) calc(var(--px) * 4)); box-shadow: inset 0 0 0 calc(var(--px) * 2) #160e2c; }
+  .b-castle .flag { bottom: calc(var(--px) * 50); left: calc(var(--px) * 22); width: calc(var(--px) * 12); height: calc(var(--px) * 6); background: #d82800; box-shadow: inset calc(var(--px) * 2) 0 0 #fcfcfc; }
 
   /* Shop — striped awning, signboard, framed window */
-  .b-shop .wall { bottom: 0; left: calc(var(--px) * 3); width: calc(var(--px) * 20); height: calc(var(--px) * 12); background: #f0e0c0; box-shadow: inset 0 0 0 var(--px) #c0a070, inset 0 calc(var(--px) * -2) 0 #d8c498; }
-  .b-shop .awning { bottom: calc(var(--px) * 12); left: calc(var(--px) * 1); width: calc(var(--px) * 24); height: calc(var(--px) * 5); background: repeating-linear-gradient(90deg, #d82800 0 calc(var(--px) * 3), #fcfcfc calc(var(--px) * 3) calc(var(--px) * 6)); box-shadow: inset 0 calc(var(--px) * -1.5) 0 rgba(0, 0, 0, 0.22); }
-  .b-shop .board { bottom: calc(var(--px) * 4); left: calc(var(--px) * 16); width: calc(var(--px) * 5); height: calc(var(--px) * 4); background: #b87818; box-shadow: inset 0 0 0 var(--px) #7a4810, inset calc(var(--px) * 1.5) calc(var(--px) * 1.5) 0 0 #fcd800; }
-  .b-shop .door { bottom: 0; left: calc(var(--px) * 9); width: calc(var(--px) * 6); height: calc(var(--px) * 8); background: #6a3410; box-shadow: inset 0 0 0 var(--px) #4a2208, inset calc(var(--px) * -2) 0 0 #7c421a; }
-  .b-shop .win { bottom: calc(var(--px) * 4); left: calc(var(--px) * 4); width: calc(var(--px) * 5); height: calc(var(--px) * 5); background: #5c94fc; box-shadow: inset 0 0 0 var(--px) #c0a070, inset calc(var(--px) * 2) 0 0 #3868c0, inset 0 calc(var(--px) * 2) 0 #3868c0; }
+  .b-shop .wall { bottom: 0; left: calc(var(--px) * 6); width: calc(var(--px) * 40); height: calc(var(--px) * 24); background: #f0e0c0; box-shadow: inset 0 0 0 calc(var(--px) * 2) #c0a070, inset 0 calc(var(--px) * -4) 0 #d8c498; }
+  .b-shop .awning { bottom: calc(var(--px) * 24); left: calc(var(--px) * 2); width: calc(var(--px) * 48); height: calc(var(--px) * 10); background: repeating-linear-gradient(90deg, #d82800 0 calc(var(--px) * 6), #fcfcfc calc(var(--px) * 6) calc(var(--px) * 12)); box-shadow: inset 0 calc(var(--px) * -3) 0 rgba(0, 0, 0, 0.22); }
+  .b-shop .awning::after { content: ''; position: absolute; left: 0; bottom: calc(var(--px) * -2); width: 100%; height: calc(var(--px) * 2); background: repeating-linear-gradient(90deg, #d82800 0 calc(var(--px) * 3), transparent calc(var(--px) * 3) calc(var(--px) * 6)); }
+  .b-shop .board { bottom: calc(var(--px) * 8); left: calc(var(--px) * 32); width: calc(var(--px) * 10); height: calc(var(--px) * 8); background: #b87818; box-shadow: inset 0 0 0 calc(var(--px) * 2) #7a4810, inset calc(var(--px) * 3) calc(var(--px) * 3) 0 0 #fcd800, 0 0 0 calc(var(--px) * 1) #4a2c08; }
+  .b-shop .door { bottom: 0; left: calc(var(--px) * 18); width: calc(var(--px) * 12); height: calc(var(--px) * 16); background: #6a3410; box-shadow: inset 0 0 0 calc(var(--px) * 2) #4a2208, inset calc(var(--px) * -4) 0 0 #7c421a; }
+  .b-shop .win { bottom: calc(var(--px) * 8); left: calc(var(--px) * 8); width: calc(var(--px) * 10); height: calc(var(--px) * 10); background: #5c94fc; box-shadow: inset 0 0 0 calc(var(--px) * 2) #c0a070, inset calc(var(--px) * 4) 0 0 #3868c0, inset 0 calc(var(--px) * 4) 0 #3868c0; }
 
   /* Library — greek temple: pediment, fluted columns, steps */
-  .b-library { height: calc(var(--px) * 26); }
-  .b-library .pediment { bottom: calc(var(--px) * 15); left: calc(var(--px) * 1); width: 0; height: 0; border-left: calc(var(--px) * 12) solid transparent; border-right: calc(var(--px) * 12) solid transparent; border-bottom: calc(var(--px) * 7) solid #d0c4a0; }
-  .b-library .cols { bottom: calc(var(--px) * 3); left: calc(var(--px) * 3); width: calc(var(--px) * 20); height: calc(var(--px) * 12); background: repeating-linear-gradient(90deg, #e8e0c8 0 calc(var(--px) * 3), #b8a888 calc(var(--px) * 3) calc(var(--px) * 4)); box-shadow: inset 0 calc(var(--px) * 2) 0 #c4b890, inset 0 calc(var(--px) * -2) 0 #cfc4a4; }
-  .b-library .steps { bottom: 0; left: calc(var(--px) * 1); width: calc(var(--px) * 24); height: calc(var(--px) * 3); background: #d8d0b8; box-shadow: inset 0 0 0 var(--px) #b8b098, inset 0 calc(var(--px) * 1.5) 0 #ece4cc; }
-  .b-library .gate { bottom: calc(var(--px) * 3); left: calc(var(--px) * 10); width: calc(var(--px) * 6); height: calc(var(--px) * 9); background: #5a3c20; box-shadow: inset 0 0 0 var(--px) #3a2410; }
+  .b-library { height: calc(var(--px) * 52); }
+  .b-library .pediment { bottom: calc(var(--px) * 30); left: calc(var(--px) * 2); width: 0; height: 0; border-left: calc(var(--px) * 24) solid transparent; border-right: calc(var(--px) * 24) solid transparent; border-bottom: calc(var(--px) * 14) solid #d0c4a0; }
+  .b-library .cols { bottom: calc(var(--px) * 6); left: calc(var(--px) * 6); width: calc(var(--px) * 40); height: calc(var(--px) * 24); background: repeating-linear-gradient(90deg, #e8e0c8 0 calc(var(--px) * 6), #b8a888 calc(var(--px) * 6) calc(var(--px) * 8)); box-shadow: inset 0 calc(var(--px) * 4) 0 #c4b890, inset 0 calc(var(--px) * -4) 0 #cfc4a4; }
+  .b-library .steps { bottom: 0; left: calc(var(--px) * 2); width: calc(var(--px) * 48); height: calc(var(--px) * 6); background: #d8d0b8; box-shadow: inset 0 0 0 calc(var(--px) * 2) #b8b098, inset 0 calc(var(--px) * 3) 0 #ece4cc; }
+  .b-library .gate { bottom: calc(var(--px) * 6); left: calc(var(--px) * 20); width: calc(var(--px) * 12); height: calc(var(--px) * 18); background: #5a3c20; box-shadow: inset 0 0 0 calc(var(--px) * 2) #3a2410; }
+  .b-library .gate::after { content: ''; position: absolute; left: calc(var(--px) * 2); top: calc(var(--px) * 2); right: calc(var(--px) * 2); bottom: calc(var(--px) * 2); background: repeating-linear-gradient(90deg, #d82800 0 calc(var(--px) * 2), #b87818 calc(var(--px) * 2) calc(var(--px) * 4), #2038c8 calc(var(--px) * 4) calc(var(--px) * 5)); box-shadow: inset 0 calc(var(--px) * 8) 0 calc(var(--px) * -7) #3a2410; }
 
   /* Mailbox — post + rounded blue box, slot, raised flag */
-  .b-mailbox { width: calc(var(--px) * 18); height: calc(var(--px) * 22); }
-  .b-mailbox .post { bottom: 0; left: calc(var(--px) * 7); width: calc(var(--px) * 4); height: calc(var(--px) * 11); background: #6a3b10; box-shadow: inset 0 0 0 var(--px) #4a2608; }
-  .b-mailbox .box { bottom: calc(var(--px) * 10); left: calc(var(--px) * 2); width: calc(var(--px) * 14); height: calc(var(--px) * 8); background: #2038c8; box-shadow: inset 0 0 0 var(--px) #16205c, inset 0 calc(var(--px) * 3) 0 #3858e0; }
-  .b-mailbox .slot { bottom: calc(var(--px) * 15); left: calc(var(--px) * 5); width: calc(var(--px) * 8); height: calc(var(--px) * 1.5); background: #11185c; }
-  .b-mailbox .mflag { bottom: calc(var(--px) * 14); left: calc(var(--px) * 14); width: calc(var(--px) * 4); height: calc(var(--px) * 4); background: #d82800; box-shadow: inset 0 0 0 var(--px) #8a1800; }
+  .b-mailbox { width: calc(var(--px) * 36); height: calc(var(--px) * 44); }
+  .b-mailbox .post { bottom: 0; left: calc(var(--px) * 14); width: calc(var(--px) * 8); height: calc(var(--px) * 22); background: #6a3b10; box-shadow: inset 0 0 0 calc(var(--px) * 2) #4a2608; }
+  .b-mailbox .box { bottom: calc(var(--px) * 20); left: calc(var(--px) * 4); width: calc(var(--px) * 28); height: calc(var(--px) * 16); background: #2038c8; box-shadow: inset 0 0 0 calc(var(--px) * 2) #16205c, inset 0 calc(var(--px) * 6) 0 #3858e0; }
+  .b-mailbox .box::after { content: ''; position: absolute; left: calc(var(--px) * 4); top: calc(var(--px) * 4); width: calc(var(--px) * 13); height: calc(var(--px) * 9); box-shadow: inset 0 0 0 calc(var(--px) * 1) #16205c; }
+  .b-mailbox .slot { bottom: calc(var(--px) * 30); left: calc(var(--px) * 10); width: calc(var(--px) * 16); height: calc(var(--px) * 3); background: #11185c; }
+  .b-mailbox .mflag { bottom: calc(var(--px) * 28); left: calc(var(--px) * 28); width: calc(var(--px) * 8); height: calc(var(--px) * 8); background: #d82800; box-shadow: inset 0 0 0 calc(var(--px) * 2) #8a1800, inset calc(var(--px) * 2) calc(var(--px) * 2) 0 0 #fc6850; }
 
   /* Chest — gold-banded treasure chest with lock */
-  .b-chest { width: calc(var(--px) * 22); height: calc(var(--px) * 16); }
-  .b-chest .base { bottom: 0; left: calc(var(--px) * 2); width: calc(var(--px) * 18); height: calc(var(--px) * 7); background: #8a4b1a; box-shadow: inset 0 0 0 var(--px) #5a2f10, inset 0 calc(var(--px) * -2) 0 #6a3812; }
-  .b-chest .lid { bottom: calc(var(--px) * 7); left: calc(var(--px) * 2); width: calc(var(--px) * 18); height: calc(var(--px) * 5); background: #a85a20; box-shadow: inset 0 0 0 var(--px) #5a2f10, inset 0 calc(var(--px) * 2) 0 #c87838; }
-  .b-chest .bands { bottom: 0; left: calc(var(--px) * 2); width: calc(var(--px) * 18); height: calc(var(--px) * 12); background: repeating-linear-gradient(90deg, transparent 0 calc(var(--px) * 7), #e0b040 calc(var(--px) * 7) calc(var(--px) * 9), transparent calc(var(--px) * 9) calc(var(--px) * 16)); }
-  .b-chest .lock { bottom: calc(var(--px) * 4); left: 50%; transform: translateX(-50%); width: calc(var(--px) * 4); height: calc(var(--px) * 5); background: #fcd800; box-shadow: inset 0 0 0 var(--px) #b89000, inset 0 calc(var(--px) * -1.5) 0 #8a6800; }
+  .b-chest { width: calc(var(--px) * 44); height: calc(var(--px) * 32); }
+  .b-chest .base { bottom: 0; left: calc(var(--px) * 4); width: calc(var(--px) * 36); height: calc(var(--px) * 14); background: #8a4b1a; box-shadow: inset 0 0 0 calc(var(--px) * 2) #5a2f10, inset 0 calc(var(--px) * -4) 0 #6a3812; }
+  .b-chest .base::after { content: ''; position: absolute; left: calc(var(--px) * 3); top: calc(var(--px) * 3); width: calc(var(--px) * 2); height: calc(var(--px) * 2); background: #e0b040; box-shadow: calc(var(--px) * 29) 0 #e0b040, 0 calc(var(--px) * 7) #e0b040, calc(var(--px) * 29) calc(var(--px) * 7) #e0b040; }
+  .b-chest .lid { bottom: calc(var(--px) * 14); left: calc(var(--px) * 4); width: calc(var(--px) * 36); height: calc(var(--px) * 10); background: #a85a20; box-shadow: inset 0 calc(var(--px) * -1) 0 #e0b040, inset 0 0 0 calc(var(--px) * 2) #5a2f10, inset 0 calc(var(--px) * 4) 0 #c87838; }
+  .b-chest .bands { bottom: 0; left: calc(var(--px) * 4); width: calc(var(--px) * 36); height: calc(var(--px) * 24); background: repeating-linear-gradient(90deg, transparent 0 calc(var(--px) * 14), #e0b040 calc(var(--px) * 14) calc(var(--px) * 18), transparent calc(var(--px) * 18) calc(var(--px) * 32)); }
+  .b-chest .lock { bottom: calc(var(--px) * 8); left: 50%; transform: translateX(-50%); width: calc(var(--px) * 8); height: calc(var(--px) * 10); background: #fcd800; box-shadow: inset 0 0 0 calc(var(--px) * 2) #b89000, inset 0 calc(var(--px) * -3) 0 #8a6800; }
   .b-chest.sparkle { animation: sparkle 0.8s steps(2, end) infinite; }
   @keyframes sparkle { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.6); } }
   @media (prefers-reduced-motion: reduce) { .b-chest.sparkle, .b-shrine.sparkle { animation: none; } }
 
   /* Shrine — secret zone: a glowing standing stone with a magic orb */
-  .b-shrine { width: calc(var(--px) * 16); height: calc(var(--px) * 26); }
-  .b-shrine .base { bottom: 0; left: calc(var(--px) * 3); width: calc(var(--px) * 10); height: calc(var(--px) * 4); background: #6c7280; box-shadow: inset 0 0 0 var(--px) #4a4e58, inset 0 calc(var(--px) * 1.5) 0 #8a909c; }
-  .b-shrine .pillar { bottom: calc(var(--px) * 4); left: calc(var(--px) * 5); width: calc(var(--px) * 6); height: calc(var(--px) * 14); background: #9aa0ac; box-shadow: inset 0 0 0 var(--px) #6c7280, inset calc(var(--px) * -1.5) 0 0 #80868f; }
-  .b-shrine .orb { bottom: calc(var(--px) * 16); left: 50%; transform: translateX(-50%); width: calc(var(--px) * 6); height: calc(var(--px) * 6); background: #5cf0a0; box-shadow: 0 0 0 var(--px) #2bd87a, 0 0 calc(var(--px) * 4) calc(var(--px) * 1) rgba(92, 240, 160, 0.7); animation: orbPulse 1.1s steps(2, end) infinite; }
+  .b-shrine { width: calc(var(--px) * 32); height: calc(var(--px) * 52); }
+  .b-shrine .base { bottom: 0; left: calc(var(--px) * 6); width: calc(var(--px) * 20); height: calc(var(--px) * 8); background: #6c7280; box-shadow: inset 0 calc(var(--px) * -1) 0 #3a3e46, inset 0 0 0 calc(var(--px) * 2) #4a4e58, inset 0 calc(var(--px) * 3) 0 #8a909c; }
+  .b-shrine .pillar { bottom: calc(var(--px) * 8); left: calc(var(--px) * 10); width: calc(var(--px) * 12); height: calc(var(--px) * 28); background: #9aa0ac; box-shadow: inset 0 0 0 calc(var(--px) * 2) #6c7280, inset calc(var(--px) * -3) 0 0 #80868f; }
+  .b-shrine .orb { bottom: calc(var(--px) * 32); left: 50%; transform: translateX(-50%); width: calc(var(--px) * 12); height: calc(var(--px) * 12); background: #5cf0a0; box-shadow: 0 0 0 calc(var(--px) * 2) #2bd87a, 0 0 calc(var(--px) * 8) calc(var(--px) * 2) rgba(92, 240, 160, 0.7); animation: orbPulse 1.1s steps(2, end) infinite; }
   @keyframes orbPulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.7); } }
   .b-shrine.sparkle { animation: sparkle 0.8s steps(2, end) infinite; }
   @media (prefers-reduced-motion: reduce) { .b-shrine .orb { animation: none; } }
 
   /* ── Hero sprite (original CSS pixel art, ~12×20 sub-pixels) ──────────── */
   .hero {
+    --px: calc(var(--tile) / 16);
     position: absolute;
     width: var(--tile);
     height: var(--tile);
     z-index: 6;
     transform: translate(var(--hx), var(--hy));
-    transition: transform 150ms linear;
+    transition: transform var(--step) linear;
   }
   @media (prefers-reduced-motion: reduce) { .hero { transition: none; } }
   /* Bump: a short nudge toward the wall and back (transform includes --hx/--hy
@@ -1154,17 +1208,17 @@
   .hero.bump-down { animation: bumpDown 0.18s steps(2, end); }
   .hero.bump-left { animation: bumpLeft 0.18s steps(2, end); }
   .hero.bump-right { animation: bumpRight 0.18s steps(2, end); }
-  @keyframes bumpUp { 50% { transform: translate(var(--hx), calc(var(--hy) - var(--px) * 2)); } }
-  @keyframes bumpDown { 50% { transform: translate(var(--hx), calc(var(--hy) + var(--px) * 2)); } }
-  @keyframes bumpLeft { 50% { transform: translate(calc(var(--hx) - var(--px) * 2), var(--hy)); } }
-  @keyframes bumpRight { 50% { transform: translate(calc(var(--hx) + var(--px) * 2), var(--hy)); } }
+  @keyframes bumpUp { 50% { transform: translate(var(--hx), calc(var(--hy) - var(--px) * 4)); } }
+  @keyframes bumpDown { 50% { transform: translate(var(--hx), calc(var(--hy) + var(--px) * 4)); } }
+  @keyframes bumpLeft { 50% { transform: translate(calc(var(--hx) - var(--px) * 4), var(--hy)); } }
+  @keyframes bumpRight { 50% { transform: translate(calc(var(--hx) + var(--px) * 4), var(--hy)); } }
   @media (prefers-reduced-motion: reduce) {
     .hero.bump-up, .hero.bump-down, .hero.bump-left, .hero.bump-right { animation: none; }
   }
   /* Idle "Zzz" floating above the hero */
   .zzz {
     position: absolute;
-    bottom: calc(100% - var(--px) * 2);
+    bottom: calc(100% - var(--px) * 4);
     left: 64%;
     color: #fcfcfc;
     font-size: 0.5rem;
@@ -1175,13 +1229,13 @@
   @keyframes floatZ {
     0% { opacity: 0; transform: translateY(0) scale(0.6); }
     40% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(calc(var(--px) * -6)) scale(1.1); }
+    100% { opacity: 0; transform: translateY(calc(var(--px) * -12)) scale(1.1); }
   }
   @media (prefers-reduced-motion: reduce) { .zzz { display: none; } }
   /* Fishing prompt bubble when facing water */
   .fish-hint {
     position: absolute;
-    bottom: calc(100% + var(--px));
+    bottom: calc(100% + var(--px) * 2);
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -1195,9 +1249,10 @@
 
   /* Collectible coin — a little spinning gold disc */
   .coin {
+    --px: calc(var(--tile) / 16);
     position: absolute;
-    width: var(--tile);
-    height: var(--tile);
+    width: calc(var(--tile) * 2);
+    height: calc(var(--tile) * 2);
     z-index: 4;
     pointer-events: none;
   }
@@ -1207,10 +1262,10 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: calc(var(--px) * 6);
-    height: calc(var(--px) * 8);
+    width: calc(var(--px) * 12);
+    height: calc(var(--px) * 16);
     background: #fcd800;
-    box-shadow: inset calc(var(--px) * -1.5) 0 0 #c89000, inset calc(var(--px) * 2) 0 0 #ffe840;
+    box-shadow: inset 0 calc(var(--px) * 1) 0 #fff8b0, inset calc(var(--px) * -3) 0 0 #c89000, inset calc(var(--px) * 4) 0 0 #ffe840;
     animation: coinSpin 1.1s steps(4, end) infinite;
   }
   @keyframes coinSpin {
@@ -1222,53 +1277,59 @@
   @media (prefers-reduced-motion: reduce) { .coin::after { animation: none; } }
   .hero-shadow {
     position: absolute;
-    bottom: calc(var(--px) * 1.5);
+    bottom: calc(var(--px) * 3);
     left: 50%;
     transform: translateX(-50%);
-    width: calc(var(--px) * 11);
-    height: calc(var(--px) * 2);
+    width: calc(var(--px) * 22);
+    height: calc(var(--px) * 4);
     background: rgba(0, 0, 0, 0.32);
   }
   .hero-sprite {
     position: absolute;
     left: 50%;
-    bottom: calc(var(--px) * 2);
+    bottom: calc(var(--px) * 4);
     transform: translateX(-50%);
-    width: calc(var(--px) * 12);
-    height: calc(var(--px) * 20);
+    width: calc(var(--px) * 24);
+    height: calc(var(--px) * 40);
   }
   .hero-sprite.flip { transform: translateX(-50%) scaleX(-1); }
   .hero-sprite > span { position: absolute; image-rendering: pixelated; }
 
   /* Hair (blond, short & messy), fringe, face, eyes */
-  .h-hat-top { top: 0; left: calc(var(--px) * 2.5); width: calc(var(--px) * 7); height: calc(var(--px) * 2.5); background: #e6bd4d; box-shadow: inset 0 calc(var(--px) * 1) 0 #f3d77f, calc(var(--px) * -1.5) 0 0 #e6bd4d, calc(var(--px) * 1.5) calc(var(--px) * -1) 0 #f3d77f; }
-  .h-hat-brim { top: calc(var(--px) * 2.5); left: calc(var(--px) * 1.5); width: calc(var(--px) * 9); height: calc(var(--px) * 1.5); background: #c9962f; }
-  .h-face { top: calc(var(--px) * 4); left: calc(var(--px) * 3); width: calc(var(--px) * 6); height: calc(var(--px) * 4); background: #fcb878; box-shadow: inset 0 0 0 var(--px) #e09850; }
-  .h-eye { top: calc(var(--px) * 5.5); width: var(--px); height: calc(var(--px) * 1.5); background: #20123a; }
-  .h-eye.l { left: calc(var(--px) * 4); }
-  .h-eye.r { right: calc(var(--px) * 4); }
+  .h-hat-top { top: 0; left: calc(var(--px) * 5); width: calc(var(--px) * 14); height: calc(var(--px) * 5); background: #e6bd4d; box-shadow: inset 0 calc(var(--px) * 2) 0 #f3d77f, calc(var(--px) * -3) 0 0 #e6bd4d, calc(var(--px) * 3) calc(var(--px) * -2) 0 #f3d77f; }
+  .h-hat-brim { top: calc(var(--px) * 5); left: calc(var(--px) * 3); width: calc(var(--px) * 18); height: calc(var(--px) * 3); background: #c9962f; box-shadow: inset 0 calc(var(--px) * -1) 0 #a67a20, inset 0 calc(var(--px) * 1) 0 #e6bd4d; }
+  .h-face { top: calc(var(--px) * 8); left: calc(var(--px) * 6); width: calc(var(--px) * 12); height: calc(var(--px) * 8); background: #fcb878; box-shadow: inset 0 0 0 calc(var(--px) * 2) #e09850; }
+  .h-eye { top: calc(var(--px) * 11); width: calc(var(--px) * 2); height: calc(var(--px) * 3); background: #20123a; box-shadow: inset 0 calc(var(--px) * 1) 0 #6c5c9c; }
+  .h-eye.l { left: calc(var(--px) * 8); }
+  .h-eye.r { right: calc(var(--px) * 8); }
   /* Tunic, belt, arms, legs */
-  .h-body { top: calc(var(--px) * 8); left: calc(var(--px) * 2.5); width: calc(var(--px) * 7); height: calc(var(--px) * 6); background: #d82800; box-shadow: inset 0 0 0 var(--px) #a01800, inset 0 calc(var(--px) * 1.5) 0 #fc4030; }
-  .h-belt { top: calc(var(--px) * 12); left: calc(var(--px) * 2.5); width: calc(var(--px) * 7); height: calc(var(--px) * 1.5); background: #7a3b10; box-shadow: inset 0 0 0 1px #4a2208; }
-  .h-arm { top: calc(var(--px) * 8.5); width: calc(var(--px) * 2); height: calc(var(--px) * 4); background: #b81f00; box-shadow: inset 0 calc(var(--px) * -1.5) 0 #fcb878; }
-  .h-arm.l { left: calc(var(--px) * 0.5); }
-  .h-arm.r { right: calc(var(--px) * 0.5); }
-  .h-leg { top: calc(var(--px) * 13.5); width: calc(var(--px) * 3); height: calc(var(--px) * 5); background: #2038a0; box-shadow: inset 0 calc(var(--px) * -2) 0 #3a2410; }
-  .h-leg.l { left: calc(var(--px) * 3); }
-  .h-leg.r { right: calc(var(--px) * 3); }
+  .h-body { top: calc(var(--px) * 16); left: calc(var(--px) * 5); width: calc(var(--px) * 14); height: calc(var(--px) * 12); background: #d82800; box-shadow: inset 0 0 0 calc(var(--px) * 2) #a01800, inset 0 calc(var(--px) * 3) 0 #fc4030; }
+  .h-body-shade { top: calc(var(--px) * 18); left: calc(var(--px) * 15); width: calc(var(--px) * 3); height: calc(var(--px) * 9); background: #a01800; }
+  .h-belt { top: calc(var(--px) * 24); left: calc(var(--px) * 5); width: calc(var(--px) * 14); height: calc(var(--px) * 3); background: #7a3b10; box-shadow: inset 0 0 0 1px #4a2208; }
+  .h-buckle { top: calc(var(--px) * 24); left: calc(var(--px) * 11); width: calc(var(--px) * 3); height: calc(var(--px) * 3); background: #fcd800; box-shadow: inset 0 0 0 calc(var(--px) * 1) #b89000; }
+  .h-arm { top: calc(var(--px) * 17); width: calc(var(--px) * 4); height: calc(var(--px) * 8); background: #b81f00; box-shadow: inset 0 calc(var(--px) * -3) 0 #fcb878; }
+  .h-arm.l { left: calc(var(--px) * 1); }
+  .h-arm.r { right: calc(var(--px) * 1); }
+  .h-leg { top: calc(var(--px) * 27); width: calc(var(--px) * 6); height: calc(var(--px) * 10); background: #2038a0; box-shadow: inset 0 calc(var(--px) * -4) 0 #3a2410; }
+  .h-leg.l { left: calc(var(--px) * 6); }
+  .h-leg.r { right: calc(var(--px) * 6); }
+  .h-boot { top: calc(var(--px) * 35); width: calc(var(--px) * 6); height: calc(var(--px) * 2); background: #241606; }
+  .h-boot.l { left: calc(var(--px) * 6); }
+  .h-boot.r { right: calc(var(--px) * 6); }
   /* Walk frame: legs & arms swing in opposition + a tiny body bob */
-  .hero-sprite.step .h-leg.l { transform: translateY(calc(var(--px) * -1)); }
-  .hero-sprite.step .h-leg.r { transform: translateY(calc(var(--px) * 0.5)); }
-  .hero-sprite.step .h-arm.l { transform: translateY(calc(var(--px) * 0.8)); }
-  .hero-sprite.step .h-arm.r { transform: translateY(calc(var(--px) * -0.8)); }
+  .hero-sprite.step .h-leg.l, .hero-sprite.step .h-boot.l { transform: translateY(calc(var(--px) * -2)); }
+  .hero-sprite.step .h-leg.r, .hero-sprite.step .h-boot.r { transform: translateY(calc(var(--px) * 1)); }
+  .hero-sprite.step .h-arm.l { transform: translateY(calc(var(--px) * 1.6)); }
+  .hero-sprite.step .h-arm.r { transform: translateY(calc(var(--px) * -1.6)); }
   /* Facing up: back of head (blond hair, no eyes), arms tuck in */
-  .facing-up .h-face { background: #d9a93f; box-shadow: inset 0 0 0 var(--px) #c9962f; }
+  .facing-up .h-face { background: #d9a93f; box-shadow: inset 0 0 0 calc(var(--px) * 2) #c9962f; }
   .facing-up .h-eye { opacity: 0; }
+  .facing-up .h-buckle { opacity: 0; }
   /* Facing right (left = mirrored via .flip): single eye toward the front */
   .facing-right .h-eye.l { opacity: 0; }
-  .facing-right .h-eye.r { right: calc(var(--px) * 2.5); }
+  .facing-right .h-eye.r { right: calc(var(--px) * 5); }
   .facing-right .h-arm.l { opacity: 0; }
-  .facing-right .h-arm.r { right: calc(var(--px) * 1.5); }
+  .facing-right .h-arm.r { right: calc(var(--px) * 3); }
 
   /* ── Controls hint ───────────────────────────────────────────────────── */
   .controls-hint {

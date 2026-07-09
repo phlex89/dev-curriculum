@@ -102,7 +102,7 @@ Actions per chi non vuole digitare. Easter egg `matrix`, `sudo`.
 **metà anni '80 – metà anni '90** (era 8/16-bit, NES → SNES) · `src/lib/themes/PixelArt.svelte`
 
 > **Stato implementazione.** Realizzato come da concept: overworld top-down a tile
-> (24×16) in DOM/CSS, camera che segue l'eroe (sprite a 4 direzioni con walk-cycle,
+> (48×32) in DOM/CSS, camera che segue l'eroe (sprite a 4 direzioni con walk-cycle,
 > tutto CSS originale), sei zone-edificio → `cv-data.ts`, dialog box NES con intro
 > typewriter, HUD con quest log `★ n/6` e `QUEST COMPLETE` + fanfara. **Doppio
 > binario**: edifici cliccabili + directory "MOSTRA TUTTO". Sotto
@@ -121,6 +121,17 @@ Actions per chi non vuole digitare. Easter egg `matrix`, `sudo`.
 > tendone a righe e insegna, biblioteca a colonne + frontone, cassetta postale, scrigno
 > a bande dorate) e **sprite eroe più curato**. **Invio** chiude il dialog (prima
 > avanza il typewriter, poi chiude); `Esc` chiude sempre.
+>
+> **Rifinitura (2026-07).** **Griglia di gioco raddoppiata**: mappa 24×16 → **48×32**
+> con tile dimezzati (il viewport mostra il doppio dei quadratini), strada larga 2 tile,
+> laghetto 6×6, collisioni/interazioni/monete a **blocco 2×2**. Gli **sprite mantengono
+> la dimensione assoluta** — il terreno segue la griglia fine (`--px = tile/32`), mentre
+> eroe/edifici/monete/segnaletica usano l'override `--px = tile/16` — e guadagnano
+> **dettaglio a mezzo pixel**: eroe con stivali, fibbia, ombreggiatura laterale e
+> highlight negli occhi; finestre con croce, merli e feritoie, tendone con frangia,
+> increspature sull'acqua, ciottoli sul sentiero. Movimento più rapido e fluido
+> (`STEP_MS` 150→50 su passi dimezzati, transizioni CSS sincronizzate via custom
+> property `--step`); typewriter dei dialoghi a 13ms/carattere.
 >
 > **Easter egg.**
 > - **Konami Code** (`↑↑↓↓←→←→ B A`) → toggle **modalità notte** (overlay blu + stelle) +

@@ -84,8 +84,7 @@ export const cvDataEn: typeof cvData = {
     email: 'stefano.tedeschi@protechstudio.it',
     linkedin: 'https://www.linkedin.com/in/stefano-tedeschi-developer/',
     location: 'Turin (Italy)',
-    phone: '+39 3478736835',
-    website: 'https://www.protechstudio.it'
+    phone: '+39 3478736835'
   },
 
   skillGroups: skillGroupsEn,
@@ -289,7 +288,6 @@ const it = {
     expDetailHintB: " per l'elenco",
     email: 'EMAIL',
     tel: 'TEL',
-    web: 'WEB',
     link: 'LINK',
     location: 'LUOGO',
     downloadCv: '▼ SCARICA CV (PDF)',
@@ -360,7 +358,6 @@ const it = {
     education: 'Formazione',
     conferences: 'Conferenze',
     linkedin: 'in · LinkedIn (nuova scheda)',
-    website: (url: string) => `🌐 ${url} (nuova scheda)`,
     cvLead: 'Apri lo scrigno e porta via il tesoro: il curriculum completo in PDF.',
     questNote: '★ QUEST COMPLETE — hai esplorato tutto il villaggio!',
     downloadCv: '⬇ SCARICA IL CV (PDF)',
@@ -406,8 +403,7 @@ const it = {
     experience: 'Esperienza',
     education: 'Istruzione',
     languages: 'Lingue',
-    conferences: 'Conferenze',
-    website: 'Sito web'
+    conferences: 'Conferenze'
   },
   material: {
     tabProfile: 'Profilo',
@@ -415,7 +411,6 @@ const it = {
     tabSkills: 'Competenze',
     tabStudies: 'Studi',
     tabContacts: 'Contatti',
-    website: 'Sito web',
     quickContacts: 'Contatti rapidi',
     resumeSections: 'Sezioni del curriculum',
     profile: 'Profilo',
@@ -463,8 +458,7 @@ const it = {
     ctaKicker: 'Lavoriamo insieme',
     ctaTitle: 'Parliamone.',
     ctaEmail: 'Scrivimi',
-    ctaLinkedin: 'LinkedIn',
-    ctaWebsite: 'Sito'
+    ctaLinkedin: 'LinkedIn'
   },
   vote: {
     panelTitle: 'Le ere più amate',
@@ -560,7 +554,6 @@ const en: UiStrings = {
     expDetailHintB: ' for the list',
     email: 'EMAIL',
     tel: 'TEL',
-    web: 'WEB',
     link: 'LINK',
     location: 'LOCATION',
     downloadCv: '▼ DOWNLOAD CV (PDF)',
@@ -631,7 +624,6 @@ const en: UiStrings = {
     education: 'Education',
     conferences: 'Conferences',
     linkedin: 'in · LinkedIn (new tab)',
-    website: (url: string) => `🌐 ${url} (new tab)`,
     cvLead: 'Open the chest and take the treasure: the full résumé as a PDF.',
     questNote: '★ QUEST COMPLETE — you explored the whole village!',
     downloadCv: '⬇ DOWNLOAD THE CV (PDF)',
@@ -677,8 +669,7 @@ const en: UiStrings = {
     experience: 'Experience',
     education: 'Education',
     languages: 'Languages',
-    conferences: 'Conferences',
-    website: 'Website'
+    conferences: 'Conferences'
   },
   material: {
     tabProfile: 'Profile',
@@ -686,7 +677,6 @@ const en: UiStrings = {
     tabSkills: 'Skills',
     tabStudies: 'Studies',
     tabContacts: 'Contacts',
-    website: 'Website',
     quickContacts: 'Quick contacts',
     resumeSections: 'Resume sections',
     profile: 'Profile',
@@ -734,8 +724,7 @@ const en: UiStrings = {
     ctaKicker: "Let's work together",
     ctaTitle: "Let's talk.",
     ctaEmail: 'Email me',
-    ctaLinkedin: 'LinkedIn',
-    ctaWebsite: 'Website'
+    ctaLinkedin: 'LinkedIn'
   },
   vote: {
     panelTitle: 'The most loved eras',

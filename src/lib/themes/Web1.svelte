@@ -379,7 +379,6 @@
                       <a href={cvData.contact.linkedin} target="_blank" rel="noopener">My LinkedIn Profile</a>
                       <span class="hot" aria-hidden="true">&#128293;</span>
                     </li>
-                    <li><a href={cvData.contact.website} target="_blank" rel="noopener">{cvData.contact.website.replace('https://', '')}</a> &mdash; my company</li>
                     <li><a href="mailto:{cvData.contact.email}">Send me electronic mail</a></li>
                     <li><a href="tel:{cvData.contact.phone.replace(/\s/g, '')}">Call my telephone</a> <span class="muted">{cvData.contact.phone}</span></li>
                   </ul>

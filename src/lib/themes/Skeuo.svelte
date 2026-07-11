@@ -158,9 +158,6 @@
       <a class="gel-btn email" href="mailto:{cvData.contact.email}">
         <span class="gel-ico">@</span><span class="gel-label">Email</span>
       </a>
-      <a class="gel-btn website" href={cvData.contact.website} target="_blank" rel="noopener">
-        <span class="gel-ico">🌐</span><span class="gel-label">{t.website}</span>
-      </a>
     </section>
   </div>
 </div>
@@ -652,7 +649,6 @@
   }
   .gel-btn.linkedin { background: linear-gradient(180deg, #4f97e6 0%, #2f6fd0 50%, #2560bd 100%); }
   .gel-btn.email { background: linear-gradient(180deg, #7cc24e 0%, #4e9a2f 50%, #418526 100%); }
-  .gel-btn.website { background: linear-gradient(180deg, #a878e0 0%, #7b4fc4 50%, #6a40b2 100%); }
   .gel-ico {
     font-family: Georgia, serif;
     font-size: 1.3rem;

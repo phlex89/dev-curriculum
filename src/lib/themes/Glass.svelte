@@ -112,9 +112,6 @@
           <a class="pill" href="mailto:{cvData.contact.email}">
             <span class="pill-icon">@</span> Email
           </a>
-          <a class="pill" href={cvData.contact.website} target="_blank" rel="noopener">
-            <span class="pill-icon">⦿</span> Website
-          </a>
         </div>
       </div>
     </section>

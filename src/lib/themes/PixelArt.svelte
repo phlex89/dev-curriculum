@@ -801,7 +801,6 @@
             <div class="links">
               <a class="link" href="mailto:{cvData.contact.email}">✉ {cvData.contact.email}</a>
               <a class="link" href={cvData.contact.linkedin} target="_blank" rel="noopener noreferrer">{t.linkedin}</a>
-              <a class="link" href={cvData.contact.website} target="_blank" rel="noopener noreferrer">{t.website(cvData.contact.website)}</a>
               <a class="link" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">☎ {cvData.contact.phone}</a>
               <p class="job-co">📍 {cvData.contact.location}</p>
             </div>

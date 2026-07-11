@@ -210,9 +210,6 @@
         <a class="bru-cta cobalt" href="mailto:{cvData.contact.email}">
           <span class="bru-cta-k">Email</span><span class="bru-cta-v">{cvData.contact.email}</span><span class="bru-cta-arrow">→</span>
         </a>
-        <a class="bru-cta red" href={cvData.contact.website} target="_blank" rel="noopener">
-          <span class="bru-cta-k">Website</span><span class="bru-cta-v">{cvData.contact.website.replace('https://', '')}</span><span class="bru-cta-arrow">→</span>
-        </a>
         <a class="bru-cta pink" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">
           <span class="bru-cta-k">Phone</span><span class="bru-cta-v">{cvData.contact.phone}</span><span class="bru-cta-arrow">→</span>
         </a>
@@ -638,8 +635,6 @@
   .bru-cta.acid { background: var(--acid); }
   .bru-cta.cobalt { background: var(--cobalt); color: var(--paper); }
   .bru-cta.cobalt .bru-cta-k { border-color: var(--paper); }
-  .bru-cta.red { background: var(--red); color: var(--paper); }
-  .bru-cta.red .bru-cta-k { border-color: var(--paper); }
   .bru-cta.pink { background: var(--pink); color: var(--paper); }
   .bru-cta.pink .bru-cta-k { border-color: var(--paper); }
 

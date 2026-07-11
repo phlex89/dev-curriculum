@@ -535,9 +535,6 @@
           <a class="cta-btn" href={cvData.contact.linkedin} target="_blank" rel="noopener" use:magnetic={{ strength: 0.35 }} data-cursor>
             <span class="cta-btn-in">{t.ctaLinkedin}</span>
           </a>
-          <a class="cta-btn" href={cvData.contact.website} target="_blank" rel="noopener" use:magnetic={{ strength: 0.35 }} data-cursor>
-            <span class="cta-btn-in">{t.ctaWebsite}</span>
-          </a>
         </div>
         <p class="cta-email" data-reveal>{cvData.contact.email}</p>
       </section>

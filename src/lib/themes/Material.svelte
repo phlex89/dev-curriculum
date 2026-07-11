@@ -198,8 +198,7 @@
 
   const contacts = [
     { label: 'LinkedIn', icon: ICON.linkedin, href: cvData.contact.linkedin, ext: true },
-    { label: 'Email', icon: ICON.email, href: `mailto:${cvData.contact.email}`, ext: false },
-    { label: t.website, icon: ICON.public, href: cvData.contact.website, ext: true }
+    { label: 'Email', icon: ICON.email, href: `mailto:${cvData.contact.email}`, ext: false }
   ];
 </script>
 

@@ -379,7 +379,6 @@
                 <p><strong>Email:</strong> <a href="mailto:{cvData.contact.email}">{cvData.contact.email}</a></p>
                 <p><strong>Phone:</strong> {cvData.contact.phone}</p>
                 <p><strong>LinkedIn:</strong> <a href="{cvData.contact.linkedin}" target="_blank">{t.linkedinProfile}</a></p>
-                <p><strong>Website:</strong> <a href="{cvData.contact.website}" target="_blank">{cvData.contact.website}</a></p>
               </div>
             {:else if win.content === 'error'}
               <div class="error-content">

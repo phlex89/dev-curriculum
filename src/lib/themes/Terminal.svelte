@@ -386,7 +386,6 @@
         } else if (args[1] === 'contact.txt') {
           addOutput(`Email:    ${cvData.contact.email}`);
           addOutput(`LinkedIn: ${cvData.contact.linkedin}`);
-          addOutput(`Website:  ${cvData.contact.website}`);
           addOutput(`Phone:    ${cvData.contact.phone}`);
         } else if (args[1] === 'skills.txt') {
           cvData.skillGroups.forEach((group) => {

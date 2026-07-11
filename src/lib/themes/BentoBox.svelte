@@ -184,12 +184,6 @@
       <span class="social-go" aria-hidden="true">→</span>
     </a>
 
-    <a href={cvData.contact.website} target="_blank" rel="noopener" class="bento-box social-box website" use:reveal={{ delay: 480 }} use:tilt={{ max: 3 }}>
-      <span class="social-icon">🌐</span>
-      <span class="social-label">Website</span>
-      <span class="social-go" aria-hidden="true">→</span>
-    </a>
-
   </div>
 </div>
 
@@ -256,7 +250,7 @@
       'exp     exp     lang   lang'
       'exp     exp     cert   cert'
       'exp     exp     soc1   soc1'
-      'soc2    soc2    soc3   soc3';
+      'soc2    soc2    soc2   soc2';
     gap: 18px;
     max-width: 1040px;
     width: 100%;
@@ -627,7 +621,6 @@
   }
   .social-box.linkedin { grid-area: soc1; background: linear-gradient(140deg, #0a66c2, #0a4f96); }
   .social-box.email { grid-area: soc2; background: linear-gradient(140deg, #5b54e6, #4338ca); }
-  .social-box.website { grid-area: soc3; background: linear-gradient(140deg, #7c3aed, #9333ea); }
 
   .social-box .social-icon {
     font-family: 'Space Grotesk', sans-serif;
@@ -659,8 +652,7 @@
         'edu     edu'
         'lang    lang'
         'cert    cert'
-        'soc1    soc2'
-        'soc3    soc3';
+        'soc1    soc2';
     }
   }
 

@@ -22,7 +22,6 @@ export interface ContactInfo {
   linkedin: string;
   location: string;
   phone: string;
-  website: string;
 }
 
 export interface SkillGroup {
@@ -154,8 +153,7 @@ export const cvData = {
     email: 'stefano.tedeschi@protechstudio.it',
     linkedin: 'https://www.linkedin.com/in/stefano-tedeschi-developer/',
     location: 'Torino (Italy)',
-    phone: '+39 3478736835',
-    website: 'https://www.protechstudio.it'
+    phone: '+39 3478736835'
   } as ContactInfo,
 
   // Competenze categorizzate + lista piatta derivata (back-compat con i temi a chip)

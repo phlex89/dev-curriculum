@@ -376,7 +376,6 @@
         <div class="rainbow-bar thin" aria-hidden="true"></div>
         <p class="contact-line"><span class="c-cyn">{t.email}</span> <a class="c-yel" href="mailto:{cvData.contact.email}">{cvData.contact.email}</a></p>
         <p class="contact-line"><span class="c-cyn">{t.tel}</span>   <a class="c-yel" href="tel:{cvData.contact.phone.replace(/\s/g, '')}">{cvData.contact.phone}</a></p>
-        <p class="contact-line"><span class="c-cyn">{t.web}</span>   <a class="c-yel" href={cvData.contact.website} target="_blank" rel="noopener">{cvData.contact.website}</a></p>
         <p class="contact-line"><span class="c-cyn">{t.link}</span>  <a class="c-yel" href={cvData.contact.linkedin} target="_blank" rel="noopener">LinkedIn</a></p>
         <p class="contact-line"><span class="c-cyn">{t.location}</span> <span class="c-wht">{cvData.contact.location}</span></p>
         <div class="rainbow-bar thin" aria-hidden="true"></div>

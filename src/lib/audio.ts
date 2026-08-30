@@ -218,6 +218,13 @@ export function playEra(theme: Theme) {
       tone(c, master, { freq: 1975.53, type: 'sine', start: 0.16, dur: 0.6, gain: 0.03 }); // high shimmer halo
       break;
     }
+    case 'liquid': {
+      // Water drop — a quick fall, a snap back up, a soft low body.
+      tone(c, master, { freq: 900, type: 'sine', dur: 0.14, gain: 0.09, slideTo: 240 });
+      tone(c, master, { freq: 260, type: 'sine', start: 0.12, dur: 0.26, gain: 0.11, slideTo: 720 });
+      tone(c, master, { freq: 160, type: 'sine', start: 0.1, dur: 0.3, gain: 0.05 });
+      break;
+    }
     case 'parallax': {
       // Airy cinematic swell — a soft pad that rises and opens, breathy and calm.
       // Distinct from glass's crystalline chime and threed's dark drone: warm,

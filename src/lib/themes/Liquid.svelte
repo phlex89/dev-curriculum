@@ -48,21 +48,35 @@
 
   let tabbar = $state<HTMLElement | undefined>();
 
-  $effect(() => {
-    const bar = tabbar;
-    const el = bar?.querySelector<HTMLElement>(`#tab-${active}`);
-    if (!bar || !el) return;
+  function positionPill(bar: HTMLElement, stretch: boolean) {
+    const el = bar.querySelector<HTMLElement>(`#tab-${active}`);
+    if (!el) return;
     const x = el.offsetLeft;
     const w = el.offsetWidth;
     const prev = parseFloat(bar.style.getPropertyValue('--pill-x') || String(x));
     const dir = Math.sign(x - prev);
     bar.style.setProperty('--pill-x', String(x));
     bar.style.setProperty('--pill-w', String(w));
-    if (dir !== 0 && !reduced) {
+    if (stretch && dir !== 0 && !reduced) {
       bar.style.setProperty('--pill-stretch', '1.12');
-      const id = setTimeout(() => bar.style.setProperty('--pill-stretch', '1'), 180);
-      return () => clearTimeout(id);
+      return setTimeout(() => bar.style.setProperty('--pill-stretch', '1'), 180);
     }
+  }
+
+  $effect(() => {
+    const bar = tabbar;
+    if (!bar) return;
+    active;
+    const id = positionPill(bar, true);
+    return () => clearTimeout(id);
+  });
+
+  $effect(() => {
+    const bar = tabbar;
+    if (!bar) return;
+    const observer = new ResizeObserver(() => positionPill(bar, false));
+    observer.observe(bar);
+    return () => observer.disconnect();
   });
 
   let collapsed = $state(false);
@@ -431,13 +445,15 @@
     border: none;
     border-radius: 999px;
     font: inherit;
+    font-weight: 500;
+    color: inherit;
     cursor: pointer;
-    opacity: 0.6;
+    opacity: 0.78;
   }
 
   .tab-btn.active {
     opacity: 1;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .tab-btn:focus-visible {
@@ -460,7 +476,8 @@
     left: 0;
     z-index: 0;
     width: calc(var(--pill-w, 0) * 1px);
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 999px;
     transform: translateX(calc(var(--pill-x, 0) * 1px)) scaleX(var(--pill-stretch, 1));
     transition:
@@ -480,7 +497,8 @@
     height: 36px;
     padding: 0 18px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     opacity: 0;
     transform: scale(0.7);
     pointer-events: none;

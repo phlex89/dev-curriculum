@@ -515,11 +515,13 @@
   }
 
   .bars {
-    position: relative;
-    flex: 0 0 auto;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    z-index: 20;
     display: flex;
     flex-direction: column;
-    margin: 12px 12px 0;
   }
 
   .bars.collapsed {
@@ -679,7 +681,7 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 24px 20px 130px;
+    padding: 154px 20px 130px;
   }
 
   .screen-title {

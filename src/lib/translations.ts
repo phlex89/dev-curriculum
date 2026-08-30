@@ -244,6 +244,7 @@ const it = {
       brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
       glass: 'Glassmorphism · 2020',
+      liquid: 'Liquid Glass · 2025',
       threed: 'Future 3D · 2026'
     } as Record<Theme, string>,
     eraNames: {} as Partial<Record<Theme, string>>
@@ -437,6 +438,20 @@ const it = {
     education: 'Formazione',
     conferences: 'Conferenze'
   },
+  liquid: {
+    tabs: { profile: 'Profilo', path: 'Percorso', skills: 'Competenze', more: 'Altro' },
+    tabsNav: 'Sezioni del profilo',
+    wallpapers: { aurora: 'Aurora', sunset: 'Tramonto', deep: 'Abisso' },
+    changeWallpaper: 'Cambia sfondo',
+    currentWallpaper: (name: string) => `Sfondo attuale: ${name}. Tocca per cambiarlo`,
+    profile: 'Profilo',
+    experience: 'Esperienza',
+    earlyCareer: 'Prima esperienza',
+    skills: 'Competenze',
+    languages: 'Lingue',
+    education: 'Formazione',
+    conferences: 'Conferenze'
+  },
   parallax: {
     heroKicker: (role: string) => `${role} · Portfolio`,
     highlightWords: ['15', 'anni', 'architetture', 'frontend', 'design', 'system', 'scalare', 'prodotti', 'team', 'pixel', 'problema'],
@@ -510,6 +525,7 @@ const en: UiStrings = {
       brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
       glass: 'Glassmorphism · 2020',
+      liquid: 'Liquid Glass · 2025',
       threed: 'Future 3D · 2026'
     },
     eraNames: { teletext: 'Teletext' }
@@ -702,6 +718,20 @@ const en: UiStrings = {
     languages: 'Languages',
     education: 'Education',
     conferences: 'Conferences'
+  },
+  liquid: {
+    tabs: { profile: 'Profile', path: 'Journey', skills: 'Skills', more: 'More' },
+    tabsNav: 'Profile sections',
+    wallpapers: { aurora: 'Aurora', sunset: 'Sunset', deep: 'Deep' },
+    changeWallpaper: 'Change wallpaper',
+    currentWallpaper: (name: string) => `Current wallpaper: ${name}. Tap to change it`,
+    profile: 'Profile',
+    experience: 'Experience',
+    earlyCareer: 'Early career',
+    skills: 'Skills',
+    languages: 'Languages',
+    education: 'Education',
+    conferences: 'Talks'
   },
   parallax: {
     heroKicker: (role: string) => `${role} · Portfolio`,

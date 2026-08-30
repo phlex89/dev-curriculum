@@ -19,6 +19,7 @@ export const themeLoaders: Record<Theme, () => Promise<{ default: Component }>> 
   parallax: () => import('./Parallax.svelte'),
   bento: () => import('./BentoBox.svelte'),
   glass: () => import('./Glass.svelte'),
+  liquid: () => import('./Liquid.svelte'),
   threed: () => import('./ThreeD.svelte')
 };
 

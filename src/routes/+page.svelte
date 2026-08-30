@@ -140,7 +140,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'liquid', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };

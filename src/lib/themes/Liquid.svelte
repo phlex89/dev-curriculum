@@ -52,8 +52,8 @@
     type="button"
     class="wallpaper-btn"
     onclick={cycleWallpaper}
-    aria-label={t.changeWallpaper}
-    title={t.currentWallpaper(t.wallpapers[wallpaper])}
+    aria-label={t.currentWallpaper(t.wallpapers[wallpaper])}
+    title={t.changeWallpaper}
   >
     <span aria-hidden="true">◐</span>
   </button>

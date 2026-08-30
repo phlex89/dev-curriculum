@@ -136,7 +136,7 @@
     <span aria-hidden="true">◐</span>
   </button>
 
-  <header class="bars" class:collapsed>
+  <header class="bars glass-surface" class:collapsed>
     <div class="identity">
       <span class="who">{cvData.name}</span>
       <span class="what">{cvData.role}</span>
@@ -172,35 +172,39 @@
 
   <div class="screen-scroll" bind:this={scroller}>
     <div class="screen" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" hidden={active !== 'profile'}>
-      <div class="avatar-wrap">
-        {#if avatarFailed}
-          <div class="avatar-fallback">ST</div>
-        {:else}
-          <img class="avatar-img" src="/avatar.svg" alt={cvData.name} onerror={() => (avatarFailed = true)} />
-        {/if}
-      </div>
-      <h1>{cvData.name}</h1>
-      <p class="role">{cvData.role}</p>
-      <p class="tagline">{cvData.tagline}</p>
-      <p class="location"><span class="dot">◍</span> {cvData.contact.location}</p>
-      <div class="contact-pills">
-        <a class="pill" href={cvData.contact.linkedin} target="_blank" rel="noopener">
-          <span class="pill-icon">in</span> LinkedIn
-        </a>
-        <a class="pill" href="mailto:{cvData.contact.email}">
-          <span class="pill-icon">@</span> Email
-        </a>
+      <div class="profile-hero glass-surface glass-surface--light">
+        <div class="avatar-wrap">
+          {#if avatarFailed}
+            <div class="avatar-fallback">ST</div>
+          {:else}
+            <img class="avatar-img" src="/avatar.svg" alt={cvData.name} onerror={() => (avatarFailed = true)} />
+          {/if}
+        </div>
+        <h1>{cvData.name}</h1>
+        <p class="role">{cvData.role}</p>
+        <p class="tagline">{cvData.tagline}</p>
+        <p class="location"><span class="dot">◍</span> {cvData.contact.location}</p>
+        <div class="contact-pills">
+          <a class="pill glass-surface glass-surface--light" href={cvData.contact.linkedin} target="_blank" rel="noopener">
+            <span class="pill-icon">in</span> LinkedIn
+          </a>
+          <a class="pill glass-surface glass-surface--light" href="mailto:{cvData.contact.email}">
+            <span class="pill-icon">@</span> Email
+          </a>
+        </div>
       </div>
 
       <h2 class="screen-title">{t.profile}</h2>
-      <p class="summary">{cvData.summary}</p>
+      <div class="bio-card glass-surface glass-surface--light">
+        <p class="summary">{cvData.summary}</p>
+      </div>
     </div>
 
     <div class="screen" role="tabpanel" id="panel-path" aria-labelledby="tab-path" hidden={active !== 'path'}>
       <h2 class="screen-title">{t.experience}</h2>
       <div class="path-list">
         {#each cvData.experience as exp}
-          <article class="path-item">
+          <article class="path-item glass-surface glass-surface--light">
             <div class="path-head">
               <h3>{exp.company}</h3>
               <span class="path-period">{exp.period}</span>
@@ -215,7 +219,7 @@
       </div>
 
       <h2 class="screen-title">{t.earlyCareer}</h2>
-      <article class="path-item">
+      <article class="path-item glass-surface glass-surface--light">
         <div class="path-head">
           <h3>{cvData.earlyCareer.title}</h3>
           <span class="path-period">{cvData.earlyCareer.period}</span>
@@ -229,7 +233,7 @@
 
     <div class="screen" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills" hidden={active !== 'skills'}>
       <h2 class="screen-title">{t.skills}</h2>
-      <div class="skill-groups">
+      <div class="skill-groups glass-surface glass-surface--light">
         {#each cvData.skillGroups as group}
           <div class="skill-group">
             <span class="skill-group-name">{group.label}</span>
@@ -241,7 +245,7 @@
       </div>
 
       <h2 class="screen-title">{t.languages}</h2>
-      <div class="lang-list">
+      <div class="lang-list glass-surface glass-surface--light">
         {#each cvData.languages as lang}
           <div class="lang-item">
             <div class="lang-top">
@@ -256,7 +260,7 @@
 
     <div class="screen" role="tabpanel" id="panel-more" aria-labelledby="tab-more" hidden={active !== 'more'}>
       <h2 class="screen-title">{t.education}</h2>
-      <div class="edu-list">
+      <div class="edu-list glass-surface glass-surface--light">
         {#each cvData.education as edu}
           <div class="edu-item">
             <strong>{edu.title}</strong>
@@ -266,7 +270,7 @@
       </div>
 
       <h2 class="screen-title">{t.conferences}</h2>
-      <div class="talk-list">
+      <div class="talk-list glass-surface glass-surface--light">
         {#each cvData.conferences as conf}
           <div class="talk-item">
             <span class="talk-name">{conf.name}</span>
@@ -360,12 +364,65 @@
     }
   }
 
+  .glass-surface {
+    position: relative;
+    background: rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    border-radius: 30px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 18px 50px rgba(0, 0, 0, 0.35);
+  }
+
+  .glass-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from 210deg,
+      rgba(255, 255, 255, 0.7),
+      rgba(120, 220, 255, 0.35) 25%,
+      rgba(255, 255, 255, 0.15) 45%,
+      rgba(255, 150, 230, 0.35) 70%,
+      rgba(255, 255, 255, 0.7)
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .glass-surface::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: inherit;
+    -webkit-backdrop-filter: blur(2px) brightness(1.08) saturate(1.4);
+    backdrop-filter: blur(2px) brightness(1.08) saturate(1.4);
+    transform: scale(1.015);
+    box-shadow:
+      inset 1px 0 6px rgba(90, 220, 255, 0.28),
+      inset -1px 0 6px rgba(255, 120, 220, 0.28);
+    pointer-events: none;
+  }
+
+  .glass-surface--light {
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(10px) saturate(160%);
+    backdrop-filter: blur(10px) saturate(160%);
+  }
+
   .bars {
     position: relative;
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+    margin: 12px 12px 0;
   }
 
   .bars.collapsed {
@@ -430,6 +487,7 @@
   .tabbar {
     position: relative;
     display: flex;
+    padding: 0 14px;
   }
 
   .tab-btn {
@@ -533,6 +591,11 @@
     font-size: 1rem;
   }
 
+  .profile-hero,
+  .bio-card {
+    padding: 24px 22px;
+  }
+
   .avatar-wrap {
     width: 96px;
     height: 96px;
@@ -574,7 +637,6 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    border: 1px solid rgba(128, 128, 128, 0.4);
     border-radius: 999px;
     text-decoration: none;
     color: inherit;
@@ -585,6 +647,10 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  .path-item {
+    padding: 18px 20px;
   }
 
   .path-head {
@@ -622,6 +688,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    padding: 20px;
   }
 
   .skill-group-name {
@@ -636,6 +703,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    padding: 20px;
   }
 
   .lang-top {

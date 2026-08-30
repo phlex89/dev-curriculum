@@ -53,10 +53,12 @@
     if (!el) return;
     const x = el.offsetLeft;
     const w = el.offsetWidth;
+    const base = bar.querySelector<HTMLElement>('.tab-btn')?.offsetWidth || w;
     const prev = parseFloat(bar.style.getPropertyValue('--pill-x') || String(x));
     const dir = Math.sign(x - prev);
     bar.style.setProperty('--pill-x', String(x));
-    bar.style.setProperty('--pill-w', String(w));
+    bar.style.setProperty('--pill-base', String(base));
+    bar.style.setProperty('--pill-scale', String(w / base));
     if (stretch && dir !== 0 && !reduced) {
       bar.style.setProperty('--pill-stretch', '1.12');
       return setTimeout(() => bar.style.setProperty('--pill-stretch', '1'), 180);
@@ -171,7 +173,7 @@
   </header>
 
   <div class="screen-scroll" bind:this={scroller}>
-    <div class="screen" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" hidden={active !== 'profile'}>
+    <div class="screen" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" tabindex="0" hidden={active !== 'profile'}>
       <div class="profile-hero glass-surface glass-surface--light">
         <div class="avatar-wrap">
           {#if avatarFailed}
@@ -200,7 +202,7 @@
       </div>
     </div>
 
-    <div class="screen" role="tabpanel" id="panel-path" aria-labelledby="tab-path" hidden={active !== 'path'}>
+    <div class="screen" role="tabpanel" id="panel-path" aria-labelledby="tab-path" tabindex="0" hidden={active !== 'path'}>
       <h2 class="screen-title">{t.experience}</h2>
       <div class="path-list">
         {#each cvData.experience as exp}
@@ -231,7 +233,7 @@
       </article>
     </div>
 
-    <div class="screen" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills" hidden={active !== 'skills'}>
+    <div class="screen" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills" tabindex="0" hidden={active !== 'skills'}>
       <h2 class="screen-title">{t.skills}</h2>
       <div class="skill-groups glass-surface glass-surface--light">
         {#each cvData.skillGroups as group}
@@ -258,7 +260,7 @@
       </div>
     </div>
 
-    <div class="screen" role="tabpanel" id="panel-more" aria-labelledby="tab-more" hidden={active !== 'more'}>
+    <div class="screen" role="tabpanel" id="panel-more" aria-labelledby="tab-more" tabindex="0" hidden={active !== 'more'}>
       <h2 class="screen-title">{t.education}</h2>
       <div class="edu-list glass-surface glass-surface--light">
         {#each cvData.education as edu}
@@ -533,14 +535,13 @@
     bottom: 8px;
     left: 0;
     z-index: 0;
-    width: calc(var(--pill-w, 0) * 1px);
+    width: calc(var(--pill-base, 0) * 1px);
     background: rgba(255, 255, 255, 0.24);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 999px;
-    transform: translateX(calc(var(--pill-x, 0) * 1px)) scaleX(var(--pill-stretch, 1));
-    transition:
-      transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
-      width 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-origin: left center;
+    transform: translateX(calc(var(--pill-x, 0) * 1px)) scaleX(calc(var(--pill-scale, 1) * var(--pill-stretch, 1)));
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   .mini-tab {
@@ -637,10 +638,13 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
+    background: rgba(8, 10, 24, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 999px;
     text-decoration: none;
-    color: inherit;
+    color: #fff;
     font-size: 0.85rem;
+    font-weight: 600;
   }
 
   .path-list {
@@ -679,9 +683,12 @@
 
   .chip {
     padding: 3px 10px;
+    background: rgba(8, 10, 24, 0.4);
     border-radius: 999px;
-    border: 1px solid rgba(128, 128, 128, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    color: #fff;
     font-size: 0.75rem;
+    font-weight: 500;
   }
 
   .skill-groups {

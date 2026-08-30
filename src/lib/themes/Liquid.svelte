@@ -14,11 +14,75 @@
   ];
 
   let active = $state<TabId>('profile');
+  const activeTab = $derived(TABS.find((tab) => tab.id === active) ?? TABS[0]);
 
   const reduced =
     typeof window !== 'undefined' &&
     !!window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let tabButtons = $state<HTMLButtonElement[]>([]);
+
+  function onTabKey(e: KeyboardEvent, index: number) {
+    let next = index;
+    switch (e.key) {
+      case 'ArrowRight':
+        next = (index + 1) % TABS.length;
+        break;
+      case 'ArrowLeft':
+        next = (index - 1 + TABS.length) % TABS.length;
+        break;
+      case 'Home':
+        next = 0;
+        break;
+      case 'End':
+        next = TABS.length - 1;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    active = TABS[next].id;
+    tabButtons[next]?.focus();
+  }
+
+  let tabbar = $state<HTMLElement | undefined>();
+
+  $effect(() => {
+    const bar = tabbar;
+    const el = bar?.querySelector<HTMLElement>(`#tab-${active}`);
+    if (!bar || !el) return;
+    const x = el.offsetLeft;
+    const w = el.offsetWidth;
+    const prev = parseFloat(bar.style.getPropertyValue('--pill-x') || String(x));
+    const dir = Math.sign(x - prev);
+    bar.style.setProperty('--pill-x', String(x));
+    bar.style.setProperty('--pill-w', String(w));
+    if (dir !== 0 && !reduced) {
+      bar.style.setProperty('--pill-stretch', '1.12');
+      const id = setTimeout(() => bar.style.setProperty('--pill-stretch', '1'), 180);
+      return () => clearTimeout(id);
+    }
+  });
+
+  let collapsed = $state(false);
+  let scroller = $state<HTMLElement | undefined>();
+
+  $effect(() => {
+    const el = scroller;
+    if (!el || reduced) return;
+    let idle: ReturnType<typeof setTimeout>;
+    const onScroll = () => {
+      collapsed = el.scrollTop > 40;
+      clearTimeout(idle);
+      idle = setTimeout(() => (collapsed = false), 600);
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      clearTimeout(idle);
+      el.removeEventListener('scroll', onScroll);
+    };
+  });
 
   let avatarFailed = $state(false);
 
@@ -58,28 +122,42 @@
     <span aria-hidden="true">◐</span>
   </button>
 
-  <header class="bars">
+  <header class="bars" class:collapsed>
     <div class="identity">
       <span class="who">{cvData.name}</span>
       <span class="what">{cvData.role}</span>
     </div>
-    <nav class="tabbar" role="tablist" aria-label={t.tabsNav}>
-      {#each TABS as tab (tab.id)}
-        <button
-          type="button"
-          class="tab-btn"
-          class:active={active === tab.id}
-          onclick={() => (active = tab.id)}
-        >
-          <span class="tab-icon" aria-hidden="true">{tab.icon}</span>
-          <span class="tab-label">{tab.label}</span>
-        </button>
-      {/each}
+    <nav class="tabbar-nav" aria-label={t.tabsNav}>
+      <div class="tabbar" role="tablist" bind:this={tabbar}>
+        {#each TABS as tab, i (tab.id)}
+          <button
+            type="button"
+            class="tab-btn"
+            class:active={active === tab.id}
+            role="tab"
+            id="tab-{tab.id}"
+            aria-selected={active === tab.id}
+            aria-controls="panel-{tab.id}"
+            tabindex={active === tab.id ? 0 : -1}
+            bind:this={tabButtons[i]}
+            onclick={() => (active = tab.id)}
+            onkeydown={(e) => onTabKey(e, i)}
+          >
+            <span class="tab-icon" aria-hidden="true">{tab.icon}</span>
+            <span class="tab-label">{tab.label}</span>
+          </button>
+        {/each}
+        <span class="tab-pill" aria-hidden="true"></span>
+      </div>
     </nav>
+    <div class="mini-tab" aria-hidden="true">
+      <span class="tab-icon">{activeTab.icon}</span>
+      <span class="tab-label">{activeTab.label}</span>
+    </div>
   </header>
 
-  <div class="screen-scroll">
-    <section class="screen" role="tabpanel" hidden={active !== 'profile'}>
+  <div class="screen-scroll" bind:this={scroller}>
+    <div class="screen" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" hidden={active !== 'profile'}>
       <div class="avatar-wrap">
         {#if avatarFailed}
           <div class="avatar-fallback">ST</div>
@@ -102,9 +180,9 @@
 
       <h2 class="screen-title">{t.profile}</h2>
       <p class="summary">{cvData.summary}</p>
-    </section>
+    </div>
 
-    <section class="screen" role="tabpanel" hidden={active !== 'path'}>
+    <div class="screen" role="tabpanel" id="panel-path" aria-labelledby="tab-path" hidden={active !== 'path'}>
       <h2 class="screen-title">{t.experience}</h2>
       <div class="path-list">
         {#each cvData.experience as exp}
@@ -133,9 +211,9 @@
           {#each cvData.earlyCareer.technologies as tech}<span class="chip">{tech}</span>{/each}
         </div>
       </article>
-    </section>
+    </div>
 
-    <section class="screen" role="tabpanel" hidden={active !== 'skills'}>
+    <div class="screen" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills" hidden={active !== 'skills'}>
       <h2 class="screen-title">{t.skills}</h2>
       <div class="skill-groups">
         {#each cvData.skillGroups as group}
@@ -160,9 +238,9 @@
           </div>
         {/each}
       </div>
-    </section>
+    </div>
 
-    <section class="screen" role="tabpanel" hidden={active !== 'more'}>
+    <div class="screen" role="tabpanel" id="panel-more" aria-labelledby="tab-more" hidden={active !== 'more'}>
       <h2 class="screen-title">{t.education}</h2>
       <div class="edu-list">
         {#each cvData.education as edu}
@@ -182,7 +260,7 @@
           </div>
         {/each}
       </div>
-    </section>
+    </div>
   </div>
 </div>
 
@@ -259,19 +337,51 @@
     .liquid-wrapper {
       transition: none;
     }
+
+    .identity,
+    .tabbar-nav,
+    .tab-pill,
+    .mini-tab {
+      transition: none;
+    }
   }
 
   .bars {
+    position: relative;
     flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid rgba(128, 128, 128, 0.3);
   }
 
+  .bars.collapsed {
+    min-height: 52px;
+    transition: min-height 0s linear 0.3s;
+  }
+
   .identity {
     display: flex;
     flex-direction: column;
     padding: 16px 20px 8px;
+    transform-origin: top;
+    transition:
+      transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.22s ease;
+  }
+
+  .bars.collapsed .identity {
+    transform: scaleY(0);
+    opacity: 0;
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.26s ease-in,
+      opacity 0.18s ease,
+      height 0s linear 0.26s,
+      padding 0s linear 0.26s;
   }
 
   .who {
@@ -284,11 +394,33 @@
     opacity: 0.7;
   }
 
+  .tabbar-nav {
+    transform-origin: top;
+    transition:
+      transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.22s ease;
+  }
+
+  .bars.collapsed .tabbar-nav {
+    transform: scaleY(0);
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.26s ease-in,
+      opacity 0.18s ease,
+      height 0s linear 0.26s;
+  }
+
   .tabbar {
+    position: relative;
     display: flex;
   }
 
   .tab-btn {
+    position: relative;
+    z-index: 1;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -297,6 +429,7 @@
     padding: 8px 4px 12px;
     background: none;
     border: none;
+    border-radius: 999px;
     font: inherit;
     cursor: pointer;
     opacity: 0.6;
@@ -307,12 +440,67 @@
     font-weight: 600;
   }
 
+  .tab-btn:focus-visible {
+    outline: 2px solid var(--l-accent);
+    outline-offset: 2px;
+  }
+
   .tab-icon {
     font-size: 1.15rem;
   }
 
   .tab-label {
     font-size: 0.7rem;
+  }
+
+  .tab-pill {
+    position: absolute;
+    top: 4px;
+    bottom: 8px;
+    left: 0;
+    z-index: 0;
+    width: calc(var(--pill-w, 0) * 1px);
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    transform: translateX(calc(var(--pill-x, 0) * 1px)) scaleX(var(--pill-stretch, 1));
+    transition:
+      transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+      width 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .mini-tab {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: auto;
+    width: fit-content;
+    height: 36px;
+    padding: 0 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    opacity: 0;
+    transform: scale(0.7);
+    pointer-events: none;
+    transition:
+      transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.22s ease 0.1s;
+  }
+
+  .bars.collapsed .mini-tab {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .mini-tab .tab-icon {
+    font-size: 1rem;
+  }
+
+  .mini-tab .tab-label {
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
   .screen-scroll {

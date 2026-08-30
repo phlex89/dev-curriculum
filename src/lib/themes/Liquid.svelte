@@ -404,13 +404,22 @@
     position: absolute;
     inset: 2px;
     border-radius: inherit;
+    padding: 5px;
     -webkit-backdrop-filter: blur(2px) brightness(1.08) saturate(1.4);
     backdrop-filter: blur(2px) brightness(1.08) saturate(1.4);
     transform: scale(1.015);
     box-shadow:
       inset 1px 0 6px rgba(90, 220, 255, 0.28),
       inset -1px 0 6px rgba(255, 120, 220, 0.28);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
     pointer-events: none;
+  }
+
+  .pill.glass-surface::after {
+    padding: 2px;
   }
 
   .glass-surface--light {

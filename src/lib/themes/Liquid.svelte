@@ -21,9 +21,43 @@
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let avatarFailed = $state(false);
+
+  const WALLPAPERS = ['aurora', 'sunset', 'deep'] as const;
+  type WallpaperId = (typeof WALLPAPERS)[number];
+
+  const readWallpaper = (): WallpaperId => {
+    if (typeof localStorage === 'undefined') return 'aurora';
+    try {
+      const saved = localStorage.getItem('cv_liquid_wallpaper');
+      return WALLPAPERS.includes(saved as WallpaperId) ? (saved as WallpaperId) : 'aurora';
+    } catch {
+      return 'aurora';
+    }
+  };
+
+  let wallpaper = $state<WallpaperId>(readWallpaper());
+
+  const cycleWallpaper = () => {
+    wallpaper = WALLPAPERS[(WALLPAPERS.indexOf(wallpaper) + 1) % WALLPAPERS.length];
+    try {
+      localStorage.setItem('cv_liquid_wallpaper', wallpaper);
+    } catch {
+      /* storage blocked */
+    }
+  };
 </script>
 
-<div class="liquid-wrapper">
+<div class="liquid-wrapper wp-{wallpaper}">
+  <button
+    type="button"
+    class="wallpaper-btn"
+    onclick={cycleWallpaper}
+    aria-label={t.changeWallpaper}
+    title={t.currentWallpaper(t.wallpapers[wallpaper])}
+  >
+    <span aria-hidden="true">◐</span>
+  </button>
+
   <header class="bars">
     <div class="identity">
       <span class="who">{cvData.name}</span>
@@ -154,11 +188,77 @@
 
 <style>
   .liquid-wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 100vw;
     height: 100dvh;
     overflow: hidden;
+    background: var(--l-bg);
+    color: #fff;
+    font-family: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    letter-spacing: -0.01em;
+    transition: background 0.6s ease;
+  }
+
+  .wp-aurora {
+    --l-accent: #7aa2ff;
+    --l-bg:
+      radial-gradient(60% 55% at 12% 18%, #3b2fd6 0%, transparent 60%),
+      radial-gradient(55% 50% at 85% 12%, #c02fb8 0%, transparent 62%),
+      radial-gradient(70% 60% at 60% 95%, #1a6be0 0%, transparent 65%),
+      linear-gradient(160deg, #14103a 0%, #241650 55%, #0d1030 100%);
+  }
+
+  .wp-sunset {
+    --l-accent: #ffb37a;
+    --l-bg:
+      radial-gradient(58% 52% at 20% 88%, #ff6a3d 0%, transparent 62%),
+      radial-gradient(52% 48% at 82% 20%, #ff3d8b 0%, transparent 60%),
+      radial-gradient(65% 55% at 50% 45%, #6d3bd6 0%, transparent 68%),
+      linear-gradient(155deg, #2a1038 0%, #4a1740 50%, #1b0d2c 100%);
+  }
+
+  .wp-deep {
+    --l-accent: #5fe3d0;
+    --l-bg:
+      radial-gradient(60% 55% at 15% 25%, #0e7f8c 0%, transparent 62%),
+      radial-gradient(55% 50% at 88% 78%, #1b3fb0 0%, transparent 60%),
+      radial-gradient(70% 60% at 55% 10%, #12a58c 0%, transparent 65%),
+      linear-gradient(165deg, #04141c 0%, #072634 55%, #03101a 100%);
+  }
+
+  .wallpaper-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--l-accent);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  .wallpaper-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .wallpaper-btn:focus-visible {
+    outline: 2px solid var(--l-accent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid-wrapper {
+      transition: none;
+    }
   }
 
   .bars {
@@ -354,5 +454,17 @@
   .talk-meta {
     font-size: 0.85rem;
     opacity: 0.7;
+  }
+
+  @media (max-width: 720px) {
+    .wallpaper-btn {
+      top: 14px;
+      left: 14px;
+      right: auto;
+    }
+
+    .identity {
+      padding-left: 60px;
+    }
   }
 </style>

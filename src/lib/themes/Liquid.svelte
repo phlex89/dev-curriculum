@@ -1,8 +1,15 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
+  import { buildDisplacementMap, supportsBackdropLens } from './liquid/lens';
 
   const cvData = getCvData();
   const t = getUi().liquid;
+
+  const LENS_SCALE = 46;
+  const LENS_RADIUS = 30;
+  const LENS_STRENGTH = 0.9;
+  const LENS_MAP_W = 256;
 
   type TabId = 'profile' | 'path' | 'skills' | 'more';
 
@@ -125,9 +132,72 @@
       /* storage blocked */
     }
   };
+
+  let lensOn = $state(false);
+  let mapUrl = $state('');
+  let lensW = $state(0);
+  let lensH = $state(0);
+  let barsEl = $state<HTMLElement | undefined>();
+
+  onMount(() => {
+    lensOn = supportsBackdropLens({
+      vendor: navigator.vendor ?? '',
+      supports: (p, v) => CSS.supports(p, v)
+    });
+  });
+
+  function regenerateMap(w: number, h: number) {
+    if (!lensOn || w < 2 || h < 2) return;
+    const mw = LENS_MAP_W;
+    const mh = Math.max(2, Math.round((h / w) * mw));
+    const canvas = document.createElement('canvas');
+    canvas.width = mw;
+    canvas.height = mh;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const data = buildDisplacementMap({
+      width: mw,
+      height: mh,
+      radius: (LENS_RADIUS / w) * mw,
+      strength: LENS_STRENGTH
+    });
+    const image = ctx.createImageData(mw, mh);
+    image.data.set(data);
+    ctx.putImageData(image, 0, 0);
+    lensW = w;
+    lensH = h;
+    mapUrl = canvas.toDataURL();
+  }
+
+  $effect(() => {
+    const el = barsEl;
+    if (!el || !lensOn) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      regenerateMap(width, height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  });
 </script>
 
-<div class="liquid-wrapper wp-{wallpaper}">
+<div class="liquid-wrapper wp-{wallpaper}" class:lens-on={lensOn && mapUrl !== ''}>
+  {#if mapUrl}
+    <svg class="lens-defs" aria-hidden="true" focusable="false">
+      <filter id="liquid-lens" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feImage href={mapUrl} x="0" y="0" width={lensW} height={lensH} preserveAspectRatio="none" result="map" />
+        <feDisplacementMap in="SourceGraphic" in2="map" scale={LENS_SCALE * 1.06} xChannelSelector="R" yChannelSelector="G" result="dr" />
+        <feDisplacementMap in="SourceGraphic" in2="map" scale={LENS_SCALE} xChannelSelector="R" yChannelSelector="G" result="dg" />
+        <feDisplacementMap in="SourceGraphic" in2="map" scale={LENS_SCALE * 0.94} xChannelSelector="R" yChannelSelector="G" result="db" />
+        <feColorMatrix in="dr" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r" />
+        <feColorMatrix in="dg" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g" />
+        <feColorMatrix in="db" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b" />
+        <feBlend in="r" in2="g" mode="screen" result="rg" />
+        <feBlend in="rg" in2="b" mode="screen" />
+      </filter>
+    </svg>
+  {/if}
+
   <button
     type="button"
     class="wallpaper-btn"
@@ -138,7 +208,7 @@
     <span aria-hidden="true">◐</span>
   </button>
 
-  <header class="bars glass-surface" class:collapsed>
+  <header class="bars glass-surface" class:collapsed bind:this={barsEl}>
     <div class="identity">
       <span class="who">{cvData.name}</span>
       <span class="what">{cvData.role}</span>
@@ -426,6 +496,22 @@
     background: rgba(255, 255, 255, 0.18);
     -webkit-backdrop-filter: blur(10px) saturate(160%);
     backdrop-filter: blur(10px) saturate(160%);
+  }
+
+  .lens-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .lens-on .bars.glass-surface {
+    -webkit-backdrop-filter: url(#liquid-lens) blur(6px) saturate(180%);
+    backdrop-filter: url(#liquid-lens) blur(6px) saturate(180%);
+  }
+
+  .lens-on .bars.glass-surface::after {
+    display: none;
   }
 
   .bars {

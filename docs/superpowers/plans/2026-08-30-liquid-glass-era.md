@@ -46,6 +46,18 @@ Valgono per **ogni** task, non si ripetono task per task:
   Non committare `.serena/` né `aura_bin` (untracked, non nostri).
 - **Branch:** `feat/liquid-glass-era` (già creato, contiene la spec).
 
+### Due punti da non scavalcare
+
+1. **Il Task 11 contiene un gate di approvazione umana** (Step 6): il confronto prima/dopo delle
+   schermate di `Glass` va **mostrato all'utente**, e bisogna **fermarsi ad attendere la sua
+   conferma** prima di proseguire. L'utente ha chiesto esplicitamente di non peggiorare quell'era.
+   Non è una formalità e non si auto-approva: se manca la risposta, il Task 11 resta aperto e si
+   passa oltre solo dopo il suo sì.
+
+2. **La lente si tara guardandola.** Le costanti in Task 8 Step 3 (`LENS_SCALE`, `LENS_RADIUS`,
+   `LENS_STRENGTH`) sono valori di partenza plausibili, **non tarati**. Se l'effetto risulta
+   eccessivo o kitsch, si abbassano quelle — **non** si aggiungono altri effetti per compensare.
+
 ---
 
 ## File Structure

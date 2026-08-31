@@ -840,17 +840,17 @@
   }
 
   :global(:root) .theme-liquid .node-pill {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.46);
     border: 1px solid rgba(255, 255, 255, 0.16);
     color: #fff;
   }
 
   :global(:root) .theme-liquid .timeline-stop:hover .node-pill {
-    background: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.56);
   }
 
   :global(:root) .theme-liquid .timeline-stop.active .node-pill {
-    background: rgba(122, 162, 255, 0.38);
+    background: rgba(122, 162, 255, 0.62);
     border: 1px solid rgba(255, 255, 255, 0.5);
     color: #fff;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 16px rgba(122, 162, 255, 0.4);

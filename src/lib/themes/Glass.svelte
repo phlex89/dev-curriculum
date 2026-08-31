@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
-  import { tilt, reveal } from '$lib/actions/interactive';
+  import { reveal } from '$lib/actions/interactive';
 
   const cvData = getCvData();
   const t = getUi().glass;
@@ -92,7 +92,7 @@
 
   <div class="glass-grid">
     <!-- Hero -->
-    <section class="panel hero" style="grid-area: hero" use:reveal={{ delay: 0 }} use:tilt={{ max: 3, scale: 1.004, perspective: 1400 }}>
+    <section class="panel hero" style="grid-area: hero" use:reveal={{ delay: 0 }}>
       <div class="avatar-ring">
         {#if avatarFailed}
           <div class="avatar-fallback">ST</div>
@@ -117,13 +117,13 @@
     </section>
 
     <!-- About -->
-    <section class="panel about" style="grid-area: about" use:reveal={{ delay: 70 }} use:tilt={{ max: 2.5 }}>
+    <section class="panel about" style="grid-area: about" use:reveal={{ delay: 70 }}>
       <h2 class="label">{t.profile}</h2>
       <p class="summary">{cvData.summary}</p>
     </section>
 
     <!-- Experience -->
-    <section class="panel exp" style="grid-area: exp" use:reveal={{ delay: 120 }} use:tilt={{ max: 1.8 }}>
+    <section class="panel exp" style="grid-area: exp" use:reveal={{ delay: 120 }}>
       <h2 class="label">{t.experience}</h2>
       <div class="exp-list">
         {#each cvData.experience as exp}
@@ -153,7 +153,7 @@
     </section>
 
     <!-- Skills -->
-    <section class="panel skills" style="grid-area: skills" use:reveal={{ delay: 170 }} use:tilt={{ max: 2.5 }}>
+    <section class="panel skills" style="grid-area: skills" use:reveal={{ delay: 170 }}>
       <h2 class="label">{t.skills}</h2>
       <div class="skill-groups">
         {#each cvData.skillGroups as group}
@@ -168,7 +168,7 @@
     </section>
 
     <!-- Languages -->
-    <section class="panel lang" style="grid-area: lang" use:reveal={{ delay: 210 }} use:tilt={{ max: 2.5 }}>
+    <section class="panel lang" style="grid-area: lang" use:reveal={{ delay: 210 }}>
       <h2 class="label">{t.languages}</h2>
       <div class="lang-list">
         {#each cvData.languages as lang}
@@ -184,7 +184,7 @@
     </section>
 
     <!-- Education -->
-    <section class="panel edu" style="grid-area: edu" use:reveal={{ delay: 250 }} use:tilt={{ max: 2.5 }}>
+    <section class="panel edu" style="grid-area: edu" use:reveal={{ delay: 250 }}>
       <h2 class="label">{t.education}</h2>
       {#each cvData.education as edu}
         <div class="edu-item">
@@ -195,7 +195,7 @@
     </section>
 
     <!-- Talks / Conferences -->
-    <section class="panel talks" style="grid-area: talks" use:reveal={{ delay: 290 }} use:tilt={{ max: 2.5 }}>
+    <section class="panel talks" style="grid-area: talks" use:reveal={{ delay: 290 }}>
       <h2 class="label">{t.conferences}</h2>
       <div class="talk-list">
         {#each cvData.conferences as conf}
@@ -229,7 +229,7 @@
     --g-meta: #5c5c78;
     --g-label: #7c74cc;
     --g-dot: #9b8bff;
-    --g-panel-bg: rgba(255, 255, 255, 0.45);
+    --g-panel-bg: rgba(255, 255, 255, 0.58);
     --g-panel-border: rgba(255, 255, 255, 0.6);
     --g-panel-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -286,7 +286,7 @@
     --g-meta: #8a8aa8;
     --g-label: #a99bff;
     --g-dot: #b9aeff;
-    --g-panel-bg: rgba(28, 28, 44, 0.45);
+    --g-panel-bg: rgba(28, 28, 44, 0.55);
     --g-panel-border: rgba(255, 255, 255, 0.12);
     --g-panel-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
@@ -415,34 +415,15 @@
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     backdrop-filter: blur(30px) saturate(180%);
     border: 1px solid var(--g-panel-border);
-    border-radius: 26px;
+    border-radius: 18px;
     padding: 28px 30px;
     /* Fine top light-edge highlight + soft diffuse ambient shadow. */
     box-shadow: var(--g-panel-shadow);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, background 0.45s ease, border-color 0.45s ease;
-    transform-style: preserve-3d;
+    transition: box-shadow 0.3s ease, background 0.45s ease, border-color 0.45s ease;
     overflow: hidden;
   }
   .panel:hover {
-    will-change: transform;
     box-shadow: var(--g-panel-shadow-hover);
-  }
-
-  /* Specular sheen following the cursor (driven by the tilt action's vars). */
-  .panel::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: var(--spot, 0);
-    transition: opacity 0.35s ease;
-    background: radial-gradient(
-      340px circle at var(--mx, 50%) var(--my, 50%),
-      var(--g-sheen),
-      transparent 60%
-    );
-    mix-blend-mode: overlay;
   }
 
   /* ── Section labels ────────────────────────────────────────────────── */
@@ -569,7 +550,7 @@
   .exp-item {
     padding: 16px 18px;
     margin: 0 -18px;
-    border-radius: 16px;
+    border-radius: 12px;
     transition: background 0.25s ease;
   }
   .exp-item:not(:last-child) { border-bottom: 1px solid var(--g-divider); }

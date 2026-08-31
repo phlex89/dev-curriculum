@@ -239,7 +239,6 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
       inset 0 0 0 1px rgba(255, 255, 255, 0.2),
       0 18px 50px rgba(31, 38, 135, 0.18);
-    --g-sheen: rgba(255, 255, 255, 0.55);
     --g-divider: rgba(124, 116, 204, 0.14);
     --g-exp-hover: rgba(255, 255, 255, 0.4);
     --g-chip-bg: rgba(124, 116, 255, 0.12);
@@ -296,7 +295,6 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.18),
       inset 0 0 0 1px rgba(255, 255, 255, 0.06),
       0 18px 50px rgba(0, 0, 0, 0.55);
-    --g-sheen: rgba(255, 255, 255, 0.22);
     --g-divider: rgba(255, 255, 255, 0.08);
     --g-exp-hover: rgba(255, 255, 255, 0.06);
     --g-chip-bg: rgba(150, 140, 255, 0.18);

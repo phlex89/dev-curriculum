@@ -140,7 +140,7 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'threed'] as const).includes(t as Theme)) {
+      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'liquid', 'threed'] as const).includes(t as Theme)) {
         currentTheme.setFromHash(t as Theme);
       }
     };
@@ -484,6 +484,20 @@
   .audio-fab.theme-glass.on {
     background: rgba(124, 116, 255, 0.42);
     border-color: rgba(255, 255, 255, 0.8);
+    color: #fff;
+  }
+
+  .audio-fab.theme-liquid {
+    background: rgba(12, 14, 28, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #fff;
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  .audio-fab.theme-liquid.on {
+    background: rgba(122, 162, 255, 0.38);
+    border-color: rgba(255, 255, 255, 0.5);
     color: #fff;
   }
 

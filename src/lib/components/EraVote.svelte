@@ -399,6 +399,18 @@
     --vote-bar: rgba(255, 255, 255, 0.5);
   }
 
+  .vote-widget.theme-liquid {
+    font-family: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    --vote-bg: rgba(12, 14, 28, 0.55);
+    --vote-border: 1px solid rgba(255, 255, 255, 0.22);
+    --vote-color: #fff;
+    --vote-accent: #7aa2ff;
+    --vote-radius: 30px;
+    --vote-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.45);
+    --vote-blur: blur(24px) saturate(160%);
+    --vote-bar: rgba(255, 255, 255, 0.18);
+  }
+
   .vote-widget.theme-threed {
     font-family: 'Orbitron', 'Space Grotesk', sans-serif;
     --vote-bg: rgba(10, 8, 28, 0.62);

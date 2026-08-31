@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 
-export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass' | 'teletext' | 'parallax';
+export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass' | 'teletext' | 'parallax' | 'liquid';
 
 /** Valid themes (used to validate persisted / deep-linked values). */
-const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass', 'teletext', 'parallax'];
+const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass', 'teletext', 'parallax', 'liquid'];
 
 /** Chronological order of the eras — drives the directional time-travel transition.
  *  Teletext / Televideo (text broadcast over TV, 1984) is a parallel lineage to the
@@ -12,8 +12,10 @@ const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'mater
  *  bridges the gap between the console/terminal age and the Windows XP desktop.
  *  Glassmorphism (the luminous Big Sur / Windows 11 present) sits between Bento and
  *  the 3D future. Parallax / Immersive Scroll (the premium craft-web of ~2018) sits
- *  between Brutalism and Glassmorphism, just before the luminous present. */
-export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'bento', 'brutalism', 'parallax', 'glass', 'threed'];
+ *  between Brutalism and Glassmorphism, just before the luminous present. Liquid Glass
+ *  (Apple's 2025 refraction language) follows Glassmorphism as its next refinement,
+ *  right before the 3D future. */
+export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'bento', 'brutalism', 'parallax', 'glass', 'liquid', 'threed'];
 
 const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 

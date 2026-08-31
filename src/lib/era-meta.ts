@@ -14,5 +14,6 @@ export const ERA_META: EraMeta[] = [
   { id: 'brutalism', label: 'Brutalism', year: '2017', icon: '🧱' },
   { id: 'parallax', label: 'Parallax', year: '2018', icon: '🎬' },
   { id: 'glass', label: 'Glass', year: '2020', icon: '🧊' },
+  { id: 'liquid', label: 'Liquid Glass', year: '2025', icon: '💧' },
   { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
 ];

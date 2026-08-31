@@ -24,13 +24,18 @@
   // The extended (desktop) timeline bar, bound so we can measure whether it fits.
   let extendedNav = $state<HTMLElement | undefined>();
   let neededWidth = 0; // intrinsic px width of the extended bar (plain, not reactive)
+  let measuredFor: Theme | null = null; // era that width was measured for
 
   // Phones (<=600px) always use the compact stepper. Above that, the extended
   // timeline shows only while it actually fits the viewport: once its measured
   // width (which grows with the active era's label) would spill past the screen
   // edges, we fall back to the stepper. So the bar adapts to any in-between size
   // (e.g. a Galaxy Fold unfolded) instead of being clipped at a hard breakpoint.
-  const FIT_GUTTER = 16; // px of breathing room kept on each side
+  // The gutter has to clear the chrome parked in the bottom corners — language
+  // switch + audio toggle on the left, vote widget on the right — or the bar
+  // slides under them instead of falling back to the stepper.
+  const FIT_GUTTER = 112;
+
   function recomputeLayout() {
     if (typeof window === 'undefined') return;
     const phone = window.matchMedia('(max-width: 600px)').matches;
@@ -62,6 +67,16 @@
     recomputeLayout();
     window.addEventListener('resize', recomputeLayout);
 
+    // Webfonts landing mid-measure inflate the bar (the emoji fallback shifts as
+    // Space Grotesk arrives). Without a re-run from scratch that transient width
+    // can strand the bar on the stepper for good: once it unmounts, nothing
+    // measures it again.
+    document.fonts?.ready.then(() => {
+      measuredFor = null;
+      neededWidth = extendedNav ? extendedNav.scrollWidth : 0;
+      recomputeLayout();
+    });
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && sheetOpen) closeSheet();
     };
@@ -75,11 +90,24 @@
 
   // Measure the extended bar's intrinsic width whenever it's mounted (and on any
   // internal resize, e.g. the active label changing), then re-evaluate the fit.
+  // The width depends on the active era — label length, and the era's own font:
+  // Press Start 2P is far wider than SF Pro — and can only be measured while the
+  // bar is mounted. Without `measuredFor`, one wide era stranded every era after
+  // it on the stepper: nothing was left to re-measure once the bar unmounted.
   $effect(() => {
     const el = extendedNav;
-    if (!el) return;
+    const theme = $currentTheme;
+    if (!el) {
+      if (measuredFor !== theme) {
+        measuredFor = theme;
+        neededWidth = 0;
+        recomputeLayout();
+      }
+      return;
+    }
     const measure = () => {
       const w = el.scrollWidth;
+      measuredFor = theme;
       if (w && Math.abs(w - neededWidth) > 1) {
         neededWidth = w;
         recomputeLayout();
@@ -328,6 +356,19 @@
     animation: hintPulse 2s ease-in-out infinite;
   }
   .timeline-hint strong { font-weight: 600; }
+  /* Narrow screens: the one-liner is wider than the viewport, and at the stepper's
+     shoulder it runs under the vote widget. Wrap it and lift it clear. */
+  @media (max-width: 720px) {
+    .timeline-hint {
+      bottom: calc(100% + 74px);
+      width: max-content;
+      max-width: calc(100vw - 28px);
+      white-space: normal;
+      text-align: center;
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+  }
   .timeline-hint::after {
     content: '';
     position: absolute;
@@ -356,7 +397,7 @@
     margin: 0;
     padding: 0;
     display: flex;
-    gap: 25px;
+    gap: 12px;
     align-items: center;
     position: relative;
     z-index: 1;
@@ -826,6 +867,49 @@
     box-shadow: none;
   }
 
+  :global(:root) .theme-liquid .timeline-container {
+    background: rgba(12, 14, 28, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 40px;
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  :global(:root) .theme-liquid .timeline-track {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  /* Opaque lozenges on purpose: translucent ones let the track through, and a
+     2px line crossing the active label reads as strikethrough. */
+  :global(:root) .theme-liquid .node-pill {
+    background: linear-gradient(180deg, #2b3055, #1f2440);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+
+  :global(:root) .theme-liquid .timeline-stop:hover .node-pill {
+    background: linear-gradient(180deg, #3a4070, #2a3057);
+  }
+
+  :global(:root) .theme-liquid .timeline-stop.active .node-pill {
+    background: linear-gradient(180deg, #4a6fd6, #3a5ac0);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 16px rgba(58, 90, 192, 0.45);
+  }
+
+  :global(:root) .theme-liquid .label-text {
+    font-family: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  :global(:root) .theme-liquid .timeline-fill {
+    background: linear-gradient(90deg, #7aa2ff, #ffb37a, #5fe3d0);
+    box-shadow: none;
+  }
+
   /* --- ThreeD Theme Adaptations --- */
   :global(:root) .theme-threed .timeline-container {
     background: rgba(10, 8, 28, 0.62);
@@ -1073,6 +1157,8 @@
   :global(:root) .theme-pixel .era-sheet { color: #fcfcfc; }
   :global(:root) .theme-threed .step-dots,
   :global(:root) .theme-threed .era-sheet { color: #7df9ff; }
+  :global(:root) .theme-liquid .step-dots,
+  :global(:root) .theme-liquid .era-sheet { color: #fff; }
 
   @keyframes sheetUp {
     from { opacity: 0; transform: translateX(-50%) translateY(22px); }

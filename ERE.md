@@ -53,6 +53,7 @@
 | 13 | Teletext / Televideo (Mode 7) | anni '70 – 2000 | ✅ Implementato | `Teletext.svelte` |
 | 14 | Neumorphism / Soft UI | 2020 | ⬜ Proposta (valutata) | — (da creare) |
 | 15 | Parallax / Immersive Scroll | ~2018–oggi (apice premium) | ✅ Implementata | `Parallax.svelte` (`'parallax'`, `#parallax`) |
+| 16 | Liquid Glass | 2025 | ✅ Implementata | `Liquid.svelte` (`'liquid'`, `#liquid`) |
 
 > Le proposte **§12–§15** sono state *valutate* (giu 2026) come prossimi candidati
 > memorabili: ognuna ha contesto, stile e rischio-sovrapposizione documentati. Le idee a
@@ -454,18 +455,30 @@ circolare.
 > pesca, cielo, menta) su base quasi-bianca, sfocati (`blur(70px)`) e in **drift CSS
 > lento**, con **parallax 2D piatto** (l'intero campo scivola di pochi px verso il
 > cursore — niente camera/prospettiva, a differenza del 3D). **Vetro frosted presente
-> e lattiginoso:** `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`,
-> **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen
-> speculare** bianco che segue il cursore (`mix-blend-mode: overlay`, via action `tilt`).
-> Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso) — non l'Orbitron sci-fi del 3D.
+> e lattiginoso:** `rgba(255,255,255,.58)` in chiaro / `rgba(28,28,44,.55)` in scuro
+> (alzato dal Task 11 — il blur torna a essere *velo*, non lente) + `backdrop-filter:
+> blur(30px) saturate(180%)`, **bordo-luce 1px** in alto (inset highlight), ombra
+> ambient diffusa. Tipografia **Outfit ultralight** (nome a peso 200; geometrico
+> arioso) — non l'Orbitron sci-fi del 3D.
 >
 > **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza →
 > Profilo → Esperienza → Competenze/Lingue → Formazione/Conferenze),
-> arioso, scrollabile, max 1080px; mobile a colonna singola. Contenuti **tutti da
-> `cv-data.ts`**. **Cue audio** (`case 'glass'`): **campanella di vetro** cristallina
-> (arpeggio triangle alto + halo sine acuto) — l'opposto del drone scuro del 3D.
-> **Tutto gated da `prefers-reduced-motion`** (drift dei blob, parallax e sheen
+> arioso, scrollabile, max 1080px; mobile a colonna singola. Raggi **18px** sui
+> pannelli e **12px** su `.exp-item` (ridotti dal Task 11 dai precedenti 26px/16px:
+> capsule e squircle larghi sono diventati un tratto esclusivo di `liquid`). Contenuti
+> **tutti da `cv-data.ts`**. **Cue audio** (`case 'glass'`): **campanella di vetro**
+> cristallina (arpeggio triangle alto + halo sine acuto) — l'opposto del drone scuro
+> del 3D. **Tutto gated da `prefers-reduced-motion`** (drift dei blob e parallax
 > disattivati; il vetro e i contenuti restano).
+>
+> **Nessuna interazione col cursore sul vetro** (Task 11): rimossi l'azione `use:tilt`
+> sui pannelli, la regola `.panel::after` dello sheen speculare che seguiva il puntatore
+> e, con essi, `transform-style: preserve-3d` e il `will-change: transform` che
+> restavano altrimenti senza scopo. L'hover continua a sollevare i pannelli passando a
+> `--g-panel-shadow-hover` (già presente nel codice): si sollevano, semplicemente non si
+> inclinano più. Era CSS fermo, non superficie che risponde al mouse — quella risposta
+> al cursore è passata a `liquid`, che la esprime piegando la luce invece di inclinare
+> il pannello.
 >
 > **Toggle aspetto chiaro/scuro (sole/luna).** Pulsante frosted fisso in alto a destra
 > (in alto a sinistra su mobile, per non sovrapporsi al FAB audio). I colori del tema sono
@@ -485,12 +498,16 @@ visionOS). Profondità eterea fatta di sfocature e luce, non di materiali reali.
 - **Palette:** gradienti pastello morbidi e **luminosi** come sfondo (chiaro, arioso),
   pannelli traslucidi lattiginosi, bordi bianchi finissimi (`1px rgba(255,255,255,.6)`).
 - **Tipografia:** moderna e leggera (**Inter**), pesi sottili (200–300 per il display).
-- **Materiali:** `backdrop-filter: blur + saturate`, riflessi/sheen sottili, ombre diffuse.
+- **Materiali:** `backdrop-filter: blur + saturate`, bordo-luce sottile, ombre diffuse.
 - **Layout:** pannelli fluttuanti su sfondo colorato animato lentamente.
 
 **Differenziazione dal 3D (Futuro).** **Luce vs Buio** è il discriminante portante:
 Glass = chiaro/pastello/calmo/arioso, **niente WebGL** (solo gradienti CSS animati sotto
 il vetro), Outfit ultralight; 3D = scuro/neon/sci-fi, scena WebGL immersiva, Orbitron.
+
+**Differenziazione da `Liquid` (2025).** Vedi §16 per il dettaglio completo: in breve,
+Glass è un **documento** (scroll unico, senza navigazione) che **sfoca** ciò che sta
+dietro; Liquid è un'**app** (shell a tab) che **piega** la luce con una lente SVG.
 
 ---
 
@@ -872,6 +889,129 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 
 ---
 
+## 16. Liquid Glass — ✅ Implementato
+**2025** · `src/lib/themes/Liquid.svelte` (+ modulo puro `src/lib/themes/liquid/lens.ts`)
+
+> **Stato implementazione.** Aggiunta come **tredicesima era** per colmare il buco che il
+> trend "Liquid Glass Navigation" (analisi Muzli del 30 luglio 2026) segnalava nella
+> timeline: `Glass` (2020) non aveva alcuna navigazione, era un *documento*. Hash
+> `#liquid`, chiave tema `'liquid'`, in `ERA_ORDER` **tra `glass` e `threed`**, label
+> d'anno **"2025"**, icona 💧 in Timeline. Ha richiesto una rifocalizzazione di `Glass`
+> (§9) perché le due non si sovrapponessero: **Glass = documento, Liquid = app**.
+>
+> **Struttura: app shell, non scroll di pagina.** `100dvh` con una testata a due barre
+> impilate (**striscia identità** `name · role`, sempre visibile, sopra una **tab bar a
+> capsula** con **pillola indicatore a molla** che scivola e si deforma nella direzione
+> del movimento) e sotto **un'unica regione scrollabile** con **quattro schermate a tab**
+> — Profilo, Percorso, Competenze, Altro — che coprono tutti i contenuti che `Glass`
+> mostra nei suoi sette pannelli (nessun testo duplicato, tutto da `cv-data.ts`). Pattern
+> ARIA `tablist`/`tab`/`tabpanel` completo: `aria-selected`, `aria-controls`, frecce
+> ←/→ con wrap tra le tab, `Home`/`End` agli estremi; il cambio di tab riporta la
+> regione scrollabile in cima. La testata è una **capsula flottante centrata**
+> (`min(468px, 100% - 24px)`), non una fascia a tutta larghezza: lascia liberi gli
+> angoli dello schermo per la chrome del sito e dà alla lente un bordo su entrambi i
+> lati. Allo scroll le due barre collassano in **un'unica capsula compatta** (icona +
+> etichetta della tab attiva) e **restano compatte finché si è lontani dalla cima**: il
+> vetro grande scompare, resta solo la pillola. Si riespande al focus da tastiera
+> (`:focus-within`), al passaggio del puntatore sulla pillola compatta o al tocco su di
+> essa, e si richiude al primo nuovo scroll. La testata è **`pointer-events: none`** —
+> solo i controlli prendono il puntatore, così la rotellina sopra il vetro continua a
+> scorrere la pagina. **È sempre `position: absolute`, mai `fixed`** — elimina per
+> costruzione il jank noto di iOS Safari quando `backdrop-filter` sta su un elemento
+> `fixed` durante lo scroll. Sotto i 720px la capsula scende a `top: 62px`, sotto la
+> riga di chrome (wallpaper a sinistra, lingua + audio a destra), invece di dividersi
+> con lei la stessa riga.
+>
+> **Il contenuto scorre dietro la testata** — scelta deliberata (diverge dalla spec
+> originaria, che prevedeva barre come fratelli statici e nulla dietro): è ciò che dà
+> alla lente qualcosa da rifrangere, e senza contenuto sotto l'effetto sarebbe
+> invisibile.
+>
+> **Ambiente.** Tre wallpaper in **CSS puro** (mesh gradient saturi, nessun asset
+> aggiunto) — **Aurora** (blu/violetto/magenta), **Sunset** (arancio/rosa/indaco),
+> **Deep** (verde acqua/blu notte) — ciclati da un pulsante in alto a destra (in alto a
+> sinistra sotto i 720px, dove l'audio FAB si sposta in alto a destra), con la scelta
+> persistita in `localStorage` (`cv_liquid_wallpaper`). Ogni wallpaper definisce la
+> propria `--l-accent`, che ri-tinge accenti e chrome. È l'affordance esclusiva di
+> Liquid, e sostituisce senza duplicarlo il toggle chiaro/scuro che resta a `Glass`.
+>
+> **La lente.** Filtro SVG con `feImage` + **tre** `feDisplacementMap` a `scale`
+> leggermente diversa per i canali R, G e B, isolati con `feColorMatrix` e ricomposti con
+> `feBlend` in `screen` — è questo a produrre l'**iridescenza sul bordo**, dettaglio che
+> nessun'altra era del sito possiede. La *displacement map* è **generata a runtime su
+> `<canvas>`** dal modulo puro `liquid/lens.ts` (coperto da test `vitest`) e
+> **rigenerata a ogni cambio di geometria** della barra via `ResizeObserver`, perché la
+> barra collassa durante lo scroll — con **cache per geometria e debounce**, così le due
+> forme (estesa e compatta) si pagano una volta sola e non a ogni gesto di scroll.
+> L'`id` del filtro è **per istanza**: il cambio lingua incrocia due `Liquid` per ~460ms
+> e un id condiviso farebbe puntare la testata entrante al filtro di quella uscente. La lente vive **su un solo elemento**, la testata;
+> i pannelli di contenuto (hero, blocchi) usano un `backdrop-filter: blur() saturate()`
+> più semplice — pur condividendo con la testata il **bordo a conic-gradient** iridescente
+> e l'**anello di dispersione ciano/magenta** che compongono l'identità visiva "vetro" di
+> tutta l'era.
+>
+> **Detection del motore.** `navigator.vendor` — la lente si attiva **solo** quando
+> `vendor === 'Google Inc.'` (Chromium); WebKit (incluso ogni browser su iOS/iPadOS,
+> dove tutti girano su WebKit) e Gecko vanno al fallback. È sniffing, un compromesso
+> consapevole, reso sicuro dal fatto che **il default è il fallback**: una detection
+> errata degrada l'effetto, non rompe nulla.
+>
+> **Fallback curato** (non una resa di serie B: su iPhone/iPad è il percorso di
+> chiunque apra il sito da telefono): rim-light conico sul bordo, doppia ombra `inset`
+> ciano/magenta a simulare la dispersione cromatica, e un **anello di bordo** mascherato
+> con `backdrop-filter: blur(2px) brightness(1.08) saturate(1.4)` che finge la
+> compressione ai bordi — un anello, non un pannello pieno, perché un pannello con
+> `backdrop-filter` sfocherebbe il contenuto sottostante.
+>
+> **Tipografia di sistema**, nessun webfont: `-apple-system, 'SF Pro Display', system-ui,
+> 'Segoe UI Variable', 'Segoe UI', sans-serif`, pesi 500–600 e tracking stretto
+> (`letter-spacing: -0.02em` sui titoli). L'unica era in cui il font di sistema *è* il
+> font storicamente corretto (iOS 26 / SF Pro) — l'opposto voluto dell'Outfit ultralight
+> di `Glass`.
+>
+> **Movimento.** Curva elastica (`cubic-bezier(0.34, 1.56, 0.64, 1)`) sulle transizioni
+> di stato: la pillola dell'indicatore si allunga nella direzione dello spostamento e
+> rimbalza a destinazione; le schermate entrano con un lieve *rise* in dissolvenza.
+>
+> **Cue audio** (`case 'liquid'` in `src/lib/audio.ts`): una **goccia** — sine con pitch
+> che scende rapido e scatta di nuovo verso l'alto, più un corpo grave che sostiene.
+> Tutto `sine`, contro l'arpeggio `triangle` acuto di `glass` e il drone `sawtooth` di
+> `threed`: acquatico, non cristallino.
+>
+> **`prefers-reduced-motion`.** Le tab **restano pienamente funzionanti** (sono
+> navigazione, non decorazione): niente collasso delle barre (restano ferme ed estese),
+> niente deformazione della pillola né molla, niente transizione animata tra schermate.
+> La lente resta attiva perché è un effetto statico, non movimento. Contenuti sempre
+> integri e raggiungibili.
+>
+> **Contrasto, misurato.** Il testo della testata vive sopra il wallpaper, quindi il velo
+> del vetro **scurisce** (`rgba(14, 18, 38, 0.42)`) invece di schiarire: con un velo
+> chiaro il bianco moriva sulle zone luminose. Misure WCAG (colore del testo compositato
+> sul pixel di fondo reale, catturato a schermo) sui **tre** wallpaper: identità
+> 16.3–17.8:1, ruolo 10.8–11.6:1, tab inattive 8.9–9.9:1, pillola della tab attiva
+> 6.4–6.8:1, corpo testo 6.1–13.3:1 — tutto sopra 4.5:1. Il blob acqua di **Deep** è
+> stato spostato dal centro-alto (dove stava esattamente dietro la testata, portando le
+> etichette a ~2:1) verso il centro. Anche le pillole della Timeline sono **opache** in
+> questa era: translucide lasciavano passare il tracciato, e una riga da 2px attraverso
+> l'etichetta attiva si leggeva come testo barrato.
+
+**Contesto.** La grammatica di navigazione delle app mobile 2025 (iOS 26 "Liquid Glass"):
+barre flottanti che si dimenticano durante lo scroll, collassano, si ricompongono — e un
+vetro che non sfoca ma **piega e disperde** la luce, come una lente ottica reale.
+
+**Differenziazione da `Glass` (2020).** L'asse portante dell'intera operazione:
+**Glass = documento, Liquid = app.** Glass sfoca ciò che sta dietro; Liquid lo **piega**.
+Glass è lattiginoso e colorato di suo; Liquid è quasi incolore e prende colore dal
+wallpaper sottostante. Glass è uno scroll unico di sette pannelli senza navigazione;
+Liquid è un'app shell in cui **la navigazione è il tema**. Glass ha drift lento ed
+easing; Liquid ha la molla, con deformazione. Glass ha il toggle chiaro/scuro; Liquid ha
+il cambio wallpaper. Vedi anche §9 per il ridisegno che questa era ha richiesto.
+
+**Differenziazione da `ThreeD` (2026, l'era successiva).** Nessun WebGL in Liquid: la
+"profondità" è ottica (lensing SVG su superficie 2D), non una scena 3D reale.
+
+---
+
 ## Idee oltre la lista (timeline futura)
 
 Spunti **a più basso valore narrativo** o **a maggior rischio di sovrapposizione** con le ere già
@@ -919,6 +1059,11 @@ implementate: ottimi come *variante* o *easter egg*, non (ancora) come ere auton
     palette chiara editoriale, serif display di lusso, smooth-scroll **Lenis** (~3KB, lazy).
     **Caveat:** distinguere dal parallax-verso-il-cursore di Glass/3D e gestire la
     motion-sickness col doppio binario `prefers-reduced-motion`.
+11. ~~**Liquid Glass**~~ (§16) — ✅ **implementata** (`Liquid.svelte`): l'unico trend
+    dell'articolo Muzli del 30 luglio 2026 a colmare un buco reale della timeline. Colloca il
+    presente-app **tra `glass` e `threed`** con l'asse **documento vs app**: app shell a tab
+    con lente SVG a dispersione cromatica sulla testata, fallback curato su WebKit/Gecko.
+    Ha richiesto la rifocalizzazione di `Glass` (§9) per non sovrapporsi.
 
 > **Da maneggiare con cautela (vedi "Idee oltre la lista"):** Frutiger Aero (sovrappone Skeuo/Glass),
 > Vaporwave (estetica/meme, neon come il 3D) e PS1 low-poly (re-introduce WebGL a ridosso del Futuro)

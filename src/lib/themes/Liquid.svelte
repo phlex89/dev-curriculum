@@ -6,10 +6,11 @@
   const cvData = getCvData();
   const t = getUi().liquid;
 
-  const LENS_SCALE = 46;
+  const LENS_SCALE = 28;
   const LENS_RADIUS = 30;
   const LENS_STRENGTH = 0.9;
   const LENS_MAP_W = 256;
+  const LENS_MARGIN = 40;
 
   type TabId = 'profile' | 'path' | 'skills' | 'more';
 
@@ -138,6 +139,7 @@
   let lensW = $state(0);
   let lensH = $state(0);
   let barsEl = $state<HTMLElement | undefined>();
+  let wrapEl = $state<HTMLElement | undefined>();
 
   onMount(() => {
     lensOn = supportsBackdropLens({
@@ -171,20 +173,31 @@
 
   $effect(() => {
     const el = barsEl;
-    if (!el || !lensOn) return;
+    const host = wrapEl;
+    if (!el || !host) return;
+    const on = lensOn;
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
-      regenerateMap(width, height);
+      if (!collapsed) host.style.setProperty('--bars-h', `${height}px`);
+      if (on) regenerateMap(width, height);
     });
     observer.observe(el);
     return () => observer.disconnect();
   });
 </script>
 
-<div class="liquid-wrapper wp-{wallpaper}" class:lens-on={lensOn && mapUrl !== ''}>
+<div class="liquid-wrapper wp-{wallpaper}" class:lens-on={lensOn && mapUrl !== ''} bind:this={wrapEl}>
   {#if mapUrl}
     <svg class="lens-defs" aria-hidden="true" focusable="false">
-      <filter id="liquid-lens" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <filter
+        id="liquid-lens"
+        filterUnits="userSpaceOnUse"
+        x={-LENS_MARGIN}
+        y={-LENS_MARGIN}
+        width={lensW + LENS_MARGIN * 2}
+        height={lensH + LENS_MARGIN * 2}
+        color-interpolation-filters="sRGB"
+      >
         <feImage href={mapUrl} x="0" y="0" width={lensW} height={lensH} preserveAspectRatio="none" result="map" />
         <feDisplacementMap in="SourceGraphic" in2="map" scale={LENS_SCALE * 1.06} xChannelSelector="R" yChannelSelector="G" result="dr" />
         <feDisplacementMap in="SourceGraphic" in2="map" scale={LENS_SCALE} xChannelSelector="R" yChannelSelector="G" result="dg" />
@@ -243,8 +256,8 @@
   </header>
 
   <div class="screen-scroll" bind:this={scroller}>
-    <div class="screen" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" tabindex="0" hidden={active !== 'profile'}>
-      <div class="profile-hero glass-surface glass-surface--light">
+    <div class="screen screen--profile" role="tabpanel" id="panel-profile" aria-labelledby="tab-profile" tabindex="0" hidden={active !== 'profile'}>
+      <div class="hero-card glass-surface glass-surface--light">
         <div class="avatar-wrap">
           {#if avatarFailed}
             <div class="avatar-fallback">ST</div>
@@ -254,102 +267,118 @@
         </div>
         <h1>{cvData.name}</h1>
         <p class="role">{cvData.role}</p>
-        <p class="tagline">{cvData.tagline}</p>
         <p class="location"><span class="dot">◍</span> {cvData.contact.location}</p>
         <div class="contact-pills">
-          <a class="pill glass-surface glass-surface--light" href={cvData.contact.linkedin} target="_blank" rel="noopener">
+          <a class="pill" href={cvData.contact.linkedin} target="_blank" rel="noopener">
             <span class="pill-icon">in</span> LinkedIn
           </a>
-          <a class="pill glass-surface glass-surface--light" href="mailto:{cvData.contact.email}">
+          <a class="pill" href="mailto:{cvData.contact.email}">
             <span class="pill-icon">@</span> Email
           </a>
         </div>
       </div>
 
-      <h2 class="screen-title">{t.profile}</h2>
-      <div class="bio-card glass-surface glass-surface--light">
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.profile}</h2>
+        <p class="tagline">{cvData.tagline}</p>
         <p class="summary">{cvData.summary}</p>
-      </div>
+      </section>
     </div>
 
     <div class="screen" role="tabpanel" id="panel-path" aria-labelledby="tab-path" tabindex="0" hidden={active !== 'path'}>
-      <h2 class="screen-title">{t.experience}</h2>
-      <div class="path-list">
-        {#each cvData.experience as exp}
-          <article class="path-item glass-surface glass-surface--light">
-            <div class="path-head">
-              <h3>{exp.company}</h3>
-              <span class="path-period">{exp.period}</span>
-            </div>
-            <p class="path-role">{exp.title}</p>
-            <p class="path-desc">{exp.description}</p>
-            <div class="chip-row">
-              {#each exp.technologies as tech}<span class="chip">{tech}</span>{/each}
-            </div>
-          </article>
-        {/each}
-      </div>
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.experience}</h2>
+        <div class="path-list">
+          {#each cvData.experience as exp}
+            <article class="path-item">
+              <div class="path-head">
+                <h3>{exp.company}</h3>
+                <span class="path-period">{exp.period}</span>
+              </div>
+              <div class="path-body">
+                <p class="path-role">{exp.title}</p>
+                <p class="path-desc">{exp.description}</p>
+                <div class="chip-row">
+                  {#each exp.technologies as tech}<span class="chip">{tech}</span>{/each}
+                </div>
+              </div>
+            </article>
+          {/each}
+        </div>
+      </section>
 
-      <h2 class="screen-title">{t.earlyCareer}</h2>
-      <article class="path-item glass-surface glass-surface--light">
-        <div class="path-head">
-          <h3>{cvData.earlyCareer.title}</h3>
-          <span class="path-period">{cvData.earlyCareer.period}</span>
-        </div>
-        <p class="path-desc">{cvData.earlyCareer.description}</p>
-        <div class="chip-row">
-          {#each cvData.earlyCareer.technologies as tech}<span class="chip">{tech}</span>{/each}
-        </div>
-      </article>
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.earlyCareer}</h2>
+        <article class="path-item">
+          <div class="path-head">
+            <h3>{cvData.earlyCareer.title}</h3>
+            <span class="path-period">{cvData.earlyCareer.period}</span>
+          </div>
+          <div class="path-body">
+            <p class="path-desc">{cvData.earlyCareer.description}</p>
+            <div class="chip-row">
+              {#each cvData.earlyCareer.technologies as tech}<span class="chip">{tech}</span>{/each}
+            </div>
+          </div>
+        </article>
+      </section>
     </div>
 
     <div class="screen" role="tabpanel" id="panel-skills" aria-labelledby="tab-skills" tabindex="0" hidden={active !== 'skills'}>
-      <h2 class="screen-title">{t.skills}</h2>
-      <div class="skill-groups glass-surface glass-surface--light">
-        {#each cvData.skillGroups as group}
-          <div class="skill-group">
-            <span class="skill-group-name">{group.label}</span>
-            <div class="chip-row">
-              {#each group.items as item}<span class="chip">{item}</span>{/each}
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.skills}</h2>
+        <div class="skill-groups">
+          {#each cvData.skillGroups as group}
+            <div class="skill-group">
+              <span class="skill-group-name">{group.label}</span>
+              <div class="chip-row">
+                {#each group.items as item}<span class="chip">{item}</span>{/each}
+              </div>
             </div>
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
+      </section>
 
-      <h2 class="screen-title">{t.languages}</h2>
-      <div class="lang-list glass-surface glass-surface--light">
-        {#each cvData.languages as lang}
-          <div class="lang-item">
-            <div class="lang-top">
-              <span class="lang-name">{lang.name}</span>
-              <span class="lang-level">{lang.level}</span>
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.languages}</h2>
+        <div class="lang-list">
+          {#each cvData.languages as lang}
+            <div class="lang-item">
+              <div class="lang-top">
+                <span class="lang-name">{lang.name}</span>
+                <span class="lang-level">{lang.level}</span>
+              </div>
+              {#if lang.note}<span class="lang-note">{lang.note}</span>{/if}
             </div>
-            {#if lang.note}<span class="lang-note">{lang.note}</span>{/if}
-          </div>
-        {/each}
-      </div>
+          {/each}
+        </div>
+      </section>
     </div>
 
     <div class="screen" role="tabpanel" id="panel-more" aria-labelledby="tab-more" tabindex="0" hidden={active !== 'more'}>
-      <h2 class="screen-title">{t.education}</h2>
-      <div class="edu-list glass-surface glass-surface--light">
-        {#each cvData.education as edu}
-          <div class="edu-item">
-            <strong>{edu.title}</strong>
-            <span class="edu-meta">{edu.institute} · {edu.period}</span>
-          </div>
-        {/each}
-      </div>
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.education}</h2>
+        <div class="row-list">
+          {#each cvData.education as edu}
+            <div class="row-item">
+              <strong class="row-name">{edu.title}</strong>
+              <span class="row-meta">{edu.institute} · {edu.period}</span>
+            </div>
+          {/each}
+        </div>
+      </section>
 
-      <h2 class="screen-title">{t.conferences}</h2>
-      <div class="talk-list glass-surface glass-surface--light">
-        {#each cvData.conferences as conf}
-          <div class="talk-item">
-            <span class="talk-name">{conf.name}</span>
-            <span class="talk-meta">{conf.location} · {conf.year}</span>
-          </div>
-        {/each}
-      </div>
+      <section class="block glass-surface glass-surface--light">
+        <h2 class="block-title">{t.conferences}</h2>
+        <div class="row-list">
+          {#each cvData.conferences as conf}
+            <div class="row-item">
+              <strong class="row-name">{conf.name}</strong>
+              <span class="row-meta">{conf.location} · {conf.year}</span>
+            </div>
+          {/each}
+        </div>
+      </section>
     </div>
   </div>
 </div>
@@ -369,8 +398,19 @@
     transition: background 0.6s ease;
   }
 
+  .liquid-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 19;
+    background: var(--l-bg);
+    clip-path: inset(0 0 calc(100% - 14px) 0);
+    pointer-events: none;
+  }
+
   .wp-aurora {
     --l-accent: #7aa2ff;
+    --l-accent-soft: #d7e2ff;
     --l-bg:
       radial-gradient(60% 55% at 12% 18%, #3b2fd6 0%, transparent 60%),
       radial-gradient(55% 50% at 85% 12%, #c02fb8 0%, transparent 62%),
@@ -380,6 +420,7 @@
 
   .wp-sunset {
     --l-accent: #ffb37a;
+    --l-accent-soft: #ffe2cd;
     --l-bg:
       radial-gradient(58% 52% at 20% 88%, #ff6a3d 0%, transparent 62%),
       radial-gradient(52% 48% at 82% 20%, #ff3d8b 0%, transparent 60%),
@@ -389,6 +430,7 @@
 
   .wp-deep {
     --l-accent: #5fe3d0;
+    --l-accent-soft: #cdf6ef;
     --l-bg:
       radial-gradient(60% 55% at 15% 25%, #0e7f8c 0%, transparent 62%),
       radial-gradient(55% 50% at 88% 78%, #1b3fb0 0%, transparent 60%),
@@ -414,26 +456,22 @@
     cursor: pointer;
   }
 
+  .wallpaper-btn span {
+    display: block;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
   .wallpaper-btn:hover {
     background: rgba(255, 255, 255, 0.25);
+  }
+
+  .wallpaper-btn:hover span {
+    transform: rotate(180deg);
   }
 
   .wallpaper-btn:focus-visible {
     outline: 2px solid var(--l-accent);
     outline-offset: 3px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .liquid-wrapper {
-      transition: none;
-    }
-
-    .identity,
-    .tabbar-nav,
-    .tab-pill,
-    .mini-tab {
-      transition: none;
-    }
   }
 
   .glass-surface {
@@ -488,14 +526,10 @@
     pointer-events: none;
   }
 
-  .pill.glass-surface::after {
-    padding: 2px;
-  }
-
   .glass-surface--light {
-    background: rgba(255, 255, 255, 0.18);
-    -webkit-backdrop-filter: blur(10px) saturate(160%);
-    backdrop-filter: blur(10px) saturate(160%);
+    background: rgba(6, 10, 22, 0.34);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
   }
 
   .lens-defs {
@@ -532,7 +566,9 @@
   .identity {
     display: flex;
     flex-direction: column;
-    padding: 16px 20px 8px;
+    align-items: center;
+    padding: 14px 20px 4px;
+    text-align: center;
     transform-origin: top;
     transition:
       transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -556,15 +592,25 @@
 
   .who {
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
   }
 
   .what {
-    font-size: 0.85rem;
-    opacity: 0.7;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.62;
   }
 
   .tabbar-nav {
+    width: min(430px, 100%);
+    margin: 0 auto 12px;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
     transform-origin: top;
     transition:
       transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -575,18 +621,21 @@
     transform: scaleY(0);
     opacity: 0;
     height: 0;
+    margin: 0 auto;
+    padding: 0;
     overflow: hidden;
     pointer-events: none;
     transition:
       transform 0.26s ease-in,
       opacity 0.18s ease,
-      height 0s linear 0.26s;
+      height 0s linear 0.26s,
+      padding 0s linear 0.26s,
+      margin 0s linear 0.26s;
   }
 
   .tabbar {
     position: relative;
     display: flex;
-    padding: 0 14px;
   }
 
   .tab-btn {
@@ -596,8 +645,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 8px 4px 12px;
+    gap: 1px;
+    padding: 6px 4px 7px;
     background: none;
     border: none;
     border-radius: 999px;
@@ -605,12 +654,17 @@
     font-weight: 500;
     color: inherit;
     cursor: pointer;
-    opacity: 0.78;
+    opacity: 0.72;
+    transition: opacity 0.24s ease;
   }
 
   .tab-btn.active {
     opacity: 1;
-    font-weight: 700;
+    font-weight: 600;
+  }
+
+  .tab-btn:hover {
+    opacity: 1;
   }
 
   .tab-btn:focus-visible {
@@ -619,22 +673,30 @@
   }
 
   .tab-icon {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
+    transition: transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .tab-btn.active .tab-icon {
+    transform: translateY(-1px) scale(1.08);
   }
 
   .tab-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.01em;
   }
 
   .tab-pill {
     position: absolute;
-    top: 4px;
-    bottom: 8px;
+    top: 0;
+    bottom: 0;
     left: 0;
     z-index: 0;
     width: calc(var(--pill-base, 0) * 1px);
-    background: rgba(255, 255, 255, 0.24);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+      0 4px 14px rgba(0, 0, 0, 0.18);
     border-radius: 999px;
     transform-origin: left center;
     transform: translateX(calc(var(--pill-x, 0) * 1px)) scaleX(calc(var(--pill-scale, 1) * var(--pill-stretch, 1)));
@@ -681,27 +743,81 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 154px 20px 130px;
+    padding: calc(12px + var(--bars-h, 128px) + 26px) 20px 130px;
   }
 
-  .screen-title {
-    margin: 28px 0 12px;
-    font-size: 1rem;
+  .screen {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
   }
 
-  .profile-hero,
-  .bio-card {
-    padding: 24px 22px;
+  .screen[hidden] {
+    display: none;
+  }
+
+  .screen:not([hidden]) > * {
+    animation: liquid-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .screen:not([hidden]) > *:nth-child(2) {
+    animation-delay: 0.08s;
+  }
+
+  @keyframes liquid-rise {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .block {
+    padding: 26px 28px 28px;
+  }
+
+  .block-title {
+    margin: 0 0 16px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.62;
+  }
+
+  .hero-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 30px 28px;
   }
 
   .avatar-wrap {
-    width: 96px;
-    height: 96px;
-    margin-bottom: 12px;
+    width: 104px;
+    height: 104px;
+    margin-bottom: 18px;
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.15) 55%, rgba(255, 255, 255, 0.5));
+    box-shadow:
+      0 12px 34px rgba(0, 0, 0, 0.38),
+      0 0 0 1px rgba(255, 255, 255, 0.18);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .avatar-wrap:hover {
+    transform: scale(1.04) rotate(-2deg);
   }
 
   .avatar-img,
   .avatar-fallback {
+    display: block;
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -712,126 +828,278 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.8rem;
     font-weight: 600;
-    background: rgba(128, 128, 128, 0.25);
+    letter-spacing: -0.02em;
+    background: rgba(10, 14, 30, 0.55);
+  }
+
+  .hero-card h1 {
+    margin: 0;
+    font-size: clamp(1.85rem, 3.4vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.04;
   }
 
   .role {
-    opacity: 0.8;
+    margin: 8px 0 0;
+    font-size: 0.98rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    color: var(--l-accent-soft);
+  }
+
+  .location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 14px 0 0;
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.62;
   }
 
   .location .dot {
-    opacity: 0.6;
+    font-size: 0.6rem;
   }
 
   .contact-pills {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 22px;
   }
 
   .pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    background: rgba(8, 10, 24, 0.55);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    gap: 7px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
     border-radius: 999px;
     text-decoration: none;
     color: #fff;
     font-size: 0.85rem;
     font-weight: 600;
+    letter-spacing: -0.005em;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .pill:hover {
+    transform: translateY(-2px);
+  }
+
+  .pill:focus-visible {
+    outline: 2px solid var(--l-accent);
+    outline-offset: 3px;
+  }
+
+  .pill-icon {
+    opacity: 0.7;
+    font-weight: 500;
+  }
+
+  .tagline {
+    max-width: 44ch;
+    margin: 0;
+    font-size: 1.16rem;
+    font-weight: 500;
+    letter-spacing: -0.018em;
+    line-height: 1.42;
+  }
+
+  .summary {
+    max-width: 70ch;
+    margin: 18px 0 0;
+    font-size: 0.94rem;
+    font-weight: 400;
+    line-height: 1.72;
+    opacity: 0.88;
   }
 
   .path-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 26px;
   }
 
-  .path-item {
-    padding: 18px 20px;
+  .path-item + .path-item {
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
   }
 
-  .path-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    align-items: baseline;
+  .path-head h3 {
+    margin: 0;
+    font-size: 1.14rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
   }
 
   .path-period {
-    font-size: 0.8rem;
-    opacity: 0.7;
+    font-size: 0.76rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
     white-space: nowrap;
   }
 
   .path-role {
+    margin: 0;
+    font-size: 0.88rem;
     font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--l-accent-soft);
+  }
+
+  .path-desc {
+    max-width: 68ch;
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.68;
+    opacity: 0.84;
   }
 
   .chip-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 7px;
+    margin-top: 14px;
   }
 
   .chip {
-    padding: 3px 10px;
-    background: rgba(8, 10, 24, 0.4);
+    padding: 4px 11px;
+    background: rgba(255, 255, 255, 0.11);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.32);
     color: #fff;
     font-size: 0.75rem;
     font-weight: 500;
+    letter-spacing: 0.005em;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .chip:hover {
+    transform: translateY(-2px);
   }
 
   .skill-groups {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 20px;
+    gap: 20px;
   }
 
   .skill-group-name {
     display: block;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
     font-weight: 600;
-    margin-bottom: 6px;
+    letter-spacing: -0.015em;
   }
 
   .lang-list,
-  .edu-list,
-  .talk-list {
+  .row-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 20px;
+    gap: 14px;
+  }
+
+  .lang-item + .lang-item,
+  .row-item + .row-item {
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.11);
   }
 
   .lang-top {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .lang-name {
+    font-size: 0.98rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .lang-level {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--l-accent-soft);
+    white-space: nowrap;
   }
 
   .lang-note {
     display: block;
-    font-size: 0.8rem;
-    opacity: 0.7;
+    margin-top: 3px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    opacity: 0.68;
   }
 
-  .edu-item,
-  .talk-item {
+  .row-item {
     display: flex;
     flex-direction: column;
+    gap: 3px;
   }
 
-  .edu-meta,
-  .talk-meta {
-    font-size: 0.85rem;
-    opacity: 0.7;
+  .row-name {
+    font-size: 0.98rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .row-meta {
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    opacity: 0.66;
+  }
+
+  @media (min-width: 760px) {
+    .path-item {
+      display: grid;
+      grid-template-columns: 172px minmax(0, 1fr);
+      gap: 30px;
+    }
+
+    .path-head {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  @media (max-width: 759px) {
+    .path-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .screen--profile {
+      display: grid;
+      grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+      align-items: start;
+      align-content: center;
+      min-height: 100%;
+      gap: 22px;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .screen--profile {
+      justify-content: center;
+      min-height: 100%;
+    }
   }
 
   @media (max-width: 720px) {
@@ -842,7 +1110,55 @@
     }
 
     .identity {
-      padding-left: 60px;
+      padding-left: 62px;
+      padding-right: 62px;
+    }
+
+    .screen-scroll {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .block {
+      padding: 22px 20px 24px;
+    }
+
+    .hero-card {
+      padding: 24px 20px;
+    }
+
+    .tagline {
+      font-size: 1.06rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid-wrapper {
+      transition: none;
+    }
+
+    .identity,
+    .tabbar-nav,
+    .tab-pill,
+    .mini-tab,
+    .tab-btn,
+    .tab-icon,
+    .pill,
+    .chip,
+    .avatar-wrap,
+    .wallpaper-btn span {
+      transition: none;
+    }
+
+    .screen:not([hidden]) > * {
+      animation: none;
+    }
+
+    .avatar-wrap:hover,
+    .pill:hover,
+    .chip:hover,
+    .wallpaper-btn:hover span {
+      transform: none;
     }
   }
 </style>

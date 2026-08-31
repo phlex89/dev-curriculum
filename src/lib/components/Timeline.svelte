@@ -826,6 +826,47 @@
     box-shadow: none;
   }
 
+  :global(:root) .theme-liquid .timeline-container {
+    background: rgba(12, 14, 28, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 40px;
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 10px 30px rgba(0, 0, 0, 0.45);
+  }
+
+  :global(:root) .theme-liquid .timeline-track {
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  :global(:root) .theme-liquid .node-pill {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+
+  :global(:root) .theme-liquid .timeline-stop:hover .node-pill {
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  :global(:root) .theme-liquid .timeline-stop.active .node-pill {
+    background: rgba(122, 162, 255, 0.38);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 6px 16px rgba(122, 162, 255, 0.4);
+  }
+
+  :global(:root) .theme-liquid .label-text {
+    font-family: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  :global(:root) .theme-liquid .timeline-fill {
+    background: linear-gradient(90deg, #7aa2ff, #ffb37a, #5fe3d0);
+    box-shadow: none;
+  }
+
   /* --- ThreeD Theme Adaptations --- */
   :global(:root) .theme-threed .timeline-container {
     background: rgba(10, 8, 28, 0.62);
@@ -1073,6 +1114,8 @@
   :global(:root) .theme-pixel .era-sheet { color: #fcfcfc; }
   :global(:root) .theme-threed .step-dots,
   :global(:root) .theme-threed .era-sheet { color: #7df9ff; }
+  :global(:root) .theme-liquid .step-dots,
+  :global(:root) .theme-liquid .era-sheet { color: #fff; }
 
   @keyframes sheetUp {
     from { opacity: 0; transform: translateX(-50%) translateY(22px); }

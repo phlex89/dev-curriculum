@@ -249,6 +249,20 @@
     --ls-font: 'Inter', -apple-system, sans-serif;
   }
 
+  .lang-switch.theme-liquid {
+    --ls-bg: rgba(12, 14, 28, 0.55);
+    --ls-fg: rgba(255, 255, 255, 0.72);
+    --ls-border: 1px solid rgba(255, 255, 255, 0.22);
+    --ls-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.45);
+    --ls-blur: blur(24px) saturate(160%);
+    --ls-divider: 1px solid rgba(255, 255, 255, 0.16);
+    --ls-active-bg: rgba(122, 162, 255, 0.38);
+    --ls-active-fg: #fff;
+    --ls-hover-bg: rgba(255, 255, 255, 0.14);
+    --ls-focus: #7aa2ff;
+    --ls-font: -apple-system, 'SF Pro Display', system-ui, 'Segoe UI Variable', 'Segoe UI', sans-serif;
+  }
+
   .lang-switch.theme-threed {
     --ls-bg: rgba(255, 255, 255, 0.08);
     --ls-fg: #fff;

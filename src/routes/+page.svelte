@@ -487,6 +487,20 @@
     color: #fff;
   }
 
+  .audio-fab.theme-liquid {
+    background: rgba(12, 14, 28, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: #fff;
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+  .audio-fab.theme-liquid.on {
+    background: rgba(122, 162, 255, 0.38);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+
   /* Parallax: warm cream pill with an olive accent when active — matches the
      editorial light palette of the era (no neon, no heavy blur). */
   .audio-fab.theme-parallax {

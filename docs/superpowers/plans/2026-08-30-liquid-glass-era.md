@@ -1242,3 +1242,54 @@ Ripercorre uno a uno i criteri di accettazione della spec §8.
   git add -A ':!.serena' ':!aura_bin'
   git commit -m "fix(liquid): rifiniture dalla verifica finale"
   ```
+
+---
+
+## Esito dell'esecuzione — 2026-08-31
+
+**Piano eseguito.** 19 commit su `feat/liquid-glass-era`, da `1fba111` a `9c4fddb`.
+`npm run check` → 0 errori, 6 warning (tutti preesistenti). `npx vitest run` → 22 test verdi.
+
+Il piano è stato attuato con **tre punti in cui la spec si contraddiceva** e la scelta è stata
+arbitrata a favore della spec contro il testo del piano:
+
+1. **La pillola indicatore animava `width`** (snippet del Task 6 Step 2), contro il vincolo §3.3
+   «si animano solo `transform` e `opacity`». Riscritta con larghezza di riferimento fissa +
+   `scaleX()`.
+2. **`.glass-surface::after` era un pannello pieno** con `backdrop-filter` (Task 7 Step 2), che
+   sfocava il contenuto di ogni superficie, testo compreso. La spec §5.4 lo descrive come
+   «anello interno»: mascherato ad anello con la tecnica di `::before`.
+3. **La struttura del §4.1 rendeva la lente invisibile.** Barre come fratelli statici con
+   un'unica regione scrollabile sotto → nulla passa mai dietro il vetro → la lente vedeva solo
+   il wallpaper, cioè esattamente il «fondo uniforme» che §3.1 dichiara fatale. Deciso a favore
+   di §2/§3.1: il contenuto scorre **dietro** la testata (`position: absolute`, mai `fixed`,
+   così il bug iOS Safari citato da §4.1 resta evitato). Sovrapposizione misurata: 130px.
+
+**Aggiunto al piano in corsa:** un task di **rifinitura estetica** (misura di riga, scala
+tipografica, tab bar a capsula, composizione), su richiesta dell'utente dopo aver visto
+l'anteprima. Il vincolo «nessun webfont» è stato mantenuto: la gerarchia è ottenuta con corpi,
+pesi e tracking sullo stack di sistema.
+
+**Gate umano del Task 11 rispettato:** il confronto prima/dopo di `Glass` (chiaro e scuro, stesso
+metodo di cattura del baseline) è stato sottoposto all'utente, che ha approvato prima del commit.
+
+### Resta aperto
+
+- **Misure di contrasto WCAG sui tre wallpaper**: mai completate. Richieste tre volte, ogni
+  volta l'agente si è impantanato nella verifica col browser prima di arrivarci.
+- **Verifica a 375px / 720px e con `prefers-reduced-motion`** sul risultato finale: fatta sui
+  task intermedi, non ri-fatta dopo la rifinitura.
+- **Revisione finale su tutto il branch**: non eseguita. Le revisioni per singolo task sono state
+  tagliate a metà lavoro per costo; i task 9-13 non sono passati da un revisore.
+- **Costo di ridisegno dello scroll**: con il contenuto che scorre dietro la testata, il backdrop
+  cambia a ogni frame. Mitigato dal fatto che l'elemento lensato è uno solo e che su WebKit la
+  lente è spenta, ma non misurato su hardware lento.
+
+### Nota di metodo per la prossima era
+
+Gli agenti hanno scritto codice corretto e si sono impantanati **sistematicamente** nella verifica
+col browser: quattro su quattro, tre terminati a mano. Le verifiche basate su valori interrogati
+(`getComputedStyle`, `elementFromPoint`, conteggio warning) sono risultate accurate; quelle
+dichiarate «a occhio» su difetti sottili — contrasto, sfocatura — sono risultate **sbagliate tre
+volte su tre**. Separare i due mestieri: chi scrive committa, la verifica visiva è un passaggio
+dedicato e unico.

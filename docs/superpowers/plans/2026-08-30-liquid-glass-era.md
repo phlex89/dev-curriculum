@@ -1293,3 +1293,47 @@ col browser: quattro su quattro, tre terminati a mano. Le verifiche basate su va
 dichiarate «a occhio» su difetti sottili — contrasto, sfocatura — sono risultate **sbagliate tre
 volte su tre**. Separare i due mestieri: chi scrive committa, la verifica visiva è un passaggio
 dedicato e unico.
+
+---
+
+## Revisione finale — 2026-08-31
+
+Eseguita la **revisione finale su tutto il branch**, che era rimasta aperta, con verifica in
+browser (Chromium, 1440×900, 1100×620, 375×812 emulato, tre wallpaper, IT/EN).
+
+**Chiusi i punti che restavano aperti:**
+
+- **Contrasto WCAG sui tre wallpaper**: misurato compositando il colore del testo sul pixel
+  di fondo reale catturato a schermo. **Deep bocciava**: il suo blob acqua stava a `55% 10%`,
+  esattamente dietro la testata, e portava `.what` a 1.93:1 e le tab inattive a 2.02:1. Blob
+  spostato al centro, velo della testata invertito da schiarente a **scurente**, opacità dei
+  testi tenui alzate. Ora tutto ≥ 4.5:1 su tutti e tre.
+- **375px**: il nome era **coperto** dal selettore lingua (15px di sovrapposizione) e da quello
+  audio. La capsula ora scende a `top: 62px`, sotto la riga di chrome.
+- **`prefers-reduced-motion`**: verificato per lettura del codice (l'emulazione della media
+  feature non è disponibile via CDP), non a schermo.
+
+**Difetti trovati e corretti oltre a quelli previsti:**
+
+1. La **tredicesima era** ha spinto la Timeline estesa sotto il vote-widget a destra (45px) e
+   sull'audio FAB a sinistra: `FIT_GUTTER` era 16px, non teneva conto della chrome negli angoli.
+   Ora 112px, con `gap` degli stop ridotto 25→12px perché 13 ere continuino a stare a 1440.
+2. La misura del fit si **impantanava**: i webfont che arrivavano a metà misura gonfiavano la
+   barra (~52px, il fallback delle emoji che si sposta), e una volta passata allo stepper la
+   `nav` si smontava — nessuno la rimisurava più. Aggiunta la ri-valutazione su `document.fonts.ready`.
+3. Le **pillole della Timeline** in liquid lasciavano passare il tracciato: la riga da 2px
+   attraversava l'etichetta attiva come un barrato. Ora opache.
+4. `EraVote` era l'**unico pezzo di chrome senza skin `liquid`** (pillola bianca Space Grotesk).
+5. La **mappa della lente** si rigenerava 2 volte per gesto di scroll (encode PNG sincrono):
+   ora cache per geometria + debounce.
+6. `id="liquid-lens"` **globale** con due istanze incrociate per ~460ms al cambio lingua.
+7. Lo **scroll non si azzerava al cambio tab** (a 1100×620 si atterrava a metà pannello).
+8. Il **collasso si riapriva** dopo 600ms di fermo, ricoprendo il testo che si stava leggendo:
+   ora resta compatto e si riespande a focus / puntatore / tocco sulla pillola.
+9. La testata **mangiava la rotellina**: `pointer-events: none` sul vetro, `auto` sui controlli.
+10. Il **tooltip della Timeline** (chrome condivisa, non di liquid) sforava il viewport a 375px
+    e finiva sotto il vote-widget.
+11. Fascia opaca dura di 14px in cima → ora dissolvenza mascherata; `--g-sheen` morto rimosso
+    da `Glass`.
+
+`npm run check` → 0 errori, 6 warning preesistenti. `npx vitest run` → 22 test verdi.

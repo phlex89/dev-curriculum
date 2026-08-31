@@ -3,7 +3,7 @@
 Questo documento descrive l'architettura, le tecnologie e le caratteristiche del progetto "Time-Machine Resume", un curriculum web interattivo sviluppato in SvelteKit che permette di navigare attraverso diverse "ere" dell'informatica, cambiando radicalmente l'interfaccia grafica.
 
 ## Concetto Centrale
-Il progetto si basa sull'idea di un curriculum vitae dinamico. L'utente (es. un recruiter) può visualizzare le stesse informazioni (estratte dal vero CV di Stefano Tedeschi) attraverso undici design completamente diversi, ognuno rappresentativo di un'epoca specifica della UI/UX, navigabili tramite una **Timeline** globale persistente.
+Il progetto si basa sull'idea di un curriculum vitae dinamico. L'utente (es. un recruiter) può visualizzare le stesse informazioni (estratte dal vero CV di Stefano Tedeschi) attraverso tredici design completamente diversi, ognuno rappresentativo di un'epoca specifica della UI/UX, navigabili tramite una **Timeline** globale persistente.
 
 ## Struttura e Architettura
 L'applicazione è sviluppata utilizzando **SvelteKit 5** (Runes) e **TypeScript**. L'architettura prevede una netta separazione tra dati e presentazione:
@@ -42,7 +42,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ---
 
-## Le Dodici "Ere" Implementate
+## Le Tredici "Ere" Implementate
 
 ### 1. Terminale Unix (Anni '80-'90)
 **Componente:** `src/lib/themes/Terminal.svelte`
@@ -159,9 +159,17 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **Tipografia**: serif display **Fraunces** self-hostato per gli statement + **Inter** per il corpo. Inoltre: **cursore custom** (dot + ring con lag), barra di **progresso** scroll, **indice a puntini** cliccabili (scroll fluido), **auto-scroll "▶ Play"** opzionale (pausabile al primo input, nascosto sotto reduced-motion).
 -   **Doppio binario / `prefers-reduced-motion`** (il difetto d'epoca — motion-sickness — risolto): niente Lenis/parallax/auto-scroll/cursore/marquee → **scroll verticale statico** elegante, reveal a sola opacità, marquee sostituito da una **lista skill accessibile**, sezioni *pinned* sbloccate. Contenuti **sempre integri e raggiungibili**. Cue audio (`case 'parallax'`): **swell aereo/pad ambient** ascendente (≠ campanella del Glass, ≠ drone del 3D).
 
+### 13. Liquid Glass (2025)
+**Componente:** `src/lib/themes/Liquid.svelte` (+ modulo puro `src/lib/themes/liquid/lens.ts`)
+-   La grammatica di navigazione delle app 2025 (iOS 26 "Liquid Glass"): **Glass è un documento, Liquid è un'app**. In `ERA_ORDER` è **tra `glass` e `threed`**. Hash `#liquid`, label d'anno **"2025"**, icona 💧.
+-   **App shell** a `100dvh`: **capsula flottante centrata** (identità + tab bar con **pillola indicatore a molla**) sopra **un'unica regione scrollabile** con **quattro schermate a tab** (Profilo / Percorso / Competenze / Altro) che coprono tutti i contenuti dei sette pannelli di `Glass`. Allo scroll la capsula collassa nella sola pillola della tab attiva e resta compatta finché si è lontani dalla cima.
+-   **La lente**: filtro SVG `feImage` + tre `feDisplacementMap` a `scale` diversa per R/G/B (iridescenza sul bordo), con *displacement map* generata a runtime su `<canvas>`. Vive solo sulla testata, e **solo su Chromium** (`navigator.vendor`); ogni altro motore va a un **fallback curato** in CSS.
+-   **Ambiente**: tre wallpaper in CSS puro (Aurora / Sunset / Deep), ciclati da un pulsante e persistiti in `localStorage`; ognuno ri-tinge la `--l-accent`. Tipografia **di sistema**, nessun webfont. Cue audio (`case 'liquid'`): una **goccia**.
+-   **`prefers-reduced-motion`**: tab pienamente funzionanti, niente collasso né molla né transizioni tra schermate; la lente resta (è statica).
+
 ## Il Componente Timeline
 **Componente:** `src/lib/components/Timeline.svelte`
-La linea del tempo posizionata in basso (a forma di "pillola di vetro" espandibile) è l'elemento che unisce l'intero progetto. È progettato per essere reattivo e per iniettare CSS globale (`:global`) in base al tema selezionato, così da mimetizzarsi e rispettare i canoni visivi dell'era attiva: diventa un blocco nero e verde monospace nel Terminale, una dialog-box NES indaco con bordo bianco e nodo attivo rosso (font **Press Start 2P**) nella Pixel Art, una pillola **grigio-argento `#c0c0c0` con bevel `outset` (look Netscape/Win95)** e nodo attivo blu navy in Times nel Web 1.0, una barra opaca outset in Windows XP, una pillola in **metallo spazzolato** con nodo attivo "gel" blu nello Skeuomorfismo, una **superficie bianca flat sollevata da ombre di elevazione** con nodo attivo indaco, font **Roboto** e fill indaco→accent nel Material Design, un blocco squadrato a bordo nero spesso con nodo attivo acid-yellow e font **Space Mono** nel Brutalismo, una pillola con font **Space Grotesk** in Modern Flat, una **pillola frosted lattiginosa** (vetro `backdrop-filter: blur+saturate`, bordo-luce, nodo attivo viola, font **Inter**) nel Glassmorphism, una **pillola crema editoriale** con nodo attivo **olive** e font Inter nel Parallax, e una versione neon con font **Orbitron** nel Futuro.
+La linea del tempo posizionata in basso (a forma di "pillola di vetro" espandibile) è l'elemento che unisce l'intero progetto. È progettato per essere reattivo e per iniettare CSS globale (`:global`) in base al tema selezionato, così da mimetizzarsi e rispettare i canoni visivi dell'era attiva: diventa un blocco nero e verde monospace nel Terminale, una dialog-box NES indaco con bordo bianco e nodo attivo rosso (font **Press Start 2P**) nella Pixel Art, una pillola **grigio-argento `#c0c0c0` con bevel `outset` (look Netscape/Win95)** e nodo attivo blu navy in Times nel Web 1.0, una barra opaca outset in Windows XP, una pillola in **metallo spazzolato** con nodo attivo "gel" blu nello Skeuomorfismo, una **superficie bianca flat sollevata da ombre di elevazione** con nodo attivo indaco, font **Roboto** e fill indaco→accent nel Material Design, un blocco squadrato a bordo nero spesso con nodo attivo acid-yellow e font **Space Mono** nel Brutalismo, una pillola con font **Space Grotesk** in Modern Flat, una **pillola frosted lattiginosa** (vetro `backdrop-filter: blur+saturate`, bordo-luce, nodo attivo viola, font **Inter**) nel Glassmorphism, una **pillola crema editoriale** con nodo attivo **olive** e font Inter nel Parallax, una **pillola di vetro scuro** con nodo attivo blu e **pillole opache** (le translucide lasciavano passare il tracciato sotto l'etichetta) in Liquid Glass, e una versione neon con font **Orbitron** nel Futuro.
 
 ### Sistema di voto delle ere
 I visitatori possono mettere ♥ a ogni era (multi-like, revocabile). Widget flottante

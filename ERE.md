@@ -906,11 +906,21 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 > — Profilo, Percorso, Competenze, Altro — che coprono tutti i contenuti che `Glass`
 > mostra nei suoi sette pannelli (nessun testo duplicato, tutto da `cv-data.ts`). Pattern
 > ARIA `tablist`/`tab`/`tabpanel` completo: `aria-selected`, `aria-controls`, frecce
-> ←/→ con wrap tra le tab, `Home`/`End` agli estremi. Allo scroll dentro una schermata le
-> due barre collassano in **un'unica capsula compatta** (icona + etichetta della tab
-> attiva); alla fine dello scroll si riespandono. **La testata è sempre
-> `position: absolute`, mai `fixed`** — elimina per costruzione il jank noto di iOS
-> Safari quando `backdrop-filter` sta su un elemento `fixed` durante lo scroll.
+> ←/→ con wrap tra le tab, `Home`/`End` agli estremi; il cambio di tab riporta la
+> regione scrollabile in cima. La testata è una **capsula flottante centrata**
+> (`min(468px, 100% - 24px)`), non una fascia a tutta larghezza: lascia liberi gli
+> angoli dello schermo per la chrome del sito e dà alla lente un bordo su entrambi i
+> lati. Allo scroll le due barre collassano in **un'unica capsula compatta** (icona +
+> etichetta della tab attiva) e **restano compatte finché si è lontani dalla cima**: il
+> vetro grande scompare, resta solo la pillola. Si riespande al focus da tastiera
+> (`:focus-within`), al passaggio del puntatore sulla pillola compatta o al tocco su di
+> essa, e si richiude al primo nuovo scroll. La testata è **`pointer-events: none`** —
+> solo i controlli prendono il puntatore, così la rotellina sopra il vetro continua a
+> scorrere la pagina. **È sempre `position: absolute`, mai `fixed`** — elimina per
+> costruzione il jank noto di iOS Safari quando `backdrop-filter` sta su un elemento
+> `fixed` durante lo scroll. Sotto i 720px la capsula scende a `top: 62px`, sotto la
+> riga di chrome (wallpaper a sinistra, lingua + audio a destra), invece di dividersi
+> con lei la stessa riga.
 >
 > **Il contenuto scorre dietro la testata** — scelta deliberata (diverge dalla spec
 > originaria, che prevedeva barre come fratelli statici e nulla dietro): è ciò che dà
@@ -931,7 +941,10 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 > nessun'altra era del sito possiede. La *displacement map* è **generata a runtime su
 > `<canvas>`** dal modulo puro `liquid/lens.ts` (coperto da test `vitest`) e
 > **rigenerata a ogni cambio di geometria** della barra via `ResizeObserver`, perché la
-> barra collassa durante lo scroll. La lente vive **su un solo elemento**, la testata;
+> barra collassa durante lo scroll — con **cache per geometria e debounce**, così le due
+> forme (estesa e compatta) si pagano una volta sola e non a ogni gesto di scroll.
+> L'`id` del filtro è **per istanza**: il cambio lingua incrocia due `Liquid` per ~460ms
+> e un id condiviso farebbe puntare la testata entrante al filtro di quella uscente. La lente vive **su un solo elemento**, la testata;
 > i pannelli di contenuto (hero, blocchi) usano un `backdrop-filter: blur() saturate()`
 > più semplice — pur condividendo con la testata il **bordo a conic-gradient** iridescente
 > e l'**anello di dispersione ciano/magenta** che compongono l'identità visiva "vetro" di
@@ -970,6 +983,17 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 > niente deformazione della pillola né molla, niente transizione animata tra schermate.
 > La lente resta attiva perché è un effetto statico, non movimento. Contenuti sempre
 > integri e raggiungibili.
+>
+> **Contrasto, misurato.** Il testo della testata vive sopra il wallpaper, quindi il velo
+> del vetro **scurisce** (`rgba(14, 18, 38, 0.42)`) invece di schiarire: con un velo
+> chiaro il bianco moriva sulle zone luminose. Misure WCAG (colore del testo compositato
+> sul pixel di fondo reale, catturato a schermo) sui **tre** wallpaper: identità
+> 16.3–17.8:1, ruolo 10.8–11.6:1, tab inattive 8.9–9.9:1, pillola della tab attiva
+> 6.4–6.8:1, corpo testo 6.1–13.3:1 — tutto sopra 4.5:1. Il blob acqua di **Deep** è
+> stato spostato dal centro-alto (dove stava esattamente dietro la testata, portando le
+> etichette a ~2:1) verso il centro. Anche le pillole della Timeline sono **opache** in
+> questa era: translucide lasciavano passare il tracciato, e una riga da 2px attraverso
+> l'etichetta attiva si leggeva come testo barrato.
 
 **Contesto.** La grammatica di navigazione delle app mobile 2025 (iOS 26 "Liquid Glass"):
 barre flottanti che si dimenticano durante lo scroll, collassano, si ricompongono — e un

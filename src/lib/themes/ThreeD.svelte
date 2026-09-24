@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { quintOut } from 'svelte/easing';
   import type * as THREE_NS from 'three';
@@ -16,8 +17,6 @@
   let mounted = $state(false);
   let sceneReady = $state(false); // gates the canvas fade-in once the first frame is drawn
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Staggered, "spatial" card entrance: a slow, graceful rise + soft de-blur + fade.
   function spaceIn(_node: HTMLElement, { delay = 0, duration = 1150 } = {}) {

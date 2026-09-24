@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { buildDisplacementMap, supportsBackdropLens } from './liquid/lens';
@@ -28,10 +29,7 @@
   let active = $state<TabId>('profile');
   const activeTab = $derived(TABS.find((tab) => tab.id === active) ?? TABS[0]);
 
-  const reduced =
-    typeof window !== 'undefined' &&
-    !!window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced = prefersReduced();
 
   let tabButtons = $state<HTMLButtonElement[]>([]);
 

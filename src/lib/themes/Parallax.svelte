@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import type LenisType from 'lenis';
   import { getCvData, getUi } from '$lib/i18n';
@@ -62,8 +63,6 @@
   // Lenis lives at component scope so toggleAuto()/goTo() can reach it.
   let lenis: LenisType | null = null;
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function toggleAuto() {
     if (!canAuto || !lenis || !scroller) return;

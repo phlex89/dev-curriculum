@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { reveal } from '$lib/actions/interactive';
@@ -35,8 +36,6 @@
     }
   };
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   onMount(() => {
     if (prefersReduced()) return; // no blob parallax when motion is reduced

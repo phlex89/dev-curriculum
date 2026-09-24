@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount, onDestroy } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { teletextBeep } from '$lib/audio';
@@ -66,8 +67,6 @@
   const found = $derived(validPages.has(currentPage));
   const headerNum = $derived(buffer ? (buffer + '___').slice(0, 3) : String(currentPage));
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ── Live broadcast clock (Televideo headers always carry one) ───────────────
   const GIORNI = t.days;

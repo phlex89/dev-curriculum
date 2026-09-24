@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount, tick } from 'svelte';
   import { getCvData } from '$lib/i18n';
   import { trackEvent, trackTag } from '$lib/analytics';
@@ -33,8 +34,6 @@
   const COMMANDS = ['help', 'man', 'clear', 'sudo', 'matrix', 'neofetch', 'cvfetch', 'ls', 'show', 'cat', 'cv', 'download'];
   const FILES = ['about.txt', 'contact.txt', 'skills.txt', 'languages.txt', 'talks.txt'];
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
   onMount(() => {

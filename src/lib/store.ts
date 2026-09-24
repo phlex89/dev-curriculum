@@ -17,7 +17,7 @@ const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'mater
  *  right before the 3D future. */
 export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'parallax', 'glass', 'brutalism', 'bento', 'liquid', 'threed'];
 
-const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
+export const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 
 const persist = (theme: Theme) => {
   if (typeof localStorage !== 'undefined') {

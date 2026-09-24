@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { web1Modem } from '$lib/audio';
@@ -69,9 +70,6 @@
   }
 
   let scroller: HTMLDivElement;
-  function prefersReduced() {
-    return typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }
   function scrollToSection(e: Event, id: string) {
     e.preventDefault(); // don't pollute the URL hash (it carries the era deep-link)
     const el = scroller?.querySelector('#' + id);

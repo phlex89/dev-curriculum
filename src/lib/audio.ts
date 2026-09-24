@@ -241,6 +241,8 @@ export function playEra(theme: Theme) {
       tone(c, master, { freq: 880, type: 'triangle', start: 0.18, dur: 0.5, gain: 0.04, slideTo: 1320 });
       break;
     }
+    default:
+      theme satisfies never;
   }
 }
 

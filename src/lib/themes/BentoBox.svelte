@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { tilt, reveal } from '$lib/actions/interactive';
@@ -25,8 +26,6 @@
     }
   });
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function applyDarkMode() {
     darkMode = !darkMode;

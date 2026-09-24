@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
+  import { currentTheme, ERA_ORDER, isTheme, type Theme } from '$lib/store';
   import { lang } from '$lib/i18n';
   import { ui } from '$lib/translations';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
@@ -15,8 +16,6 @@
   const t = $derived(ui[$lang].shared);
   const eraLabels = $derived(t.eraTitles);
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Gate the first paint: until the real era is resolved from the URL/localStorage
   // we render nothing, so the visitor never sees the default (bento) flash and the
@@ -140,8 +139,8 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'liquid', 'threed'] as const).includes(t as Theme)) {
-        currentTheme.setFromHash(t as Theme);
+      if (isTheme(t)) {
+        currentTheme.setFromHash(t);
       }
     };
     window.addEventListener('hashchange', onHash);

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   // ──────────────────────────────────────────────────────────────────────────
   // Pixel Art / 8-bit Console Gaming era (≈1988).
   //
@@ -548,8 +549,7 @@
   }
 
   onMount(() => {
-    reduced =
-      typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    reduced = prefersReduced();
 
     // Mirror the CSS query that reveals the touch controls (.dpad / .ab-pad are
     // hidden when the pointer is fine + hover-capable) so we can require manual

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { reveal } from '$lib/actions/interactive';
@@ -13,10 +14,6 @@
   // elevation shadows, a sliding tab ink-bar, the touch ripple, and an accent FAB.
   // Roboto is self-hosted (latin subset) in fonts.css — the only Material webfont.
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' &&
-    !!window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /** The Material touch ripple — a circle that expands from the pointer and fades.
    *  Skipped (but the element stays fully clickable) under reduced-motion. */

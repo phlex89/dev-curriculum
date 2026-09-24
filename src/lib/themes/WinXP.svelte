@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount, tick } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { draggable } from '$lib/actions/draggable';
@@ -35,8 +36,6 @@
     { id: 'error', title: t.errorTitle, content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 330, y: 176, icon: '' }
   ]);
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Window open / close / minimize / restore animation (scale + fade toward the taskbar)
   function windowPop(_node: HTMLElement, { duration = 190 } = {}) {

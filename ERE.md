@@ -49,7 +49,7 @@
 | 9 | Glassmorphism | 2020 (il presente luminoso) | ✅ Implementato | `Glass.svelte` |
 | 10 | WebGL immersivo (Awwwards) | 2019 | ✅ Implementato | `ThreeD.svelte` |
 | 11 | AI / Conversazionale | 2030+ (oltre il 3D) | ⬜ Proposta | — (da creare) |
-| 12 | Y2K / Chrome & Plastica translucida | 1999–2003 | ⬜ Proposta (valutata) | — (da creare) |
+| 12 | Y2K / Chrome & Plastica translucida | 2000 | ✅ Implementata | `Y2K.svelte` (`'y2k'`, `#y2k`) |
 | 13 | Teletext / Televideo (Mode 7) | anni '70 – 2000 | ✅ Implementato | `Teletext.svelte` |
 | 14 | Neumorphism / Soft UI | 2020 | ⬜ Proposta (valutata) | — (da creare) |
 | 15 | Parallax / Immersive Scroll | ~2018–oggi (apice premium) | ✅ Implementata | `Parallax.svelte` (`'parallax'`, `#parallax`) |
@@ -61,9 +61,9 @@
 > low-poly, Amiga, Mac Classic) restano in **"Idee oltre la lista"** come spunti/easter-egg.
 
 > L'attuale `ERA_ORDER` (rivisto a set 2026, vedi `ANALISI-STILI.md`) è
-> `['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'parallax', 'threed', 'glass', 'brutalism', 'bento', 'liquid']`.
+> `['terminal', 'teletext', 'pixel', 'web1', 'y2k', 'winxp', 'skeuo', 'material', 'parallax', 'threed', 'glass', 'brutalism', 'bento', 'liquid']`.
 > Terminale, Televideo e Pixel Art sono lineage parallele degli anni '80; il **Web 1.0** (1996)
-> precede il desktop **XP** (2001); **Skeuo** (2010) e **Material** (2014) raccontano la "grande
+> e il web Flash **Y2K** (2000) precedono il desktop **XP** (2001); **Skeuo** (2010) e **Material** (2014) raccontano la "grande
 > appiattita"; il **Parallax** (2018) apre il craft web premium; il **WebGL** (2019, prima "Future 3D · 2026") racconta i portfolio immersivi da Awwwards; seguono **Glass** (2020),
 > **Neubrutalism** (2021, prima etichettato per errore "Brutalism · 2017"), **Bento** (2022,
 > prima "Modern Flat · 2015") e **Liquid** (2025), che oggi chiude la timeline. Il nuovo finale previsto è l'**era AI**
@@ -629,8 +629,15 @@ hash `#ai` · `ERA_ORDER` **in coda** dopo `liquid` · registrare in `Theme`/`TH
 
 ---
 
-## 12. Y2K / Chrome & Plastica translucida — ⬜ Proposta (valutata)
-**1999–2003 (la svolta del millennio)** · componente da creare (es. `src/lib/themes/Y2K.svelte`)
+## 12. Y2K / Chrome & Plastica translucida — ✅ Implementata (set 2026)
+**2000 (la svolta del millennio)** · `src/lib/themes/Y2K.svelte` · chiave `'y2k'` · hash `#y2k` · label "Y2K · 2000", icona 💿
+
+> **Implementazione (set 2026).** Intro Flash con logo cromato, `LOADING… %`, `ENTER »` e
+> `skip intro`; console 960×600 in cromo e plastica Bondi con nav a pulsanti gel (tablist), schermo
+> CRT con transizioni da Flash, orologio "Y2K COMPLIANT ✓" (easter egg 19100), contatore visite,
+> ticker e "best viewed at 800×600". Michroma self-hostata (~9.5KB), corpo Verdana/Tahoma,
+> etichette Silkscreen. Prima era a skinnare la Timeline con i token `--tl-*`. Scheda di progetto
+> originale qui sotto.
 
 > **Stato.** Valutata (giu 2026) come **candidato headliner**: il più forte tra i nuovi.
 > Colma un buco narrativo reale — il web *Flash/splash* e l'ottimismo "tech" da millennium

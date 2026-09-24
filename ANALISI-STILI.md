@@ -232,7 +232,12 @@ contemporanei aiuta davvero. La seconda resta di riserva.
   cinque capitoli guidati dallo scroll, carriera come curva 3D con etichette DOM proiettate, fallback
   per reduced-motion, senza WebGL e mobile. Orbitron dismesso. La timeline oggi chiude con `liquid`.
 - ✅ **Refactor 1–3** della §10 (`isTheme`, `switch` audio esaustivo, `src/lib/motion.ts`).
-- ⬜ **Aperto.** Ondata 3 (Y2K, poi AI come finale).
+- ✅ **Ondata 3 (parziale).** Era **Y2K · 2000** (`Y2K.svelte`) tra `web1` e `winxp`.
+- ✅ **Refactor 4–7.** Focus al cambio era; token `--tl-*` della Timeline (usati da Y2K, fallback
+  identici per le altre 13 ere, gap tra le tappe 12→8px per far stare 14 tappe a 1440);
+  `winxp/window-manager.ts` e `pixel/{grid,adjacency,konami}.ts` estratti con 48 test.
+- ⬜ **Aperto.** Era AI (rinviata su richiesta), Soft UI facoltativa. Pixel Art e Neubrutalism
+  restano sul selettore compatto a 1440 (etichetta attiva più lunga), come prima.
 
 ## 10. Refactor proposti
 

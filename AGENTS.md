@@ -136,19 +136,22 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza → Profilo → Esperienza → Competenze/Lingue → Formazione/Conferenze), arioso, scrollabile; mobile a colonna singola. Contenuti **tutti da `cv-data.ts`**, ingresso con `use:reveal` + tilt con `use:tilt`.
 -   Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso, variable self-hostato `~34KB`) — la voce SF/Big Sur, opposta all'Orbitron sci-fi del 3D. Hash `#glass`, label d'anno **"2020"**, icona 🧊, cue audio `case 'glass'` (**campanella di vetro**: arpeggio triangle E5·B5·E6 + halo sine acuto). Tutto gated da `prefers-reduced-motion` (drift dei blob, parallax e sheen disattivati; vetro e contenuti restano).
 
-### 11. Il Futuro - 3D Immersivo (2026+)
-**Componente:** `src/lib/themes/ThreeD.svelte`
--   Tema sperimentale volto a mostrare skill avanzate e padronanza WebGL.
--   Scena **Three.js** elaborata a piena pagina (canvas `fixed`, copre tutto a qualsiasi dimensione): **nebulosa di particelle** a 3 strati con dot luminosi rotondi (texture radiale generata su canvas, additive blending), un **torus knot** wireframe centrale rotante e pulsante, **anelli di energia** orbitanti e solidi (icosaedro/ottaedro) che ruotano e oscillano. Parallasse della camera legata al movimento del mouse.
--   **Lazy-load di Three.js**: la libreria (~150KB) e i suoi add-on di post-processing sono importati dinamicamente (`await import('three')`) solo all'ingresso in questa era, così chi resta su Bento/Terminale non li scarica. Il canvas fa un fade-in elegante da nero al primo frame renderizzato.
--   **Bloom reale (post-processing)**: pipeline `EffectComposer` + `UnrealBloomPass` per un glow vero su dot e torus knot. È *gated*: attivo solo su viewport ampi e con motion consentito, con fallback al rendering diretto.
--   **Scena reattiva**: l'hover sulle card inietta "energia" nella scena (decade nel tempo) che accelera il drift, intensifica il bloom e scalda l'hue del torus knot → sensazione di sistema vivo.
--   **Performance**: il loop `requestAnimationFrame` viene messo in pausa quando il tab è nascosto (`visibilitychange`); cleanup completo (dispose di renderer/composer) all'uscita.
--   Tipografia futuristica: **Orbitron** per i titoli display, **Space Grotesk** per il resto.
--   Veste grafica in *Glassmorphism scuro*: blocchi semitrasparenti (`backdrop-filter: blur`) appena percettibili sopra la scena WebGL, luci neon su background profondissimo, con vignetta per la leggibilità. È la veste neon/scura — distinta dall'era Glassmorphism autonoma (n.10), chiara e senza WebGL.
--   Effetto "Tilt" 3D contenuto: le carte, grazie alla matematica basata sulla posizione del cursore (`mousemove`), ruotano leggermente orientandosi verso il mouse.
+### 11. WebGL immersivo (2019)
+**Componente:** `src/lib/themes/ThreeD.svelte` + `src/lib/themes/threed/shaders.ts`
+-   I portfolio WebGL da Awwwards del 2016–2021 (Active Theory, Lusion, Bruno Simon). In `ERA_ORDER` **tra `parallax` e `glass`**, label "WebGL · 2019", icona 🌀. Fino a set 2026 era "Future 3D · 2026".
+-   **Preloader** con contatore `000→100` legato al caricamento reale (import di three + font), poi wipe.
+-   **Blob** `ShaderMaterial`: displacement a simplex noise nel vertex, fresnel + palette coseno iridescente nel fragment; il cursore lo deforma. Polvere su tre strati a parallasse diversa, grana filmica CSS. **Nessun post-processing.**
+-   **Cinque capitoli guidati dallo scroll** (Intro, About, Path, Skills, Contact) con micro-UI mono (`01 / 05`). Nel Path la carriera è una curva 3D percorsa dalla camera, con **etichette DOM proiettate** sui nodi (testo nitido e accessibile); l'hover sulle skill fa reagire lo shader.
+-   **Doppio binario**: reduced-motion (un solo frame, nessun rAF), senza WebGL (blob CSS) e mobile (<900px) → lista statica completa.
+-   Tipografia **Space Grotesk** + **JetBrains Mono** (self-hostati). Three.js **lazy** (`import type` + `await import`), rAF in pausa a tab nascosto, cleanup completo anche se smontato prima del caricamento.
 
----
+### 11b. Y2K / Chrome & plastica translucida (2000)
+**Componente:** `src/lib/themes/Y2K.svelte`
+-   Il web Flash della svolta del millennio. In `ERA_ORDER` **tra `web1` e `winxp`**, hash `#y2k`, label "Y2K · 2000", icona 💿.
+-   **Intro Flash** (logo cromato che si compone, `LOADING… %`, `ENTER »`, `skip intro` sempre attivo; saltata con reduced-motion) su cielo digitale con griglia prospettica, lens flare e sfere lucide.
+-   **Console 960×600** in cromo e plastica Bondi rigata: orologio "Y2K COMPLIANT ✓" (easter egg 19100), contatore visite, SOUND ON/OFF collegato all'audio globale, nav a pulsanti gel (vera tablist con frecce/Home/End), schermo CRT con transizioni zoom/wipe/scan, ticker, "best viewed at 800×600". Mobile: console verticale a tutta larghezza.
+-   Tipografia **Michroma** (OFL, self-hostata ~9.5KB) per il cromo, **Verdana/Tahoma** di sistema per il corpo, **Silkscreen** per le etichette pixel.
+-   **Prima era a usare i token della Timeline** (`--tl-*`, un solo blocco `:global(:root) .theme-y2k`) invece dei blocchi per elemento.
 
 ### 12. Parallax / Immersive Scroll (≈2018)
 **Componente:** `src/lib/themes/Parallax.svelte`

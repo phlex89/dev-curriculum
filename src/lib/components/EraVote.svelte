@@ -423,6 +423,19 @@
     --vote-bar: rgba(244, 243, 239, 0.14);
   }
 
+  .vote-widget.theme-y2k {
+    font-family: Verdana, Tahoma, sans-serif;
+    --vote-bg: linear-gradient(180deg, #ffffff 0%, #d9e2ea 45%, #c3ced8 55%, #f2f6f9 100%);
+    --vote-border: 1px solid #5f6f7f;
+    --vote-color: #0b2a44;
+    --vote-accent: #b3124e;
+    --vote-radius: 30px;
+    --vote-shadow: inset 0 1px 0 #fff, 0 8px 20px rgba(8, 50, 90, 0.3);
+    --vote-blur: none;
+    --vote-bar: rgba(6, 36, 61, 0.14);
+  }
+  .vote-widget.theme-y2k .rank-fill { background: linear-gradient(90deg, #0d74ad, #3aa9d6); }
+
   @media (max-width: 720px) {
     .vote-widget {
       bottom: 96px;

@@ -109,6 +109,14 @@
     trackEra(dt);
   });
 
+  function reclaimFocus(node: HTMLElement) {
+    const id = setTimeout(() => {
+      const a = document.activeElement;
+      if (!a || a === document.body) node.focus({ preventScroll: true });
+    }, 480);
+    return { destroy: () => clearTimeout(id) };
+  }
+
   function onAudioToggle() {
     const on = toggleAudio();
     if (on) {
@@ -173,7 +181,15 @@
     <!-- Keyed on era AND language: switching language remounts the era, which
          re-reads getCvData()/getUi() at init — no per-theme reactivity needed. -->
     {#key `${displayedTheme}:${$lang}`}
-      <div class="theme-layer" in:fade={{ duration: 600, delay: 260 }} out:fade={{ duration: 460 }}>
+      <div
+        class="theme-layer"
+        role="region"
+        aria-label={eraLabels[displayedTheme] ?? displayedTheme}
+        tabindex="-1"
+        use:reclaimFocus
+        in:fade={{ duration: 600, delay: 260 }}
+        out:fade={{ duration: 460 }}
+      >
         {#await themeLoaders[displayedTheme]() then mod}
           {@const ThemeComponent = mod.default}
           <ThemeComponent />
@@ -241,6 +257,9 @@
   }
 
   /* Each theme fades in/out over the other for a smooth cross-dissolve */
+  .theme-layer:focus {
+    outline: none;
+  }
   .theme-layer {
     position: absolute;
     inset: 0;
@@ -533,6 +552,24 @@
   .audio-fab.theme-pixel:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 #000; }
   .audio-fab.theme-pixel.on { background: #d82800; }
   .audio-fab.theme-pixel .audio-icon { font-size: 0.95rem; }
+
+  .audio-fab.theme-y2k {
+    background: linear-gradient(180deg, #ffffff 0%, #d9e2ea 45%, #c3ced8 55%, #f2f6f9 100%);
+    border: 1px solid #5f6f7f;
+    color: #0b2a44;
+    box-shadow: inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0, 0, 0, 0.18), 0 8px 20px rgba(8, 50, 90, 0.3);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .audio-fab.theme-y2k.on {
+    background: linear-gradient(180deg, #6fb3ec 0%, #1560b3 20%, #0a4c96 52%, #1560b3 100%);
+    border-color: #07396f;
+    color: #fff;
+  }
+  .audio-fab.theme-y2k:focus-visible { outline-color: #06243d; }
+  .timeline-scrim.theme-y2k {
+    display: none;
+  }
 
   @media (max-width: 720px) {
     /* The Timeline collapses to a full-width bottom stepper here, so the audio

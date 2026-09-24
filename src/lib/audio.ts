@@ -174,6 +174,45 @@ export function teletextBeep() {
   tone(c, master, { freq: 1396.91, type: 'square', dur: 0.045, gain: 0.05 });
 }
 
+function millenniumSweep(c: AudioContext, dest: AudioNode) {
+  const t0 = c.currentTime;
+  const dur = 0.62;
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.Q.value = 9;
+  lp.frequency.setValueAtTime(380, t0);
+  lp.frequency.exponentialRampToValueAtTime(5200, t0 + dur * 0.8);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.05, t0 + 0.08);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  lp.connect(g).connect(dest);
+  for (const cents of [-9, 9]) {
+    const osc = c.createOscillator();
+    osc.type = 'sawtooth';
+    osc.detune.value = cents;
+    osc.frequency.setValueAtTime(130.81, t0);
+    osc.frequency.exponentialRampToValueAtTime(523.25, t0 + dur);
+    osc.connect(lp);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.05);
+  }
+  [1567.98, 2093.0, 2637.02].forEach((f, i) =>
+    tone(c, dest, { freq: f, type: 'sine', start: 0.46 + i * 0.05, dur: 0.42, gain: 0.045 })
+  );
+}
+
+export function y2kClick() {
+  if (!enabled) return;
+  const c = ensureCtx();
+  if (!c) return;
+  const master = c.createGain();
+  master.gain.value = 0.5;
+  master.connect(c.destination);
+  tone(c, master, { freq: 2200, type: 'sine', dur: 0.05, gain: 0.06, slideTo: 1100 });
+  tone(c, master, { freq: 4400, type: 'triangle', dur: 0.025, gain: 0.02 });
+}
+
 /** Play the cue for an era. No-op while audio is disabled. */
 export function playEra(theme: Theme) {
   if (!enabled) return;
@@ -268,6 +307,9 @@ export function playEra(theme: Theme) {
     }
     case 'threed':
       ambientBreath(c, master);
+      break;
+    case 'y2k':
+      millenniumSweep(c, master);
       break;
     default:
       theme satisfies never;

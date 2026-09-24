@@ -7,6 +7,7 @@ export const ERA_META: EraMeta[] = [
   { id: 'teletext', label: 'Televideo', year: '1984', icon: '📺' },
   { id: 'pixel', label: 'Pixel Art', year: '1988', icon: '🎮' },
   { id: 'web1', label: 'Web 1.0', year: '1996', icon: '🌐' },
+  { id: 'y2k', label: 'Y2K', year: '2000', icon: '💿' },
   { id: 'winxp', label: 'Win XP', year: '2001', icon: '🪟' },
   { id: 'skeuo', label: 'Skeuomorph', year: '2010', icon: '💎' },
   { id: 'material', label: 'Material', year: '2014', icon: '📐' },

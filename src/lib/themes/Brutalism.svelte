@@ -3,7 +3,7 @@
 
   const cvData = getCvData();
 
-  // Brutalism (2017–2020): raw, anti-design, intentional. A "view-source" punk-zine
+  // Neubrutalism (2021+): raw, anti-design, intentional. A "view-source" punk-zine
   // CV — newsprint paper, ink-black hairlines turned into 4px slabs, hard offset
   // shadows (no blur), screaming clashing colour blocks, giant grid-breaking type,
   // monospace meta-labels. Every interaction is blunt and tactile.
@@ -22,7 +22,7 @@
     'NO FRAMEWORKS WERE HARMED'
   ];
 
-  // expanded experience row (brutalist accordion — hard toggle, no easing)
+  // expanded experience row (neubrutalist accordion — hard toggle, no easing)
   let openExp = $state<number | null>(0);
   function toggleExp(i: number) {
     openExp = openExp === i ? null : i;
@@ -330,7 +330,7 @@
     letter-spacing: 0.005em;
     text-transform: uppercase;
     margin: 0;
-    /* Glitch / chromatic aberration — pure brutalist-web signature */
+    /* Glitch / chromatic aberration — pure neubrutalist-web signature */
     text-shadow: 4px 0 var(--cobalt), -4px 0 var(--red);
     animation: bru-glitch 5.5s steps(2) infinite;
   }
@@ -624,19 +624,18 @@
   .accent-cobalt .bru-skill-label { background: var(--cobalt); }
   .bru-num.red,
   .accent-red .bru-exp-index { background: var(--red); color: var(--paper); }
-  .accent-red .bru-skill-label { background: var(--red); }
+  .accent-red .bru-skill-label { background: var(--red); color: var(--ink); }
   .bru-num.lime,
   .accent-lime .bru-exp-index { background: var(--lime); }
   .bru-num.pink,
-  .accent-pink .bru-exp-index { background: var(--pink); color: var(--paper); }
-  .accent-pink .bru-skill-label { background: var(--pink); color: var(--paper); }
+  .accent-pink .bru-exp-index { background: var(--pink); color: var(--ink); }
+  .accent-pink .bru-skill-label { background: var(--pink); color: var(--ink); }
 
   /* CTA accent fills (the loud part) */
   .bru-cta.acid { background: var(--acid); }
   .bru-cta.cobalt { background: var(--cobalt); color: var(--paper); }
   .bru-cta.cobalt .bru-cta-k { border-color: var(--paper); }
-  .bru-cta.pink { background: var(--pink); color: var(--paper); }
-  .bru-cta.pink .bru-cta-k { border-color: var(--paper); }
+  .bru-cta.pink { background: var(--pink); }
 
   /* ░░ RESPONSIVE ░░ */
   @media (max-width: 720px) {

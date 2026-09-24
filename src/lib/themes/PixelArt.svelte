@@ -687,18 +687,18 @@
         <div class="fish-toast" role="status">{fishMsg}</div>
       {/if}
 
-      <!-- Touch D-pad (left) -->
+      <!-- Touch D-pad (left): tabindex="-1" keeps it out of the tab order too, matching aria-hidden -->
       <div class="dpad" aria-hidden="true">
-        <button class="d up" onpointerdown={() => dpadDown('up')} onpointerup={() => dpadUp('up')} onpointerleave={() => dpadUp('up')}>▲</button>
-        <button class="d left" onpointerdown={() => dpadDown('left')} onpointerup={() => dpadUp('left')} onpointerleave={() => dpadUp('left')}>◄</button>
-        <button class="d right" onpointerdown={() => dpadDown('right')} onpointerup={() => dpadUp('right')} onpointerleave={() => dpadUp('right')}>►</button>
-        <button class="d down" onpointerdown={() => dpadDown('down')} onpointerup={() => dpadUp('down')} onpointerleave={() => dpadUp('down')}>▼</button>
+        <button class="d up" tabindex="-1" onpointerdown={() => dpadDown('up')} onpointerup={() => dpadUp('up')} onpointerleave={() => dpadUp('up')}>▲</button>
+        <button class="d left" tabindex="-1" onpointerdown={() => dpadDown('left')} onpointerup={() => dpadUp('left')} onpointerleave={() => dpadUp('left')}>◄</button>
+        <button class="d right" tabindex="-1" onpointerdown={() => dpadDown('right')} onpointerup={() => dpadUp('right')} onpointerleave={() => dpadUp('right')}>►</button>
+        <button class="d down" tabindex="-1" onpointerdown={() => dpadDown('down')} onpointerup={() => dpadUp('down')} onpointerleave={() => dpadUp('down')}>▼</button>
       </div>
 
-      <!-- A / B action buttons (right) -->
+      <!-- A / B action buttons (right): same reasoning as the D-pad above -->
       <div class="ab-pad" aria-hidden="true">
-        <button class="ab b" onpointerdown={pressB}>B</button>
-        <button class="ab a" onpointerdown={pressA}>A</button>
+        <button class="ab b" tabindex="-1" onpointerdown={pressB}>B</button>
+        <button class="ab a" tabindex="-1" onpointerdown={pressA}>A</button>
       </div>
     </div>
   {:else}

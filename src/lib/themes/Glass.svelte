@@ -225,11 +225,11 @@
     --g-accent2: #6a5fd0;
     --g-tagline: #4a4a5e;
     --g-summary: #3a3a4c;
-    --g-muted: #6b6b80;
+    --g-muted: #5e5e72;
     --g-meta: #5c5c78;
-    --g-label: #7c74cc;
+    --g-label: #5a52b0;
     --g-dot: #9b8bff;
-    --g-panel-bg: rgba(255, 255, 255, 0.58);
+    --g-panel-bg: rgba(255, 255, 255, 0.64);
     --g-panel-border: rgba(255, 255, 255, 0.6);
     --g-panel-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.8),
@@ -281,11 +281,11 @@
     --g-accent2: #b9aeff;
     --g-tagline: #c2c2d6;
     --g-summary: #c8c8db;
-    --g-muted: #9a9ab4;
-    --g-meta: #8a8aa8;
+    --g-muted: #b0b0c8;
+    --g-meta: #a4a4c0;
     --g-label: #a99bff;
     --g-dot: #b9aeff;
-    --g-panel-bg: rgba(28, 28, 44, 0.55);
+    --g-panel-bg: rgba(28, 28, 44, 0.6);
     --g-panel-border: rgba(255, 255, 255, 0.12);
     --g-panel-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
@@ -387,6 +387,13 @@
     .blob { animation: none; }
   }
 
+  /* Lighter GPU load on small/mobile viewports: one fewer blurred layer and a
+     smaller blur radius, without emptying the backdrop. */
+  @media (max-width: 720px) {
+    .b5 { display: none; }
+    .blob { filter: blur(44px); }
+  }
+
   /* ── Layout ────────────────────────────────────────────────────────── */
   .glass-grid {
     position: relative;
@@ -410,8 +417,8 @@
   .panel {
     position: relative;
     background: var(--g-panel-bg);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
-    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--g-panel-border);
     border-radius: 18px;
     padding: 28px 30px;

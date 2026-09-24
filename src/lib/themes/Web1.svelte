@@ -797,6 +797,15 @@
     position: relative;
   }
   .badge b { font-size: 9px; }
+  .badge::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
   .bg-netscape { background: linear-gradient(180deg, #2b39ff, #000080); color: #fff; }
   .bg-netscape .blip { position: absolute; top: 3px; right: 4px; width: 5px; height: 5px; border-radius: 50%; background: #33ff33; box-shadow: 0 0 4px #33ff33; animation: blink 0.8s steps(1) infinite; }
   .bg-notepad { background: #efefef; color: #000080; }
@@ -856,11 +865,14 @@
   .nowplaying .note { color: var(--maroon); }
   .nowplaying tt { font-size: 0.82rem; }
 
-  /* Content cards (section tables) */
+  /* Content cards (section tables) — HTML 3.2 table bevel: explicit
+     bordercolorlight/bordercolordark two-tone, not a single-colour outset */
   .card {
     background: var(--paper);
-    border: 2px outset #fff;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55);
+    border-width: 3px;
+    border-style: solid;
+    border-color: var(--hi) var(--lolo) var(--lolo) var(--hi);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55), inset 1px 1px 0 var(--face), inset -1px -1px 0 var(--lo);
     margin-bottom: 18px;
     scroll-margin-top: 10px;
   }

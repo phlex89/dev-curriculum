@@ -19,6 +19,8 @@
   let inputFocused = $state(true);
   let booting = $state(false);
   let isTyping = $state(false);
+  let liveMessage = $state('');
+  let pendingAnnounce: string[] = [];
 
   // Shell-like command history (navigable with ↑/↓)
   let commandHistory = $state<string[]>([]);
@@ -113,6 +115,7 @@
 
   function addOutput(text: string) {
     queue.push(text);
+    pendingAnnounce.push(text);
     runQueue();
   }
 
@@ -150,6 +153,8 @@
     running = false;
     isTyping = false;
     skipTyping = false;
+    liveMessage = pendingAnnounce.join('. ');
+    pendingAnnounce = [];
   }
 
   async function handleCommand(e: KeyboardEvent) {
@@ -439,6 +444,7 @@
 
 <div class="terminal-wrapper" class:matrix-bg={matrixMode}>
   <div class="scanlines"></div>
+  <div class="sr-only" aria-live="polite" aria-atomic="true">{liveMessage}</div>
   <div class="terminal-content" bind:this={containerElement} onclick={() => inputElement.focus()}>
     {#each history as entry}
       <div class="entry {entry.type}">
@@ -516,14 +522,36 @@
        float over it and wrap into the text on mobile / Galaxy Fold). */
     display: flex;
     flex-direction: column;
-    text-shadow: 0 0 6px rgba(51, 255, 102, 0.55);
+    text-shadow:
+      0.5px 0 0 rgba(255, 45, 45, 0.16),
+      -0.5px 0 0 rgba(45, 255, 255, 0.16),
+      0 0 6px rgba(51, 255, 102, 0.55),
+      0 0 18px rgba(51, 255, 102, 0.2);
+    animation: crt-flicker 7s ease-in-out infinite;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @keyframes crt-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.992; }
   }
 
   .matrix-bg {
     background-image: linear-gradient(rgba(0, 255, 0, 0.16) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 0, 0.16) 1px, transparent 1px);
     background-size: 20px 20px;
-    animation: matrixScroll 20s linear infinite;
+    animation: matrixScroll 20s linear infinite, crt-flicker 7s ease-in-out infinite;
   }
 
   @keyframes matrixScroll {
@@ -600,6 +628,11 @@
     color: #33ff66;
   }
 
+  .input-field:focus-within .block-cursor {
+    outline: 2px solid rgba(51, 255, 102, 0.9);
+    outline-offset: 2px;
+  }
+
   .block-cursor {
     display: inline-block;
     width: 0.6em;
@@ -640,6 +673,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .block-cursor { animation: none; opacity: 1; }
+    .terminal-wrapper { animation: none; }
   }
 
   .suggestions {

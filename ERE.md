@@ -44,8 +44,8 @@
 | 4 | Windows 9x / XP Desktop | Inizio anni 2000 | ✅ Implementato | `WinXP.svelte` |
 | 5 | Glossy / Skeuomorfismo (Web 2.0) | ca. 2007–2013 | ✅ Implementato | `Skeuo.svelte` |
 | 6 | Material Design & Flat | 2014–2017 | ✅ Implementato | `Material.svelte` |
-| 7 | Brutalismo | 2017–2020 | ✅ Implementato | `Brutalism.svelte` |
-| 8 | Bento Box / Modern Flat | 2021–oggi | ✅ Implementato | `BentoBox.svelte` |
+| 7 | Neubrutalism | 2021 | ✅ Implementato | `Brutalism.svelte` |
+| 8 | Bento Box | 2022 | ✅ Implementato | `BentoBox.svelte` |
 | 9 | Glassmorphism | 2020 (il presente luminoso) | ✅ Implementato | `Glass.svelte` |
 | 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
 | 11 | AI / Conversazionale | 2030+ (oltre il 3D) | ⬜ Proposta | — (da creare) |
@@ -60,23 +60,15 @@
 > più basso valore o più a rischio di sovrapposizione (Frutiger Aero, Vaporwave, PS1
 > low-poly, Amiga, Mac Classic) restano in **"Idee oltre la lista"** come spunti/easter-egg.
 
-> L'attuale `ERA_ORDER` è
-> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed']`. La
-> **Pixel Art** è una *lineage parallela* (mondo console, non desktop/web) ma
-> contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**; il
-> **Web 1.0** (GeoCities/Netscape, metà anni '90) si inserisce **tra `pixel` e
-> `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP; il
-> **Material Design** (2014) si inserisce **tra `skeuo` e `brutalism`**, raccontando
-> la "grande appiattita" come reazione diretta allo skeuomorfismo che lo precede.
-> Il **Glassmorphism** è ora un'**era autonoma** (`✅`, §9), collocata **tra `bento` e
-> `threed`** come "presente luminoso" (Big Sur / Windows 11) — nettamente distinto dal
-> 3D dal contrasto **luce/buio**. L'unico candidato residuo per future espansioni è
-> l'**era AI / conversazionale** (§11), unica vera *nuova frontiera narrativa* oltre il
-> 3D — andrebbe **in coda a `ERA_ORDER`**, dopo `threed`. Il **Parallax / Immersive
-> Scroll** (§15) è invece l'estetica **premium contemporanea** del *craft web* (smooth-scroll
-> + parallax raffinato, stile synthesis.capital / tresmarescapital): collocazione **tra
-> `brutalism` e `bento`** (la corrente "immersive/cinematografica" emersa accanto al
-> consolidamento modulare del Bento).
+> L'attuale `ERA_ORDER` (rivisto a set 2026, vedi `ANALISI-STILI.md`) è
+> `['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'parallax', 'glass', 'brutalism', 'bento', 'liquid', 'threed']`.
+> Terminale, Televideo e Pixel Art sono lineage parallele degli anni '80; il **Web 1.0** (1996)
+> precede il desktop **XP** (2001); **Skeuo** (2010) e **Material** (2014) raccontano la "grande
+> appiattita"; il **Parallax** (2018) apre il craft web premium; seguono **Glass** (2020),
+> **Neubrutalism** (2021, prima etichettato per errore "Brutalism · 2017"), **Bento** (2022,
+> prima "Modern Flat · 2015") e **Liquid** (2025). Il **3D** chiude oggi la timeline con la label
+> "Future 3D · 2026", ormai uguale al presente: la sua ricollocazione e l'**era AI** (§11) come
+> nuovo finale sono le prossime decisioni aperte.
 
 ---
 
@@ -365,7 +357,7 @@ Gli oggetti sembrano poggiati su una superficie in pelle cucita.
 > (6dp→12dp in hover) con azione primaria *mailto*. **Ripple** autentico (azione `ripple`: cerchio
 > che si espande dal punto del tocco) su tab, icon-button, contatti e FAB. Tipografia **Roboto**
 > self-hostata (file variabile latin-subset, `fonts.css`). Hash `#material`, in `ERA_ORDER`
-> **tra `skeuo` e `brutalism`**, label d'anno **"2014"**, cue audio (`case 'material'`): *tap*
+> **tra `skeuo` e `parallax`**, label d'anno **"2014"**, cue audio (`case 'material'`): *tap*
 > sine pulito a due note. **Tutto gated da `prefers-reduced-motion`** (ripple soppresso, lift/scale
 > e scroll fluido disattivati; le ombre di elevazione restano). Mobile: app bar centrata, tab strip
 > scrollabile, due-colonne impilate. La scheda sotto resta come documentazione del concept.
@@ -391,8 +383,8 @@ elevazione a ombre + ripple + accento colorato forte. Distinguere bene per non s
 
 ---
 
-## 7. Brutalismo — ✅ Implementato
-**2017–2020** · `src/lib/themes/Brutalism.svelte`
+## 7. Neubrutalism — ✅ Implementato
+**2021** (label "Neubrutalism · 2021") · `src/lib/themes/Brutalism.svelte`
 
 **Contesto.** Reazione/ribellione al minimalismo levigato e omologato. Estetica "anti-
 design" deliberatamente cruda, eco dell'HTML grezzo ma scelta consapevolmente: web come
@@ -417,14 +409,15 @@ aberrazione cromatica sul nome (text-shadow cobalto/rosso), `● location` lampe
 accordion delle esperienze a toggle secco. Audio d'epoca: buzzer ruvido (square/saw
 dissonante). Tutto sotto `prefers-reduced-motion` (marquee/glitch/blink/press disattivati).
 
-> **Nota cronologica:** il Brutalismo (2017–2020) precede di poco l'esplosione del Bento
-> (2021+), quindi in `ERA_ORDER` è collocato **prima di `bento`**. Le label d'anno mostrano
-> "2017" (Brutalism) e "2015" (Modern Flat) — coerenti con l'avvio dei rispettivi trend.
+> **Nota cronologica (rivista set 2026).** Bordi 3–4px, ombre offset dure, "pressione
+> meccanica" e font display sono la formula del **neubrutalism** (2021+, Gumroad/Figma), non
+> del brutalismo web grezzo del 2017 (font di default, monocromo). Label corretta in
+> **"Neubrutalism · 2021"**, in `ERA_ORDER` **tra `glass` e `bento`**. Vedi `ANALISI-STILI.md`.
 
 ---
 
-## 8. Bento Box / Modern Flat — ✅ Implementato
-**2021–oggi** · `src/lib/themes/BentoBox.svelte`
+## 8. Bento Box — ✅ Implementato
+**2022** (label "Bento · 2022") · `src/lib/themes/BentoBox.svelte`
 
 **Contesto.** L'estetica dei portfolio e delle dashboard contemporanee (Apple keynote,
 widget iOS/macOS). Ordine modulare: ogni informazione nel suo "scomparto" come in una
@@ -448,7 +441,7 @@ circolare.
 > **Stato implementazione.** Estratto dal 3D come **era autonoma** e ridisegnato sul
 > principio **"Luce vs Buio"**: è il **presente luminoso** (macOS Big Sur / Windows 11
 > Acrylic / iOS) — l'opposto esatto del vuoto neon scuro del 3D. Hash `#glass`, chiave
-> tema `'glass'`, in `ERA_ORDER` **tra `bento` e `threed`**, label d'anno **"2020"**,
+> tema `'glass'`, in `ERA_ORDER` **tra `parallax` e `brutalism`**, label d'anno **"2020"**,
 > icona 🧊 in Timeline.
 >
 > **Sfondo:** **nessun WebGL** — un campo di **aurora-blobs pastello** (aqua, lilla,
@@ -756,7 +749,7 @@ Cue audio: "tap" morbido e ovattato. Font: Inter (già self-hostato) — **nessu
 ---
 
 ## 15. Parallax / Immersive Scroll — ✅ Implementata
-**Il web premium contemporaneo (apice ~2018–oggi)** · `src/lib/themes/Parallax.svelte` · chiave `'parallax'` · hash `#parallax` · in `ERA_ORDER` tra `brutalism` e `glass` · label "2018", icona 🎬
+**Il web premium contemporaneo (apice ~2018–oggi)** · `src/lib/themes/Parallax.svelte` · chiave `'parallax'` · hash `#parallax` · in `ERA_ORDER` tra `material` e `glass` · label "2018", icona 🎬
 
 > **Stato.** ✅ **Implementata** (giu 2026). Componente `Parallax.svelte`, smooth-scroll **Lenis**
 > lazy (~3KB, unico runtime dep oltre Three), serif display **Fraunces** self-hostato/subsettato
@@ -883,7 +876,7 @@ contenuto. Da **Material**: là il moto è *funzionale* (ripple/elevazione); qui
 (reveal cinematografici). Da differenziare con cura nel testo, nella palette e nel cue audio.
 
 **Identificatori tecnici (realizzati).** `Theme` key `'parallax'` · `src/lib/themes/Parallax.svelte` ·
-hash `#parallax` · `ERA_ORDER` **tra `brutalism` e `glass`** · label d'anno **"2018"**, icona 🎬 ·
+hash `#parallax` · `ERA_ORDER` **tra `material` e `glass`** · label d'anno **"2018"**, icona 🎬 ·
 dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 `+page.svelte` / `audio.ts` / `Timeline.svelte`. Contenuti **selezionati da `cv-data.ts`**.
 
@@ -895,7 +888,7 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 > **Stato implementazione.** Aggiunta come **tredicesima era** per colmare il buco che il
 > trend "Liquid Glass Navigation" (analisi Muzli del 30 luglio 2026) segnalava nella
 > timeline: `Glass` (2020) non aveva alcuna navigazione, era un *documento*. Hash
-> `#liquid`, chiave tema `'liquid'`, in `ERA_ORDER` **tra `glass` e `threed`**, label
+> `#liquid`, chiave tema `'liquid'`, in `ERA_ORDER` **tra `bento` e `threed`**, label
 > d'anno **"2025"**, icona 💧 in Timeline. Ha richiesto una rifocalizzazione di `Glass`
 > (§9) perché le due non si sovrapponessero: **Glass = documento, Liquid = app**.
 >

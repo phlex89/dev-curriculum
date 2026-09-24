@@ -269,11 +269,17 @@
         const t = e.target as HTMLElement;
         cursorEl!.classList.toggle('hover', !!t.closest('a, button, [data-cursor]'));
       };
+      const press = () => cursorEl!.classList.add('active');
+      const release = () => cursorEl!.classList.remove('active');
       window.addEventListener('mousemove', move);
       window.addEventListener('mouseover', over);
+      window.addEventListener('mousedown', press);
+      window.addEventListener('mouseup', release);
       cleanupCursor = () => {
         window.removeEventListener('mousemove', move);
         window.removeEventListener('mouseover', over);
+        window.removeEventListener('mousedown', press);
+        window.removeEventListener('mouseup', release);
         if (raf2) cancelAnimationFrame(raf2);
       };
     }
@@ -321,6 +327,7 @@
           onclick={() => goTo(i)}
           aria-label={name}
           aria-current={active === i ? 'true' : undefined}
+          use:magnetic={{ strength: 0.2 }}
         ><span></span></button>
       {/each}
     </nav>
@@ -425,7 +432,7 @@
             {@render maskText(cvData.tagline, 'lede')}
           </p>
         </div>
-        <div class="scroll-hint" data-reveal>
+        <div class="scroll-hint" data-reveal use:magnetic={{ strength: 0.12 }}>
           <span class="sh-label">{t.scrollHint}</span>
           <span class="sh-line" aria-hidden="true"></span>
         </div>
@@ -1399,6 +1406,7 @@
     left: 0;
     border-radius: 50%;
     transform: translate(-50%, -50%);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .cur-dot {
     width: 7px;
@@ -1409,7 +1417,8 @@
     width: 34px;
     height: 34px;
     border: 1px solid rgba(26, 23, 20, 0.4);
-    transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease,
+      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .px-cursor:global(.hover) .cur-ring {
     width: 58px;
@@ -1418,6 +1427,12 @@
     background: rgba(176, 116, 79, 0.08);
   }
   .px-cursor:global(.hover) .cur-dot { opacity: 0; }
+  /* Click feedback: quick scale-down on press, springy overshoot back on release. */
+  .px-cursor:global(.active) .cur-dot,
+  .px-cursor:global(.active) .cur-ring {
+    transform: translate(-50%, -50%) scale(0.72);
+    transition: transform 0.15s ease-out;
+  }
 
   /* ════════════════════════════════════════════════════════════════════════
      REDUCED MOTION — the era's flaw (parallax/auto-scroll = motion sickness) is

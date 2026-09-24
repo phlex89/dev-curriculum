@@ -166,7 +166,7 @@
   /* ── Desk surface: dark stitched leather (iOS 6 era) ─────────────────────── */
   .skeuo-wrapper {
     --leather-1: #4a3322;
-    --leather-2: #35241704;
+    --leather-2: #3a2616;
     --stitch: rgba(226, 205, 173, 0.55);
     --paper: #f6f1e4;
     --ink: #2b2118;
@@ -175,8 +175,11 @@
     --metal-lo: #c2c2c6;
     --gel-blue: #2f6fd0;
     --gel-green: #4e9a2f;
-    --gel-purple: #7b4fc4;
     --felt: #2f6b4a;
+    --grain-leather: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.2 0 0 0 -0.45'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)' opacity='0.4'/%3E%3C/svg%3E");
+    --grain-felt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.15' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.2 0 0 0 -0.45'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)' opacity='0.34'/%3E%3C/svg%3E");
+    --grain-metal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9 0.012' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.2 0 0 0 -0.45'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)' opacity='0.4'/%3E%3C/svg%3E");
+    --grain-paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.2 0 0 0 -0.45'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
 
     width: 100vw;
     height: 100vh;
@@ -187,12 +190,13 @@
     color: var(--ink);
     font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
-    background-color: #4a3322;
+    background-color: var(--leather-1);
     background-image:
+      var(--grain-leather),
       radial-gradient(circle at 18% 12%, rgba(255, 224, 178, 0.16), transparent 42%),
       radial-gradient(circle at 84% 88%, rgba(0, 0, 0, 0.32), transparent 55%),
       repeating-radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.018) 0 2px, transparent 2px 4px),
-      linear-gradient(135deg, #543a26, #3a2616);
+      linear-gradient(135deg, #543a26, var(--leather-2));
   }
 
   .desk {
@@ -220,8 +224,7 @@
     padding: 24px 30px;
     border-radius: 14px;
     background:
-      linear-gradient(180deg, #fcfcfd 0%, #e6e6ea 18%, #d3d3d8 50%, #bcbcc2 82%, #d0d0d5 100%);
-    background-size: 100% 100%, 3px 100%;
+      linear-gradient(180deg, var(--metal-hi) 0%, #e6e6ea 18%, #d3d3d8 50%, var(--metal-lo) 82%, #d0d0d5 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.9),
       inset 0 -2px 4px rgba(0, 0, 0, 0.2),
@@ -234,8 +237,9 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.35) 0 1px, transparent 1px 3px);
-    opacity: 0.4;
+    background:
+      var(--grain-metal),
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 3px);
     pointer-events: none;
   }
 
@@ -267,7 +271,7 @@
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 2.1rem;
     font-weight: 700;
-    color: #6c5c47;
+    color: var(--ink-soft);
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
@@ -360,9 +364,10 @@
     color: #2f2a22;
     background-color: #fdf8df;
     background-image:
+      var(--grain-paper),
       linear-gradient(90deg, transparent 38px, rgba(220, 90, 80, 0.45) 38px, rgba(220, 90, 80, 0.45) 40px, transparent 40px),
       repeating-linear-gradient(180deg, transparent 0 27px, rgba(80, 130, 190, 0.32) 27px 28px);
-    background-position: 0 0, 0 16px;
+    background-position: 0 0, 0 0, 0 16px;
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.6) inset,
       0 14px 28px rgba(0, 0, 0, 0.45),
@@ -400,6 +405,7 @@
     padding: 26px 30px 30px;
     border-radius: 12px;
     background:
+      var(--grain-felt),
       radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.06), transparent 60%),
       linear-gradient(180deg, #357a54, #245138);
     box-shadow:
@@ -454,12 +460,22 @@
     padding: 26px 30px 30px;
     border-radius: 12px;
     background:
+      var(--grain-leather),
       radial-gradient(circle at 20% 0%, rgba(255, 220, 170, 0.12), transparent 45%),
       linear-gradient(180deg, #6e4a2e, #4a2f1a);
     box-shadow:
       inset 0 1px 0 rgba(255, 220, 170, 0.2),
       inset 0 0 0 2px rgba(0, 0, 0, 0.25),
       0 12px 26px rgba(0, 0, 0, 0.5);
+  }
+  .leather-book::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border: 1.5px dashed var(--stitch);
+    border-radius: 7px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+    pointer-events: none;
   }
   .leather-head {
     color: #f4e3cb;
@@ -533,7 +549,9 @@
   .frame {
     padding: 12px;
     border-radius: 8px;
-    background: linear-gradient(135deg, #c9a24a 0%, #8a6a2a 50%, #b8923f 100%);
+    background:
+      var(--grain-metal),
+      linear-gradient(135deg, #c9a24a 0%, #8a6a2a 50%, #b8923f 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.4),
       inset 0 0 0 1px rgba(0, 0, 0, 0.3),
@@ -603,7 +621,7 @@
   /* ── Contacts — App Store gel buttons ────────────────────────────────────── */
   .contact-bar {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 18px;
   }
   .gel-btn {
@@ -625,7 +643,9 @@
       inset 0 -3px 6px rgba(0, 0, 0, 0.25),
       0 3px 0 rgba(0, 0, 0, 0.35),
       0 8px 18px rgba(0, 0, 0, 0.4);
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    transition:
+      transform 150ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 150ms ease-out;
   }
   /* Top gloss sweep */
   .gel-btn::before {
@@ -647,8 +667,8 @@
       0 1px 0 rgba(0, 0, 0, 0.35),
       0 3px 8px rgba(0, 0, 0, 0.4);
   }
-  .gel-btn.linkedin { background: linear-gradient(180deg, #4f97e6 0%, #2f6fd0 50%, #2560bd 100%); }
-  .gel-btn.email { background: linear-gradient(180deg, #7cc24e 0%, #4e9a2f 50%, #418526 100%); }
+  .gel-btn.linkedin { background: linear-gradient(180deg, #4f97e6 0%, var(--gel-blue) 50%, #2560bd 100%); }
+  .gel-btn.email { background: linear-gradient(180deg, #7cc24e 0%, var(--gel-green) 50%, #418526 100%); }
   .gel-ico {
     font-family: Georgia, serif;
     font-size: 1.3rem;
@@ -676,5 +696,6 @@
      its own here, so there is no additional motion to gate. */
   @media (prefers-reduced-motion: reduce) {
     .notepad { transform: none; }
+    .gel-btn { transition-duration: 60ms; transition-timing-function: ease-out; }
   }
 </style>

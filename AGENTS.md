@@ -110,16 +110,16 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **`prefers-reduced-motion`:** ripple soppresso, lift/scale e scroll fluido disattivati; le ombre di elevazione restano. **Mobile:** app bar centrata, tab strip scrollabile orizzontalmente, due-colonne impilate.
 -   **Differenziazione da Bento:** Material = superfici **piatte + elevazione a ombre + ripple + ink-bar + accento forte**; Bento = modulare/widget, vetro smerigliato, bento-grid stondata.
 
-### 8. Brutalismo (2017-2020)
+### 8. Neubrutalism (2021)
 **Componente:** `src/lib/themes/Brutalism.svelte`
 -   Reazione cruda al minimalismo levigato: un CV "view-source" in stile **fanzine punk fotocopiata** incrociata con un terminale dati. Massima personalità, anti-design consapevole.
 -   **Estetica:** carta da giornale calda (griglia a puntini "newsprint") + inchiostro nero, **bordi neri da 4px**, **ombre dure offset** (`8px 8px 0`, senza blur), zero `border-radius`. Accenti **sgargianti che si scontrano** (acid, cobalto, rosso, lime, pink) ruotati su tag, numeri di sezione e bottoni di contatto.
 -   **Tipografia:** **Anton** (titoli display giganti), **Archivo** (corpo), **Space Mono** (meta-label, ticker, tag) — nessun font condiviso con le altre ere.
 -   **Layout:** sezioni numerate (`01 / EXPERIENCE`), tipografia che sfonda la griglia, **ticker monospace** scorrevole sticky in alto, esperienze in accordion a toggle secco.
 -   **Micro-interazioni (sotto `prefers-reduced-motion`):** hover **tattili** che "schiacciano" l'ombra (translate netto, easing lineare), tag che **invertono** secco nero/carta, glitch ad aberrazione cromatica sul nome, `● location` lampeggiante. Audio: buzzer ruvido dissonante.
--   *Nota cronologica:* collocato in `ERA_ORDER` **prima di Bento** (il Brutalismo 2017 precede l'esplosione del Bento 2021+).
+-   *Nota cronologica:* lo stile implementato è **neubrutalism** (2021+, Gumroad/Figma), non il brutalismo web grezzo del 2017: label "Neubrutalism · 2021", in `ERA_ORDER` **tra `glass` e `bento`**.
 
-### 9. Modern Flat / Bento Box (2015-Oggi)
+### 9. Bento Box (2022)
 **Componente:** `src/lib/themes/BentoBox.svelte`
 -   Design basato sul layout asimmetrico "Bento Grid" tramite CSS Grid (con `grid-template-areas` per un layout bilanciato e senza buchi), molto in voga nei portafogli moderni (es. stile Apple).
 -   Tipografia curata (**Space Grotesk** per titoli/nomi, **Inter** per il corpo), label di sezione in maiuscoletto, avatar con anello a gradiente conico, ombre morbide a due livelli e palette indaco armonizzata.
@@ -129,7 +129,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ### 10. Glassmorphism (2020 - il presente luminoso)
 **Componente:** `src/lib/themes/Glass.svelte`
--   Il **presente luminoso** dei sistemi operativi (macOS Big Sur, Windows 11 Acrylic, iOS/visionOS): superfici di vetro traslucido su sfondi sfocati e luminosi. In `ERA_ORDER` è **tra `bento` e `threed`**, come tappa che precede il salto immersivo nel 3D.
+-   Il **presente luminoso** dei sistemi operativi (macOS Big Sur, Windows 11 Acrylic, iOS/visionOS): superfici di vetro traslucido su sfondi sfocati e luminosi. In `ERA_ORDER` è **tra `parallax` e `brutalism`**.
 -   **Differenziazione dal 3D/Futuro — "Luce vs Buio"** (è il discriminante portante): Glass = **chiaro/pastello/arioso**, **nessun WebGL**; il 3D = scuro/neon/sci-fi con scena WebGL. Pur condividendo il vocabolario del vetro (`backdrop-filter: blur`), i due sono opposti per luminosità, sfondo e tipografia.
 -   **Sfondo:** campo di 5 **aurora-blobs pastello** (aqua/lilla/pesca/cielo/menta) su base quasi-bianca, sfocati (`blur(70px)`) e in **drift CSS lento**, con **parallax 2D piatto** (l'intero campo scivola di pochi px verso il cursore via `--px/--py` aggiornati su `mousemove` — niente camera/prospettiva). Tutto puro CSS, zero canvas.
 -   **Vetro frosted presente e lattiginoso:** pannelli `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`, **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen speculare** bianco che segue il cursore (via action `tilt` → `::after` con `mix-blend-mode: overlay`). Molto più presente del vetro quasi invisibile del 3D.
@@ -161,7 +161,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ### 13. Liquid Glass (2025)
 **Componente:** `src/lib/themes/Liquid.svelte` (+ modulo puro `src/lib/themes/liquid/lens.ts`)
--   La grammatica di navigazione delle app 2025 (iOS 26 "Liquid Glass"): **Glass è un documento, Liquid è un'app**. In `ERA_ORDER` è **tra `glass` e `threed`**. Hash `#liquid`, label d'anno **"2025"**, icona 💧.
+-   La grammatica di navigazione delle app 2025 (iOS 26 "Liquid Glass"): **Glass è un documento, Liquid è un'app**. In `ERA_ORDER` è **tra `bento` e `threed`**. Hash `#liquid`, label d'anno **"2025"**, icona 💧.
 -   **App shell** a `100dvh`: **capsula flottante centrata** (identità + tab bar con **pillola indicatore a molla**) sopra **un'unica regione scrollabile** con **quattro schermate a tab** (Profilo / Percorso / Competenze / Altro) che coprono tutti i contenuti dei sette pannelli di `Glass`. Allo scroll la capsula collassa nella sola pillola della tab attiva e resta compatta finché si è lontani dalla cima.
 -   **La lente**: filtro SVG `feImage` + tre `feDisplacementMap` a `scale` diversa per R/G/B (iridescenza sul bordo), con *displacement map* generata a runtime su `<canvas>`. Vive solo sulla testata, e **solo su Chromium** (`navigator.vendor`); ogni altro motore va a un **fallback curato** in CSS.
 -   **Ambiente**: tre wallpaper in CSS puro (Aurora / Sunset / Deep), ciclati da un pulsante e persistiti in `localStorage`; ognuno ri-tinge la `--l-accent`. Tipografia **di sistema**, nessun webfont. Cue audio (`case 'liquid'`): una **goccia**.

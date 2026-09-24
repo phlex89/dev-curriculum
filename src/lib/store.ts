@@ -15,7 +15,7 @@ const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'mater
  *  between Brutalism and Glassmorphism, just before the luminous present. Liquid Glass
  *  (Apple's 2025 refraction language) follows Glassmorphism as its next refinement,
  *  right before the 3D future. */
-export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'bento', 'brutalism', 'parallax', 'glass', 'liquid', 'threed'];
+export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'parallax', 'glass', 'brutalism', 'bento', 'liquid', 'threed'];
 
 const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 

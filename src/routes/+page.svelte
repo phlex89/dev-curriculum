@@ -339,6 +339,9 @@
     pointer-events: none;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.13) 50%, transparent 100%);
   }
+  .timeline-scrim.theme-winxp {
+    display: none;
+  }
   /* Future 3D is the worst case: the Timeline pill is near-transparent glass over
      a busy luminous scene, so it needs a deeper scrim to read against. */
   .timeline-scrim.theme-threed {

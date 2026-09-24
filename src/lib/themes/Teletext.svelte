@@ -196,6 +196,7 @@
 </script>
 
 <div class="tv-room" bind:this={wrapperEl}>
+  <div class="tv-static" aria-hidden="true"></div>
   <div class="screen" class:acquiring>
     <div class="scanlines" aria-hidden="true"></div>
 
@@ -445,7 +446,25 @@
     gap: 14px;
     padding: 18px 18px 96px; /* room for the timeline */
     overflow: hidden;
+    position: relative;
     font-family: 'Bedstead', 'JetBrains Mono', 'Courier New', Courier, monospace;
+  }
+
+  /* Faint broadcast "snow" on the room background, never over the screen itself */
+  .tv-static {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 180px 180px;
+    animation: tvSnow 0.4s steps(2) infinite;
+  }
+  @keyframes tvSnow {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-1%, 1%); }
+    100% { transform: translate(1%, -1%); }
   }
 
   /* ── The teletext page: 40-column black screen ───────────────────────────── */
@@ -546,6 +565,7 @@
     background: linear-gradient(90deg,
       #ff0000 0 14.28%, #ffff00 14.28% 28.57%, #00ff00 28.57% 42.85%,
       #00ffff 42.85% 57.14%, #0000ff 57.14% 71.42%, #ff00ff 71.42% 85.71%, #ffffff 85.71% 100%);
+    filter: blur(0.4px);
   }
   .rainbow-bar.thin { height: 6px; margin: 4px 0 10px; }
 
@@ -600,7 +620,7 @@
 
   /* ── Cover ──────────────────────────────────────────────────────────────────── */
   .cover { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
-  .tv-art { display: flex; flex-direction: column; flex: 0 0 auto; }
+  .tv-art { display: flex; flex-direction: column; flex: 0 0 auto; filter: blur(0.35px) saturate(1.15); }
   .tv-row { display: flex; }
   .tv-cell { width: clamp(7px, 1.6vw, 11px); height: clamp(7px, 1.6vw, 11px); }
   .cover-title { flex: 1 1 180px; }
@@ -642,6 +662,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    box-shadow: 0.5px 0 0 rgba(255, 0, 0, 0.25), -0.5px 0 0 rgba(0, 255, 255, 0.25);
   }
   .fx-red { background: #ff0000; color: #fff; }
   .fx-grn { background: #00ff00; }
@@ -703,6 +724,7 @@
   /* ── Reduced-motion: no flicker, no scanline shimmer ──────────────────────── */
   @media (prefers-reduced-motion: reduce) {
     .screen.acquiring .page-body { animation: none; }
+    .tv-static { animation: none; }
   }
 
   /* On mobile the global volume toggle floats top-right over the blue header

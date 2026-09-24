@@ -210,6 +210,7 @@ export const cvDataEn: typeof cvData = {
 
 const it = {
   shared: {
+    opensInNewTab: '(si apre in una nuova scheda)',
     seoIntro: (name: string, role: string, years: number) =>
       `${name} è un ${role} basato a Torino, con ${years} anni di esperienza in architetture frontend, design system e component library per piattaforme enterprise in fintech, IoT, banking e media.`,
     sections: {
@@ -240,10 +241,10 @@ const it = {
       winxp: 'Windows XP · 2001',
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
-      bento: 'Modern Flat · 2015',
-      brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
       glass: 'Glassmorphism · 2020',
+      brutalism: 'Neubrutalism · 2021',
+      bento: 'Bento · 2022',
       liquid: 'Liquid Glass · 2025',
       threed: 'Future 3D · 2026'
     } as Record<Theme, string>,
@@ -491,6 +492,7 @@ const it = {
 
 const en: UiStrings = {
   shared: {
+    opensInNewTab: '(opens in a new tab)',
     seoIntro: (name: string, role: string, years: number) =>
       `${name} is a ${role} based in Turin, with ${years} years of experience in frontend architectures, design systems and component libraries for enterprise platforms across fintech, IoT, banking and media.`,
     sections: {
@@ -521,10 +523,10 @@ const en: UiStrings = {
       winxp: 'Windows XP · 2001',
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
-      bento: 'Modern Flat · 2015',
-      brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
       glass: 'Glassmorphism · 2020',
+      brutalism: 'Neubrutalism · 2021',
+      bento: 'Bento · 2022',
       liquid: 'Liquid Glass · 2025',
       threed: 'Future 3D · 2026'
     },

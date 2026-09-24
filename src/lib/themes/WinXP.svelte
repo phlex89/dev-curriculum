@@ -5,6 +5,7 @@
   import { draggable } from '$lib/actions/draggable';
   import { getCvData, getUi } from '$lib/i18n';
   import XpIcon from './winxp/XpIcon.svelte';
+  import * as wm from './winxp/window-manager';
 
   const cvData = getCvData();
   const t = getUi().winxp;
@@ -66,28 +67,15 @@
     selectedIcon = id;
   }
 
-  // Keep a freshly-opened window fully inside the viewport. On mid-size screens
-  // (e.g. a Galaxy Fold unfolded, wider than the 600px mobile breakpoint but
-  // narrower than a desktop) the scattered start coords would otherwise push a
-  // 450px window off the right/bottom edge.
-  function clampToViewport(win: WindowState) {
-    if (typeof window === 'undefined') return;
-    const margin = 8;
-    const winW = 450; // matches .window width
-    const taskbar = 30; // reserved bottom bar
-    const maxX = Math.max(margin, window.innerWidth - winW - margin);
-    const maxY = Math.max(margin, window.innerHeight - taskbar - 80); // keep the titlebar above the taskbar
-    win.x = Math.min(Math.max(margin, win.x), maxX);
-    win.y = Math.min(Math.max(margin, win.y), maxY);
+  function currentViewport(): wm.Viewport | undefined {
+    return typeof window === 'undefined' ? undefined : { width: window.innerWidth, height: window.innerHeight };
   }
 
   async function openWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.isOpen = true;
-      win.minimized = false;
-      if (!isMobile) clampToViewport(win);
-      bringToFront(id);
+    const result = wm.openWindow(windows, id, topZIndex, isMobile ? undefined : currentViewport());
+    windows = result.windows;
+    topZIndex = result.topZIndex;
+    if (result.opened) {
       await tick();
       document.querySelector<HTMLElement>(`[data-win-id="${id}"]`)?.focus();
     }
@@ -95,44 +83,34 @@
   }
 
   function closeWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.isOpen = false;
-      win.minimized = false;
-      win.maximized = false;
+    const result = wm.closeWindow(windows, id);
+    windows = result.windows;
+    if (result.closed) {
       document.getElementById(`icon-${id}`)?.focus();
     }
   }
 
   function minimizeWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) win.minimized = true;
+    windows = wm.minimizeWindow(windows, id);
   }
 
   function toggleMaximize(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) win.maximized = !win.maximized;
-    bringToFront(id);
+    const result = wm.toggleMaximize(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   function bringToFront(id: string) {
-    topZIndex++;
-    const win = windows.find(w => w.id === id);
-    if (win) win.zIndex = topZIndex;
+    const result = wm.bringToFront(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   // Clicking the taskbar item: restore if minimized, otherwise minimize if it's already on top, else bring to front
   function taskbarClick(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (!win) return;
-    if (win.minimized) {
-      win.minimized = false;
-      bringToFront(id);
-    } else if (win.zIndex === topZIndex) {
-      win.minimized = true;
-    } else {
-      bringToFront(id);
-    }
+    const result = wm.taskbarClick(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   function toggleStartMenu() {
@@ -194,7 +172,8 @@
     // pull any free (non-maximised) windows back inside.
     const onResize = () => {
       if (isMobile) return; // maximised on mobile, nothing to clamp
-      for (const w of windows) if (w.isOpen && !w.maximized) clampToViewport(w);
+      const viewport = currentViewport();
+      if (viewport) windows = wm.clampOpenWindows(windows, viewport);
     };
     window.addEventListener('resize', onResize);
 

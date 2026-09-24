@@ -424,7 +424,7 @@
     outline-offset: 2px;
   }
   :global(:root) .theme-threed .timeline-stop button:focus-visible .node-pill {
-    outline: 2px solid #00ffff;
+    outline: 1px solid #f4f3ef;
     outline-offset: 3px;
   }
   :global(:root) .theme-winxp .timeline-stop button:focus-visible .node-pill {
@@ -910,37 +910,45 @@
     box-shadow: none;
   }
 
-  /* --- ThreeD Theme Adaptations --- */
+  /* --- WebGL (threed) Theme Adaptations --- */
   :global(:root) .theme-threed .timeline-container {
-    background: rgba(10, 8, 28, 0.62);
-    border: 1px solid rgba(125, 249, 255, 0.35);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    background: rgba(9, 9, 12, 0.86);
+    border: 1px solid rgba(244, 243, 239, 0.12);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
   }
 
   :global(:root) .theme-threed .timeline-track {
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    background: rgba(244, 243, 239, 0.12);
+    box-shadow: none;
   }
 
   :global(:root) .theme-threed .node-pill {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
+    color: #f4f3ef;
+    background: transparent;
+    border: 1px solid transparent;
+  }
+
+  :global(:root) .theme-threed .timeline-stop:hover .node-pill {
+    background: rgba(244, 243, 239, 0.07);
   }
 
   :global(:root) .theme-threed .timeline-stop.active .node-pill {
-    background: rgba(0, 255, 255, 0.3);
-    border: 1px solid #00ffff;
-    color: #00ffff;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    color: #fff;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(#111116, #111116) padding-box,
+      linear-gradient(115deg, #8b48b5, #f4ac9f 35%, #a7f4e3 65%, #3e91f9) border-box;
+    box-shadow: 0 0 22px rgba(167, 170, 244, 0.14);
   }
 
   :global(:root) .theme-threed .label-text {
-    text-shadow: 0 2px 5px rgba(0,0,0,1);
-    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.74rem;
     font-weight: 500;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* --- Modern Flat (Bento) Theme Adaptations --- */
@@ -968,8 +976,8 @@
     box-shadow: none;
   }
   :global(:root) .theme-threed .timeline-fill {
-    background: linear-gradient(90deg, #7df9ff, #00ffff);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+    background: linear-gradient(90deg, #8b48b5, #f4ac9f, #a7f4e3);
+    box-shadow: none;
   }
   :global(:root) .theme-pixel .timeline-fill {
     background: #fcd800;
@@ -1156,7 +1164,7 @@
   :global(:root) .theme-pixel .step-dots,
   :global(:root) .theme-pixel .era-sheet { color: #fcfcfc; }
   :global(:root) .theme-threed .step-dots,
-  :global(:root) .theme-threed .era-sheet { color: #7df9ff; }
+  :global(:root) .theme-threed .era-sheet { color: #f4f3ef; }
   :global(:root) .theme-liquid .step-dots,
   :global(:root) .theme-liquid .era-sheet { color: #fff; }
 

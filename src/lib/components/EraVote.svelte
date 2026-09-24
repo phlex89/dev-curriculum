@@ -412,15 +412,15 @@
   }
 
   .vote-widget.theme-threed {
-    font-family: 'Orbitron', 'Space Grotesk', sans-serif;
-    --vote-bg: rgba(10, 8, 28, 0.62);
-    --vote-border: 1px solid rgba(125, 249, 255, 0.35);
-    --vote-color: #fff;
-    --vote-accent: #00ffff;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    --vote-bg: rgba(9, 9, 12, 0.86);
+    --vote-border: 1px solid rgba(244, 243, 239, 0.14);
+    --vote-color: #f4f3ef;
+    --vote-accent: #c9b8ff;
     --vote-radius: 30px;
-    --vote-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    --vote-blur: blur(16px);
-    --vote-bar: rgba(255, 255, 255, 0.2);
+    --vote-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --vote-blur: none;
+    --vote-bar: rgba(244, 243, 239, 0.14);
   }
 
   @media (max-width: 720px) {

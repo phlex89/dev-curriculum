@@ -11,9 +11,9 @@ export const ERA_META: EraMeta[] = [
   { id: 'skeuo', label: 'Skeuomorph', year: '2010', icon: '💎' },
   { id: 'material', label: 'Material', year: '2014', icon: '📐' },
   { id: 'parallax', label: 'Parallax', year: '2018', icon: '🎬' },
+  { id: 'threed', label: 'WebGL', year: '2019', icon: '🌀' },
   { id: 'glass', label: 'Glass', year: '2020', icon: '🧊' },
   { id: 'brutalism', label: 'Neubrutalism', year: '2021', icon: '🧱' },
   { id: 'bento', label: 'Bento', year: '2022', icon: '📱' },
-  { id: 'liquid', label: 'Liquid Glass', year: '2025', icon: '💧' },
-  { id: 'threed', label: 'Future 3D', year: '2026', icon: '🌌' }
+  { id: 'liquid', label: 'Liquid Glass', year: '2025', icon: '💧' }
 ];

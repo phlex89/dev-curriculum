@@ -242,11 +242,11 @@ const it = {
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
       parallax: 'Parallax · 2018',
+      threed: 'WebGL · 2019',
       glass: 'Glassmorphism · 2020',
       brutalism: 'Neubrutalism · 2021',
       bento: 'Bento · 2022',
-      liquid: 'Liquid Glass · 2025',
-      threed: 'Future 3D · 2026'
+      liquid: 'Liquid Glass · 2025'
     } as Record<Theme, string>,
     eraNames: {} as Partial<Record<Theme, string>>
   },
@@ -524,11 +524,11 @@ const en: UiStrings = {
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
       parallax: 'Parallax · 2018',
+      threed: 'WebGL · 2019',
       glass: 'Glassmorphism · 2020',
       brutalism: 'Neubrutalism · 2021',
       bento: 'Bento · 2022',
-      liquid: 'Liquid Glass · 2025',
-      threed: 'Future 3D · 2026'
+      liquid: 'Liquid Glass · 2025'
     },
     eraNames: { teletext: 'Teletext' }
   },

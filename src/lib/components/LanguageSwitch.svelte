@@ -264,17 +264,17 @@
   }
 
   .lang-switch.theme-threed {
-    --ls-bg: rgba(255, 255, 255, 0.08);
-    --ls-fg: #fff;
-    --ls-border: 1px solid rgba(255, 255, 255, 0.2);
-    --ls-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    --ls-blur: blur(12px);
-    --ls-divider: 1px solid rgba(255, 255, 255, 0.2);
-    --ls-active-bg: rgba(0, 255, 255, 0.25);
-    --ls-active-fg: #00ffff;
-    --ls-hover-bg: rgba(255, 255, 255, 0.12);
-    --ls-focus: #00ffff;
-    --ls-font: 'Orbitron', 'Space Grotesk', sans-serif;
+    --ls-bg: rgba(9, 9, 12, 0.86);
+    --ls-fg: #f4f3ef;
+    --ls-border: 1px solid rgba(244, 243, 239, 0.14);
+    --ls-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --ls-blur: none;
+    --ls-divider: 1px solid rgba(244, 243, 239, 0.12);
+    --ls-active-bg: #f4f3ef;
+    --ls-active-fg: #07070a;
+    --ls-hover-bg: rgba(244, 243, 239, 0.08);
+    --ls-focus: #f4f3ef;
+    --ls-font: 'JetBrains Mono', ui-monospace, monospace;
   }
 
   @media (max-width: 720px) {

@@ -227,7 +227,12 @@ contemporanei aiuta davvero. La seconda resta di riserva.
 - ✅ **Trovato in verifica a schermo.** La `timeline-scrim` di `+page.svelte` scuriva del ~35% la
   taskbar di XP: disattivata per quell'era.
 - ⏭️ **Saltato.** Cursore XP (con un SVG non sarebbe stato credibile).
-- ⬜ **Aperto.** Ondata 2 (3D ricollocato) e ondata 3 (Y2K, AI): richiedono un design dedicato.
+- ✅ **Ondata 2.** Il 3D è ora **"WebGL · 2019"** (`ThreeD.svelte` riscritto + `threed/shaders.ts`),
+  tra `parallax` e `glass`: preloader `000→100`, blob `ShaderMaterial` iridescente senza post-processing,
+  cinque capitoli guidati dallo scroll, carriera come curva 3D con etichette DOM proiettate, fallback
+  per reduced-motion, senza WebGL e mobile. Orbitron dismesso. La timeline oggi chiude con `liquid`.
+- ✅ **Refactor 1–3** della §10 (`isTheme`, `switch` audio esaustivo, `src/lib/motion.ts`).
+- ⬜ **Aperto.** Ondata 3 (Y2K, poi AI come finale).
 
 ## 10. Refactor proposti
 

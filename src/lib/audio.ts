@@ -72,6 +72,38 @@ function tone(c: AudioContext, dest: AudioNode, o: ToneOpts) {
   osc.stop(t0 + dur + 0.02);
 }
 
+function ambientBreath(c: AudioContext, dest: AudioNode) {
+  const t0 = c.currentTime;
+  const dur = 1.9;
+  const lp = c.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.Q.value = 0.6;
+  lp.frequency.setValueAtTime(260, t0);
+  lp.frequency.exponentialRampToValueAtTime(1400, t0 + dur * 0.45);
+  lp.frequency.exponentialRampToValueAtTime(320, t0 + dur);
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.07, t0 + dur * 0.42);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  lp.connect(g).connect(dest);
+  const voices: [number, number][] = [
+    [146.83, -4],
+    [146.83, 5],
+    [220.0, 0],
+    [277.18, 3],
+    [329.63, -3]
+  ];
+  for (const [freq, cents] of voices) {
+    const osc = c.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    osc.detune.value = cents;
+    osc.connect(lp);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.05);
+  }
+}
+
 /** A short band-limited noise burst — the rasping "carrier" of a dial-up handshake.
  *  Uses a one-shot buffer so we never leave an oscillator ringing. */
 function noiseBurst(c: AudioContext, dest: AudioNode, start: number, dur: number, gain: number, filterHz: number) {
@@ -212,7 +244,7 @@ export function playEra(theme: Theme) {
     case 'glass': {
       // Crystalline glass chime — bright, airy, shimmering. A soft high triangle
       // arpeggio with a sine "halo" on top. The luminous, weightless opposite of
-      // threed's low sci-fi drone.
+      // threed's soft ambient pad.
       const chime = [659.25, 987.77, 1318.51]; // E5 · B5 · E6
       chime.forEach((f, i) => tone(c, master, { freq: f, type: 'triangle', start: i * 0.07, dur: 0.5, gain: 0.07 }));
       tone(c, master, { freq: 1975.53, type: 'sine', start: 0.16, dur: 0.6, gain: 0.03 }); // high shimmer halo
@@ -227,20 +259,16 @@ export function playEra(theme: Theme) {
     }
     case 'parallax': {
       // Airy cinematic swell — a soft pad that rises and opens, breathy and calm.
-      // Distinct from glass's crystalline chime and threed's dark drone: warm,
+      // Distinct from glass's crystalline chime and threed's filtered pad: warm,
       // editorial, premium. Slow ascending sines/triangle that bloom together.
       tone(c, master, { freq: 261.63, type: 'sine', dur: 0.95, gain: 0.06, slideTo: 392.0 }); // C4 → G4
       tone(c, master, { freq: 392.0, type: 'triangle', start: 0.14, dur: 0.85, gain: 0.05, slideTo: 523.25 }); // G4 → C5
       tone(c, master, { freq: 783.99, type: 'sine', start: 0.3, dur: 0.7, gain: 0.025, slideTo: 1046.5 }); // airy top sheen
       break;
     }
-    case 'threed': {
-      // Suspended sci-fi swell — a low detuned drone that rises.
-      tone(c, master, { freq: 110, type: 'sawtooth', dur: 0.7, gain: 0.05, slideTo: 220 });
-      tone(c, master, { freq: 138.6, type: 'sine', dur: 0.7, gain: 0.07, slideTo: 277 });
-      tone(c, master, { freq: 880, type: 'triangle', start: 0.18, dur: 0.5, gain: 0.04, slideTo: 1320 });
+    case 'threed':
+      ambientBreath(c, master);
       break;
-    }
     default:
       theme satisfies never;
   }

@@ -341,11 +341,9 @@
   .timeline-scrim.theme-winxp {
     display: none;
   }
-  /* Future 3D is the worst case: the Timeline pill is near-transparent glass over
-     a busy luminous scene, so it needs a deeper scrim to read against. */
   .timeline-scrim.theme-threed {
     height: 190px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.66) 0%, rgba(0, 0, 0, 0.32) 45%, transparent 100%);
+    background: linear-gradient(to top, rgba(7, 7, 10, 0.9) 0%, rgba(7, 7, 10, 0.5) 45%, transparent 100%);
   }
 
   /* --- Global audio toggle (bottom-left, aligned with the Timeline) --- */
@@ -462,19 +460,22 @@
   .audio-fab.theme-web1.on { background: #000080; color: #fff; border-style: inset; }
 
   .audio-fab.theme-threed {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(9, 9, 12, 0.86);
+    border: 1px solid rgba(244, 243, 239, 0.14);
+    color: #f4f3ef;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .audio-fab.theme-threed.on {
-    background: rgba(0, 255, 255, 0.25);
-    border-color: #00ffff;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    border-color: transparent;
+    background:
+      linear-gradient(#111116, #111116) padding-box,
+      linear-gradient(115deg, #8b48b5, #f4ac9f 35%, #a7f4e3 65%, #3e91f9) border-box;
   }
 
   /* Glassmorphism: frosted milky pill with a fine top light-edge — the luminous
-     Big Sur look (light, not the dark neon of threed). */
+     Big Sur look (light, not the near-black of threed). */
   .audio-fab.theme-glass {
     background: rgba(255, 255, 255, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.6);

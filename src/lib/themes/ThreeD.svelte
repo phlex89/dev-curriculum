@@ -10,6 +10,8 @@
     dustFragment,
     nodeVertex,
     nodeFragment,
+    lineVertex,
+    lineFragment,
     paletteAt
   } from './threed/shaders';
 
@@ -32,23 +34,32 @@
   const nameParts = cvData.name.split(' ');
   const monogram = nameParts.map((p) => p[0]).join('');
   const words = cvData.summary.split(/\s+/);
+  let letterCounter = 0;
+  const nameWords = nameParts.map((p) => [...p].map((c) => ({ c, k: letterCounter++ })));
+  const LETTERS = letterCounter;
+
+  const isOngoing = (period: string) => !/\d\s*$/.test(period.trim());
+  const current = cvData.experience.find((e) => isOngoing(e.period));
 
   const pathItems = [
-    ...cvData.experience.map((e) => ({
-      heading: e.company,
-      role: e.title,
-      period: e.period,
-      description: e.description,
-      technologies: e.technologies
-    })),
     {
       heading: cvData.earlyCareer.title,
       role: '',
       period: cvData.earlyCareer.period,
       description: cvData.earlyCareer.description,
-      technologies: cvData.earlyCareer.technologies
-    }
+      technologies: cvData.earlyCareer.technologies,
+      now: false
+    },
+    ...[...cvData.experience].reverse().map((e) => ({
+      heading: e.company,
+      role: e.title,
+      period: e.period,
+      description: e.description,
+      technologies: e.technologies,
+      now: e === current
+    }))
   ];
+  const nowIdx = pathItems.findIndex((p) => p.now);
 
   let rowCounter = 0;
   const skillGroups = cvData.skillGroups.map((g) => ({
@@ -61,8 +72,11 @@
     { x: 2.4, y: -0.05, z: -6.6, sc: 0.9, amp: 0.26, dim: 1, vL: 1, vB: 0 },
     { x: -10, y: 3.6, z: -34, sc: 2.2, amp: 0.34, dim: 0.5, vL: 0, vB: 0 },
     { x: 2.9, y: -0.2, z: -6.4, sc: 0.92, amp: 0.28, dim: 0.95, vL: 1, vB: 0 },
-    { x: 0, y: 0.5, z: -6, sc: 0.9, amp: 0.38, dim: 1, vL: 0, vB: 1 }
+    { x: 0, y: 0.5, z: -6, sc: 0.9, amp: 0.33, dim: 1, vL: 0, vB: 1 }
   ];
+  const FINALE = { x: -1.6, y: 0.05, z: -15, sc: 1.4, dim: 1, amp: 0.24 };
+  const SPRING_K = 44;
+  const SPRING_C = 6.4;
   const POSES_NARROW: Pose[] = [
     { x: 0, y: 0.55, z: -6, sc: 0.82, amp: 0.26, dim: 1, vL: 0, vB: 1 },
     { x: 0.9, y: 1.7, z: -7.5, sc: 0.8, amp: 0.22, dim: 0.75, vL: 1, vB: 0 },
@@ -80,6 +94,9 @@
   let progEl: HTMLSpanElement;
   const sectionEls: HTMLElement[] = $state([]);
   const labelEls: HTMLLIElement[] = $state([]);
+  const letterEls: HTMLSpanElement[] = $state([]);
+  const rowEls: HTMLLIElement[] = $state([]);
+  const rowNameEls: HTMLSpanElement[] = $state([]);
 
   let mode = $state<Mode>('full');
   let narrow = $state(false);
@@ -105,7 +122,7 @@
   let dustLayers: THREE_NS.Points[] = [];
   let dustMats: THREE_NS.ShaderMaterial[] = [];
   let pathGroup: THREE_NS.Group;
-  let lineMat: THREE_NS.LineBasicMaterial;
+  let lineMat: THREE_NS.ShaderMaterial;
   let nodeMat: THREE_NS.ShaderMaterial;
   let nodeOn: THREE_NS.BufferAttribute;
   let curve: THREE_NS.CatmullRomCurve3;
@@ -128,11 +145,43 @@
   let my = 0;
   let cmx = 0;
   let cmy = 0;
+  let px = -1e5;
+  let py = -1e5;
   let energy = 0;
+  let en = 0;
   let kick = 0;
   let hueTarget = 0;
   let hue = 0;
   let rail = 0;
+  let fine = $state(false);
+  let clock = 0;
+
+  let sx = 0;
+  let sy = 0;
+  let svx = 0;
+  let svy = 0;
+  let rx = 0;
+  let ry = 0;
+  let rvx = 0;
+  let rvy = 0;
+  let hov = 0;
+  let hovered = false;
+  let warm = 0;
+  let prox = 0;
+  let ripSlot = 0;
+  let lastEmit = -10;
+  let movedSinceEmit = false;
+
+  const lx = new Float32Array(LETTERS);
+  const ly = new Float32Array(LETTERS);
+  const lp = new Float32Array(LETTERS);
+  const lv = new Float32Array(LETTERS);
+  const lShown = new Float32Array(LETTERS);
+  let lSigma = 80;
+  let measureCtx: CanvasRenderingContext2D | null = null;
+  let lettersMeasured = false;
+  let lettersSettled = true;
+  let pointerDirty = false;
 
   const cur: Pose & { path: number } = { ...POSES[0], path: 0 };
 
@@ -205,6 +254,7 @@
 
   function onScroll() {
     st = scroller.scrollTop;
+    pointerDirty = true;
     trackChapter();
     if (!animated) applyVeils(targetPose());
   }
@@ -212,9 +262,20 @@
   function onPointer(e: PointerEvent) {
     const nx = (e.clientX / window.innerWidth) * 2 - 1;
     const ny = (e.clientY / window.innerHeight) * 2 - 1;
-    energy = Math.min(1, energy + Math.hypot(nx - mx, ny - my) * 1.6);
+    energy = Math.min(1, energy + Math.hypot(nx - mx, ny - my) * 1.5);
     mx = nx;
     my = ny;
+    px = e.clientX;
+    py = e.clientY;
+    pointerDirty = true;
+    movedSinceEmit = true;
+  }
+
+  function onPointerOut(e: PointerEvent) {
+    if (e.relatedTarget) return;
+    px = -1e5;
+    py = -1e5;
+    pointerDirty = true;
   }
 
   function skillEnter(i: number) {
@@ -225,6 +286,164 @@
     hueTarget = 0;
   }
 
+  function kern(root: ParentNode | null) {
+    if (!root) return;
+    const letters = [...root.querySelectorAll<HTMLElement>('.lt')];
+    if (!letters.length) return;
+    measureCtx ??= document.createElement('canvas').getContext('2d');
+    const ctx = measureCtx;
+    if (!ctx) return;
+    const cs = getComputedStyle(letters[0]);
+    ctx.font = `400 ${cs.fontSize} ${cs.fontFamily}`;
+    letters.forEach((el, i) => {
+      const next = letters[i + 1];
+      if (!next || next.parentElement !== el.parentElement) {
+        el.style.marginRight = '';
+        return;
+      }
+      const a = el.textContent ?? '';
+      const b = next.textContent ?? '';
+      const k = ctx.measureText(a + b).width - ctx.measureText(a).width - ctx.measureText(b).width;
+      el.style.marginRight = Math.abs(k) < 0.05 ? '' : `${k.toFixed(2)}px`;
+    });
+  }
+
+  function writeLetter(i: number, v: number) {
+    const el = letterEls[i];
+    if (!el) return;
+    el.style.transform =
+      Math.abs(v) < 0.001 ? '' : `translateY(${(-v * 0.09).toFixed(4)}em) scale(${(1 + v * 0.05).toFixed(4)}, ${(1 + v * 0.1).toFixed(4)})`;
+  }
+
+  function measureLetters() {
+    if (!fine || !animated || !letterEls.length) return;
+    const first = letterEls[0];
+    if (!first) return;
+    letterEls.forEach((el, i) => {
+      const r = el.getBoundingClientRect();
+      const line = (el.closest('.line') as HTMLElement).getBoundingClientRect();
+      lx[i] = r.left + r.width / 2;
+      ly[i] = line.top + line.height / 2 + st;
+    });
+    lSigma = parseFloat(getComputedStyle(first).fontSize) * 0.62;
+    lettersMeasured = true;
+    pointerDirty = true;
+  }
+
+  function measureRows() {
+    if (!rowNameEls.length) return;
+    rowNameEls.forEach((el) => (el.style.whiteSpace = 'nowrap'));
+    const widths = rowNameEls.map((el) => el.getBoundingClientRect().width);
+    rowNameEls.forEach((el, i) => {
+      el.style.whiteSpace = '';
+      const row = rowEls[i];
+      const idx = row.lastElementChild as HTMLElement;
+      const fs = parseFloat(getComputedStyle(row).fontSize);
+      const room = row.clientWidth - idx.offsetWidth - 20 - fs * 0.4 - 6;
+      const chars = Math.max(1, (el.textContent ?? '').length);
+      const extra = clamp((room - widths[i]) / chars, 0, fs * 0.04);
+      row.style.setProperty('--trk', `${(-0.02 * fs + extra).toFixed(2)}px`);
+      row.classList.toggle('wrap', widths[i] > room + fs * 0.4);
+    });
+  }
+
+  function measureType() {
+    measureRows();
+    wrap.querySelectorAll('.split').forEach((el) => kern(el));
+    measureLetters();
+  }
+
+  function updateLetters(dt: number) {
+    if (!lettersMeasured || (!pointerDirty && lettersSettled)) return;
+    pointerDirty = false;
+    const inView = st < vh;
+    const inv = 1 / (2 * lSigma * lSigma);
+    let settled = true;
+    for (let i = 0; i < LETTERS; i++) {
+      let tgt = 0;
+      if (inView && px > -1e4) {
+        const dx = px - lx[i];
+        const dy = py - (ly[i] - st);
+        tgt = Math.exp(-(dx * dx + dy * dy * 0.45) * inv);
+      }
+      lv[i] += (120 * (tgt - lp[i]) - 13 * lv[i]) * dt;
+      lp[i] += lv[i] * dt;
+      if (Math.abs(tgt - lp[i]) < 0.002 && Math.abs(lv[i]) < 0.01) {
+        lp[i] = tgt;
+        lv[i] = 0;
+      } else {
+        settled = false;
+      }
+      if (Math.abs(lp[i] - lShown[i]) > 0.0015 || (lp[i] === tgt && lShown[i] !== tgt)) {
+        lShown[i] = lp[i];
+        writeLetter(i, lp[i]);
+      }
+    }
+    lettersSettled = settled;
+  }
+
+  function spring(dt: number) {
+    const inside = fine && px > -1e4;
+    const tx = inside ? mx * 0.34 : 0;
+    const ty = inside ? -my * 0.22 : 0;
+    const tRy = inside ? mx * 0.42 : 0;
+    const tRx = inside ? my * 0.3 : 0;
+    svx += (SPRING_K * (tx - sx) - SPRING_C * svx) * dt;
+    svy += (SPRING_K * (ty - sy) - SPRING_C * svy) * dt;
+    rvy += (SPRING_K * 0.7 * (tRy - ry) - SPRING_C * 0.85 * rvy) * dt;
+    rvx += (SPRING_K * 0.7 * (tRx - rx) - SPRING_C * 0.85 * rvx) * dt;
+    sx += svx * dt;
+    sy += svy * dt;
+    ry += rvy * dt;
+    rx += rvx * dt;
+  }
+
+  function emitRipple(dir: THREE_NS.Vector3) {
+    const slot = ripSlot ? blobMat.uniforms.uRip1.value : blobMat.uniforms.uRip0.value;
+    slot.set(dir.x, dir.y, dir.z, clock);
+    ripSlot ^= 1;
+    lastEmit = clock;
+    movedSinceEmit = false;
+  }
+
+  function pointerOnBlob(k: number, amp: number) {
+    const u = blobMat.uniforms;
+    if (!fine) {
+      u.uMouseDir.value.set(cmx * 0.9, -cmy * 0.9, 0.75).normalize();
+      u.uMouseAmp.value = 0.1 + en * 0.22;
+      return;
+    }
+    let hit = false;
+    if (px > -1e4 && v3.d && v3.e && qInv) {
+      const tanH = Math.tan((camera.fov * Math.PI) / 360);
+      const D = v3.d.set(mx * tanH * camera.aspect, -my * tanH, -1).normalize();
+      const C = blob.position;
+      const R = blob.scale.x * (1 + amp * 0.55);
+      const b = D.dot(C);
+      const disc = b * b - (C.lengthSq() - R * R);
+      hit = b > 0 && disc > 0;
+      const dir = v3.e.copy(D).multiplyScalar(hit ? b - Math.sqrt(disc) : b).sub(C);
+      const ratio = dir.length() / R;
+      if (ratio < 1e-4) dir.set(0, 0, 1);
+      dir.normalize().applyQuaternion(qInv.copy(blob.quaternion).invert());
+      u.uMouseDir.value.lerp(dir, Math.min(1, k * 1.8)).normalize();
+      prox = mix(prox, 1 - smooth(1, 2.4, ratio), k);
+      if (hit && clock - lastEmit > 0.45 && (!hovered || (movedSinceEmit && clock - lastEmit > 1.3))) emitRipple(dir);
+    } else {
+      prox = mix(prox, 0, k);
+    }
+    hovered = hit;
+    hov = mix(hov, hit ? 1 : 0, k * 0.9);
+    warm = mix(warm, hit ? 1 : 0, k * (hit ? 0.5 : 0.28));
+    u.uMouseAmp.value = 0.06 + prox * 0.16 + hov * 0.08 + en * 0.2;
+  }
+
+  function finaleWeight() {
+    const n = nodeT.length;
+    if (nowIdx < 1 || nowIdx !== n - 1) return 0;
+    return smooth(mix(nodeT[n - 2], nodeT[n - 1], 0.3), nodeT[n - 1], rail);
+  }
+
   function railCamera(s: number) {
     const c = curve.getPointAt(clamp(s, 0, 1));
     const ahead = curve.getPointAt(clamp(s + 0.06, 0, 1));
@@ -232,19 +451,24 @@
     camera.lookAt(ahead.x * 0.18 + cmx * 0.25, ahead.y * 0.18 - cmy * 0.18, ahead.z - 3);
   }
 
-  function applyPose(p: Pose & { path: number }) {
-    blob.position.set(p.x, p.y, p.z);
-    blob.scale.setScalar(p.sc * 1.55);
+  function applyPose(p: Pose & { path: number }, k = 1) {
+    const f = p.path * finaleWeight();
+    blob.position.set(mix(p.x, FINALE.x, f) + sx, mix(p.y, FINALE.y, f) + sy, mix(p.z, FINALE.z, f));
+    blob.scale.setScalar(mix(p.sc, FINALE.sc, f) * 1.55);
+    blob.rotation.set(rx, ry, 0);
+    const amp = mix(p.amp, FINALE.amp, f) + kick * 0.2 + en * 0.12;
     const u = blobMat.uniforms;
-    u.uAmp.value = p.amp + kick * 0.2;
-    u.uDim.value = p.dim;
+    u.uAmp.value = amp;
+    u.uFreq.value = 0.95 + en * 0.28;
+    u.uDim.value = mix(p.dim, FINALE.dim, f);
     u.uHue.value = hue;
     u.uScroll.value = st / maxScroll;
-    u.uMouseDir.value.set(cmx * 0.9, -cmy * 0.9, 0.75).normalize();
-    u.uMouseAmp.value = 0.1 + energy * 0.22;
+    pointerOnBlob(k, amp);
+    u.uWarm.value = Math.min(1, warm + en * 0.35);
     u.uTime.value = time;
+    u.uClock.value = clock;
     pathGroup.visible = p.path > 0.002;
-    lineMat.opacity = p.path * 0.5;
+    lineMat.uniforms.uOpacity.value = p.path * 0.5;
     nodeMat.uniforms.uOpacity.value = p.path;
     applyVeils(p);
   }
@@ -260,7 +484,13 @@
     });
   }
 
-  const v3 = { a: null as THREE_NS.Vector3 | null, b: null as THREE_NS.Vector3 | null };
+  const v3 = {
+    a: null as THREE_NS.Vector3 | null,
+    b: null as THREE_NS.Vector3 | null,
+    d: null as THREE_NS.Vector3 | null,
+    e: null as THREE_NS.Vector3 | null
+  };
+  let qInv: THREE_NS.Quaternion | null = null;
 
   const labelFade: number[] = [];
 
@@ -298,7 +528,7 @@
       let side: 'r' | 'l' = x + 22 + w <= W - 24 ? 'r' : 'l';
       if (side === 'l' && x - 22 - w < 24) side = 'r';
       if (isOn) {
-        y = clamp(y, 150 + h / 2, H - 190 - h / 2);
+        y = clamp(y, 200 + h / 2, H - 190 - h / 2);
         x = clamp(x, 24, W - 24);
       }
       const left = side === 'r' ? x + 22 : x - 22 - w;
@@ -310,7 +540,7 @@
         const [l0, t0, r0, b0] = box;
         if (left < r0 && left + w > l0 && top < b0 && top + h > t0) vis = 0;
       }
-      if (y + offY < 130 || y + offY > H - 170) vis = 0;
+      if (y + offY < 190 || y + offY > H - 170) vis = 0;
       labelFade[i] = mix(labelFade[i] ?? 0, vis, 0.14);
       const depth = (1 - smooth(8, 24, dist)) * smooth(1.2, 3.2, dist);
       const op = cur.path * labelFade[i] * (isOn ? smooth(0.6, 2.2, dist) : depth * 0.6);
@@ -339,8 +569,10 @@
     const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
     last = now;
     const k = 1 - Math.pow(1 - 0.08, dt * 60);
-    time += dt * (0.55 + energy * 0.9);
-    energy *= Math.pow(0.94, dt * 60);
+    clock += dt;
+    energy *= Math.pow(0.965, dt * 60);
+    en = mix(en, energy, 1 - Math.pow(1 - 0.12, dt * 60));
+    time += dt * (0.55 + en * 1.1);
     kick *= Math.pow(0.95, dt * 60);
     cmx = mix(cmx, mx, k * 0.75);
     cmy = mix(cmy, my, k * 0.75);
@@ -352,8 +584,10 @@
     });
     rail = mix(rail, projected ? railTarget() : nodeT[0] ?? 0, k);
     railCamera(rail);
-    applyPose(cur);
+    if (fine) spring(dt);
+    applyPose(cur, k);
     updateDust();
+    if (fine) updateLetters(dt);
     if (nodeOn) {
       for (let i = 0; i < nodeOn.count; i++) {
         const on = nodeOn.getX(i);
@@ -395,6 +629,7 @@
   function onResize() {
     measure();
     st = scroller.scrollTop;
+    measureType();
     if (renderer && camera) {
       camera.aspect = vw / vh;
       camera.updateProjectionMatrix();
@@ -423,12 +658,19 @@
     blobMat = new THREE.ShaderMaterial({
       vertexShader: blobVertex,
       fragmentShader: blobFragment,
+      side: THREE.DoubleSide,
       uniforms: {
         uTime: { value: 0 },
         uAmp: { value: 0.26 },
         uFreq: { value: 0.95 },
         uMouseDir: { value: new THREE.Vector3(0, 0, 1) },
         uMouseAmp: { value: 0.1 },
+        uMouseSharp: { value: 3 },
+        uRip0: { value: new THREE.Vector4(0, 0, 1, -100) },
+        uRip1: { value: new THREE.Vector4(0, 0, 1, -100) },
+        uRipAmp: { value: 0.055 },
+        uClock: { value: 0 },
+        uWarm: { value: 0 },
         uHue: { value: 0 },
         uDim: { value: 1 },
         uScroll: { value: 0 }
@@ -479,11 +721,12 @@
 
     const n = pathItems.length;
     nodePos = Array.from({ length: n }, (_, i) => {
+      if (i === nowIdx && i === n - 1) return new THREE.Vector3(0.6, 0.15, -i * 8 - 2);
       const a = i * 1.15 + 0.4;
       return new THREE.Vector3(Math.cos(a) * 2.5, Math.sin(a) * 1.45, -i * 8);
     });
     const lead = new THREE.Vector3(nodePos[0].x * 0.4, nodePos[0].y * 0.4, 7);
-    const tail = nodePos[n - 1].clone().add(new THREE.Vector3(-1.5, -0.8, -10));
+    const tail = nodePos[n - 1].clone().add(new THREE.Vector3(-0.9, -0.1, -10));
     curve = new THREE.CatmullRomCurve3([lead, ...nodePos, tail], false, 'centripetal');
     const samples = 800;
     const pts = curve.getSpacedPoints(samples);
@@ -510,18 +753,20 @@
       colors[j * 3 + 2] = mix(0.95, b, 0.6) * fade;
     });
     const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
-    lineGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    lineMat = new THREE.LineBasicMaterial({
-      vertexColors: true,
+    lineGeo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
+    lineMat = new THREE.ShaderMaterial({
+      vertexShader: lineVertex,
+      fragmentShader: lineFragment,
       transparent: true,
-      opacity: 0,
-      depthWrite: false
+      depthWrite: false,
+      uniforms: { uOpacity: { value: 0 } }
     });
     pathGroup.add(new THREE.Line(lineGeo, lineMat));
 
     const nodeGeo = new THREE.BufferGeometry().setFromPoints(nodePos);
     nodeOn = new THREE.BufferAttribute(new Float32Array(n), 1);
     nodeGeo.setAttribute('aOn', nodeOn);
+    nodeGeo.setAttribute('aBig', new THREE.BufferAttribute(Float32Array.from(pathItems, (p) => (p.now ? 1 : 0)), 1));
     nodeMat = new THREE.ShaderMaterial({
       vertexShader: nodeVertex,
       fragmentShader: nodeFragment,
@@ -541,6 +786,9 @@
 
     v3.a = new THREE.Vector3();
     v3.b = new THREE.Vector3();
+    v3.d = new THREE.Vector3();
+    v3.e = new THREE.Vector3();
+    qInv = new THREE.Quaternion();
   }
 
   function toFallback() {
@@ -593,7 +841,9 @@
   onMount(() => {
     rm = prefersReduced();
     const mql = window.matchMedia('(max-width: 899px), (pointer: coarse)');
+    const fineMql = window.matchMedia('(pointer: fine) and (hover: hover)');
     narrow = mql.matches;
+    fine = !rm && fineMql.matches;
     const gl = hasWebGL();
     mode = !gl ? 'nogl' : rm ? 'static' : narrow ? 'lite' : 'full';
 
@@ -609,12 +859,16 @@
 
     const onMql = () => {
       narrow = mql.matches;
+      fine = !rm && fineMql.matches;
       if (!projected) clearLabels();
       measure();
+      measureType();
     };
     mql.addEventListener('change', onMql);
+    fineMql.addEventListener('change', onMql);
     window.addEventListener('resize', onResize);
     window.addEventListener('pointermove', onPointer, { passive: true });
+    document.documentElement.addEventListener('pointerout', onPointerOut, { passive: true });
     document.addEventListener('visibilitychange', onVisibility);
     const ro = new ResizeObserver(() => {
       measure();
@@ -628,6 +882,7 @@
 
     const fontsReady = (document.fonts?.ready ?? Promise.resolve()).then(() => {
       progress += 0.22;
+      if (!disposed) measureType();
     });
 
     if (mode !== 'nogl') {
@@ -680,8 +935,10 @@
       disposed = true;
       stop();
       mql.removeEventListener('change', onMql);
+      fineMql.removeEventListener('change', onMql);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onPointer);
+      document.documentElement.removeEventListener('pointerout', onPointerOut);
       document.removeEventListener('visibilitychange', onVisibility);
       ro.disconnect();
       canvas?.removeEventListener('webglcontextlost', onContextLost);
@@ -693,6 +950,11 @@
   });
 </script>
 
+{#snippet title(text: string)}
+  <span class="sr">{text}</span>
+  <span class="split" aria-hidden="true">{#each [...text] as c, j}<span class="lt" style="--j:{j}">{c}</span>{/each}</span>
+{/snippet}
+
 <div
   class="wgl"
   class:anim={animated}
@@ -701,6 +963,7 @@
   class:narrow
   class:nogl={mode === 'nogl'}
   class:still={!animated}
+  class:fine
   bind:this={wrap}
 >
   <canvas bind:this={canvas} class="stage" class:live={glLive} aria-hidden="true"></canvas>
@@ -713,8 +976,9 @@
     <div class="track">
       <section class="ch hero" bind:this={sectionEls[0]} aria-label="Intro">
         <h1 class="name">
-          {#each nameParts as part, i}
-            <span class="line"><span style="--d:{i}">{part}</span></span>{' '}
+          <span class="sr">{cvData.name}</span>
+          {#each nameWords as word, i}
+            <span class="line split" aria-hidden="true"><span class="word" style="--d:{i}">{#each word as l}<span class="lt" bind:this={letterEls[l.k]}>{l.c}</span>{/each}</span></span>
           {/each}
         </h1>
         <div class="hero-foot">
@@ -726,13 +990,18 @@
             <span>Scroll to explore</span>
             <i class="hint-line"></i>
           </div>
-          <p class="loc">{cvData.contact.location}</p>
+          <div class="hero-side">
+            {#if current}
+              <p class="now-line"><span class="now-tag"><i class="now-dot" aria-hidden="true"></i>Now<span class="now-sep">—</span></span><span class="nw">{current.title}</span><span class="nw">@ {current.company}</span></p>
+            {/if}
+            <p class="loc">{cvData.contact.location}</p>
+          </div>
         </div>
       </section>
 
       <section class="ch about" class:in={seen[1]} bind:this={sectionEls[1]}>
         <div class="about-inner">
-          <h2 class="kicker"><span>02</span>About</h2>
+          <h2 class="kicker"><span class="k-idx" aria-hidden="true">02</span><span class="k-title">{@render title('About')}</span></h2>
           <p class="words">
             {#each words as w, i}<span class="w" style="--i:{i}">{w}</span>{' '}{/each}
           </p>
@@ -741,11 +1010,11 @@
 
       <section class="ch path" class:in={seen[2]} bind:this={sectionEls[2]} style="--n:{pathItems.length}">
         <div class="path-sticky" bind:this={pathSticky}>
-          <h2 class="kicker path-kicker"><span>03</span>Path</h2>
+          <h2 class="kicker path-kicker"><span class="k-idx" aria-hidden="true">03</span><span class="k-title">{@render title('Path')}</span></h2>
           <ol class="nodes">
             {#each pathItems as item, i}
-              <li class="node" class:on={!projected || i === active} bind:this={labelEls[i]}>
-                <span class="n-idx">{String(i + 1).padStart(2, '0')}</span>
+              <li class="node" class:on={!projected || i === active} class:now={item.now} bind:this={labelEls[i]}>
+                <span class="n-idx">{String(i + 1).padStart(2, '0')}{#if item.now}<span class="n-now"><i class="now-dot" aria-hidden="true"></i>Now</span>{/if}</span>
                 <h3 class="n-head">{item.heading}</h3>
                 <p class="n-meta">
                   {#if item.role}<span class="n-role">{item.role}</span>{/if}
@@ -764,7 +1033,7 @@
       </section>
 
       <section class="ch skills" class:in={seen[3]} bind:this={sectionEls[3]}>
-        <h2 class="kicker"><span>04</span>Skills</h2>
+        <h2 class="kicker"><span class="k-idx" aria-hidden="true">04</span><span class="k-title">{@render title('Skills')}</span></h2>
         <div class="skill-groups">
           {#each skillGroups as g}
             <div class="sg">
@@ -774,10 +1043,11 @@
                   <li
                     class="row"
                     style="--i:{item.i}"
+                    bind:this={rowEls[item.i]}
                     onpointerenter={() => skillEnter(item.i)}
                     onpointerleave={skillLeave}
                   >
-                    <span class="row-name">{item.name}</span>
+                    <span class="row-name" bind:this={rowNameEls[item.i]}>{item.name}</span>
                     <span class="row-idx" aria-hidden="true">{String(item.i + 1).padStart(2, '0')}</span>
                   </li>
                 {/each}
@@ -824,7 +1094,7 @@
       </section>
 
       <section class="ch contact" class:in={seen[4]} bind:this={sectionEls[4]}>
-        <h2 class="contact-title">Contact</h2>
+        <h2 class="contact-title">{@render title('Contact')}</h2>
         <div class="contact-foot">
           <a class="c-link c-mail" href="mailto:{cvData.contact.email}">{cvData.contact.email}</a>
           <div class="c-row">
@@ -865,6 +1135,7 @@
     --muted: #a4a3ab;
     --faint: rgba(244, 243, 239, 0.14);
     --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --display: 'Boldonse', 'Inter', system-ui, sans-serif;
     --ease: cubic-bezier(0.19, 1, 0.22, 1);
     --pad: clamp(20px, 5vw, 72px);
     position: relative;
@@ -874,8 +1145,23 @@
     overflow: hidden;
     background: var(--bg);
     color: var(--fg);
-    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .lt {
+    display: inline-block;
   }
 
   .stage {
@@ -979,25 +1265,51 @@
 
   .kicker {
     display: flex;
-    align-items: baseline;
-    gap: 14px;
-    margin: 0 0 clamp(24px, 4vh, 44px);
+    align-items: center;
+    gap: 18px;
+    margin: 0 0 clamp(28px, 4.5vh, 52px);
+    font-weight: 400;
+    color: var(--fg);
+  }
+  .k-idx {
     font-family: var(--mono);
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.16em;
-    text-transform: uppercase;
     color: var(--muted);
   }
-  .kicker span {
-    color: var(--fg);
+  .k-title {
+    padding-top: 0.14em;
+    font-family: var(--display);
+    font-size: clamp(1.3rem, 2.1vw, 2rem);
+    font-weight: 400;
+    font-synthesis: none;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .k-title .split {
+    display: inline-block;
+    letter-spacing: -0.01em;
   }
   .kicker::after {
     content: '';
-    flex: 0 0 48px;
+    flex: 0 0 56px;
     height: 1px;
-    align-self: center;
     background: var(--faint);
+  }
+  .anim .k-title .split {
+    transition: letter-spacing 1.5s var(--ease);
+  }
+  .anim .k-title .lt {
+    transition: opacity 0.9s ease, transform 1.2s var(--ease);
+    transition-delay: calc(var(--j) * 55ms);
+  }
+  .anim .ch:not(.in) .k-title .split {
+    letter-spacing: 0.42em;
+  }
+  .anim .ch:not(.in) .k-title .lt {
+    opacity: 0;
+    transform: translateY(0.45em);
   }
 
   .hero {
@@ -1009,27 +1321,36 @@
     margin: 0;
     padding-bottom: 8vh;
     text-align: center;
-    font-size: clamp(3rem, 10.5vw, 9rem);
-    font-weight: 500;
-    line-height: 0.9;
-    letter-spacing: -0.045em;
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 7.2vw, 7.25rem);
+    font-weight: 400;
+    font-synthesis: none;
+    line-height: 1.26;
+    letter-spacing: -0.02em;
     color: #fff;
     mix-blend-mode: difference;
   }
   .name .line {
     display: block;
     overflow: hidden;
-    padding: 0 0.04em 0.06em;
+    margin: -0.36em 0 -0.1em;
+    padding: 0.36em 0.08em 0.1em;
   }
-  .name .line > span {
+  .name .word {
     display: inline-block;
   }
-  .anim .name .line > span {
-    transform: translateY(108%);
+  .name .lt {
+    transform-origin: 50% 100%;
+  }
+  .fine .name .lt {
+    will-change: transform;
+  }
+  .anim .name .word {
+    transform: translateY(130%);
     transition: transform 1.3s var(--ease);
     transition-delay: calc(var(--d) * 110ms);
   }
-  .anim.ready .name .line > span {
+  .anim.ready .name .word {
     transform: none;
   }
 
@@ -1045,6 +1366,60 @@
   }
   .hero-id {
     max-width: 30rem;
+  }
+  .hero-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    justify-self: end;
+    text-align: right;
+  }
+  .now-line {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 6px 10px;
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .now-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--fg);
+  }
+  .now-sep {
+    margin-left: 2px;
+    color: var(--muted);
+  }
+  .nw {
+    white-space: nowrap;
+  }
+  .now-dot {
+    position: relative;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a7f4e3;
+    box-shadow: 0 0 10px rgba(167, 244, 227, 0.55);
+  }
+  .anim .now-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(167, 244, 227, 0.6);
+    animation: now-pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes now-pulse {
+    0% { transform: scale(0.4); opacity: 1; }
+    100% { transform: scale(1.8); opacity: 0; }
   }
   .role {
     margin: 0 0 8px;
@@ -1063,7 +1438,6 @@
   }
   .loc {
     margin: 0;
-    justify-self: end;
     font-family: var(--mono);
     font-size: 0.72rem;
     letter-spacing: 0.16em;
@@ -1168,7 +1542,7 @@
   }
   .projected .path-kicker {
     position: absolute;
-    top: 96px;
+    top: 128px;
     left: var(--pad);
     z-index: 1;
   }
@@ -1182,17 +1556,38 @@
     position: relative;
   }
   .n-idx {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 14px;
     margin-bottom: 8px;
     font-family: var(--mono);
     font-size: 0.68rem;
     letter-spacing: 0.16em;
     color: var(--muted);
   }
+  .n-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background:
+      linear-gradient(#0d0d12, #0d0d12) padding-box,
+      linear-gradient(115deg, #8b48b5, #f4ac9f 40%, #a7f4e3 75%, #3e91f9) border-box;
+    font-size: 0.64rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg);
+  }
+  .projected .node:global([data-side='l']) .n-idx {
+    justify-content: flex-end;
+  }
   .n-head {
     margin: 0;
     font-size: clamp(1.25rem, 1.8vw, 1.6rem);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.12;
     letter-spacing: -0.02em;
   }
@@ -1264,6 +1659,25 @@
     background: var(--fg);
     box-shadow: 0 0 0 4px rgba(7, 7, 10, 1), 0 0 14px 2px rgba(190, 180, 255, 0.45);
   }
+  .wgl:not(.projected) .node.now::after {
+    left: -34px;
+    top: 4px;
+    width: 17px;
+    height: 17px;
+    background: radial-gradient(circle at 35% 35%, #fff, #f4ac9f 45%, #8b48b5);
+    box-shadow: 0 0 0 5px rgba(7, 7, 10, 1), 0 0 26px 6px rgba(244, 172, 159, 0.4);
+  }
+  .node.now .n-head {
+    font-family: var(--display);
+    font-weight: 400;
+    font-synthesis: none;
+    font-size: clamp(1.35rem, 2vw, 1.85rem);
+    line-height: 1.32;
+    letter-spacing: -0.01em;
+  }
+  .wgl:not(.projected) .node.now .n-desc {
+    color: var(--fg);
+  }
 
   .projected .nodes {
     position: absolute;
@@ -1306,6 +1720,12 @@
   .projected .node.on .n-head {
     font-size: clamp(1.5rem, 2.3vw, 2.1rem);
   }
+  .projected .node.now {
+    width: min(440px, 38vw);
+  }
+  .projected .node.now.on .n-head {
+    font-size: clamp(1.45rem, 2.2vw, 2.05rem);
+  }
   .projected .n-head {
     transition: font-size 0.6s var(--ease);
   }
@@ -1345,11 +1765,21 @@
     font-size: clamp(1.4rem, 2.7vw, 2.55rem);
     font-weight: 500;
     line-height: 1.12;
-    letter-spacing: -0.028em;
+    letter-spacing: -0.02em;
     transition: color 0.4s ease, padding 0.6s var(--ease);
   }
-  .row:hover {
+  .row-name {
+    white-space: nowrap;
+    transition: letter-spacing 0.7s var(--ease);
+  }
+  .row:global(.wrap) .row-name {
+    white-space: normal;
+  }
+  .anim .row:hover {
     padding-left: 0.4em;
+  }
+  .anim .row:hover .row-name {
+    letter-spacing: var(--trk, -0.01em);
   }
   .row-idx {
     font-family: var(--mono);
@@ -1421,12 +1851,32 @@
   }
   .contact-title {
     margin: 0 0 12vh;
-    font-size: clamp(3rem, 11vw, 9rem);
-    font-weight: 500;
-    line-height: 0.9;
-    letter-spacing: -0.05em;
+    font-family: var(--display);
+    font-size: clamp(2.6rem, 8.2vw, 8.25rem);
+    font-weight: 400;
+    font-synthesis: none;
+    line-height: 1.26;
     color: #fff;
+    white-space: nowrap;
     mix-blend-mode: difference;
+  }
+  .contact-title .split {
+    display: inline-block;
+    letter-spacing: -0.02em;
+  }
+  .anim .contact-title .split {
+    transition: letter-spacing 1.8s var(--ease);
+  }
+  .anim .contact-title .lt {
+    transition: opacity 1s ease, transform 1.4s var(--ease);
+    transition-delay: calc(var(--j) * 60ms);
+  }
+  .anim .contact:not(.in) .contact-title .split {
+    letter-spacing: 0.24em;
+  }
+  .anim .contact:not(.in) .contact-title .lt {
+    opacity: 0;
+    transform: translateY(0.35em);
   }
   .contact-foot {
     position: absolute;
@@ -1614,6 +2064,15 @@
     .loc {
       display: none;
     }
+    .hero-side {
+      order: -1;
+      justify-self: start;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .now-line {
+      justify-content: flex-start;
+    }
   }
 
   @media (max-width: 720px) {
@@ -1656,11 +2115,18 @@
     .row {
       font-size: 1.35rem;
     }
+    .name {
+      font-size: min(14.6vw, 4.2rem);
+    }
+    .contact-title {
+      font-size: min(13vw, 3.6rem);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .grain,
-    .hint-line::after {
+    .hint-line::after,
+    .now-dot::after {
       animation: none !important;
     }
     .pre,

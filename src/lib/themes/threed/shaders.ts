@@ -60,10 +60,15 @@ vec3 pal(float t) {
 
 export const blobVertex = `
 uniform float uTime;
+uniform float uClock;
 uniform float uAmp;
 uniform float uFreq;
 uniform vec3 uMouseDir;
 uniform float uMouseAmp;
+uniform float uMouseSharp;
+uniform vec4 uRip0;
+uniform vec4 uRip1;
+uniform float uRipAmp;
 varying vec3 vNormal;
 varying vec3 vView;
 varying float vNoise;
@@ -75,11 +80,21 @@ float field(vec3 p) {
   return n;
 }
 
+float ripple(vec3 dir, vec4 r) {
+  float age = uClock - r.w;
+  float env = smoothstep(0.0, 0.14, age) * (1.0 - smoothstep(0.9, 2.6, age));
+  if (env <= 0.0) return 0.0;
+  float ang = acos(clamp(dot(dir, r.xyz), -1.0, 1.0));
+  float x = ang - age * 1.3;
+  return sin(x * 10.0) * exp(-x * x * 4.5) * env;
+}
+
 vec3 displace(vec3 p, out float n) {
   vec3 dir = normalize(p);
-  float pull = pow(max(dot(dir, uMouseDir), 0.0), 4.0) * uMouseAmp;
+  float pull = pow(max(dot(dir, uMouseDir), 0.0), uMouseSharp) * uMouseAmp;
+  float rip = (ripple(dir, uRip0) + ripple(dir, uRip1)) * uRipAmp;
   n = field(p);
-  return dir * (1.0 + n * (uAmp + pull) + pull * 0.35);
+  return dir * (1.0 + n * (uAmp + pull * 0.6) + pull * 0.5 + rip);
 }
 
 void main() {
@@ -103,6 +118,7 @@ void main() {
 
 export const blobFragment = `
 uniform float uHue;
+uniform float uWarm;
 uniform float uDim;
 uniform float uScroll;
 varying vec3 vNormal;
@@ -112,11 +128,17 @@ ${palette}
 
 void main() {
   vec3 N = normalize(vNormal);
+  if (!gl_FrontFacing) N = -N;
   vec3 V = normalize(vView);
   float ndv = clamp(dot(N, V), 0.0, 1.0);
-  float fres = pow(1.0 - ndv, 2.6);
+  float edge = smoothstep(0.0, 0.2, ndv);
+  float fres = pow(1.0 - ndv, 2.6) * edge;
   float t = vNoise * 0.22 + fres * 0.5 + uHue + uScroll * 0.35;
   vec3 irid = pal(t);
+  vec3 warm = irid * vec3(1.24, 0.95, 0.72);
+  vec3 lw = vec3(0.2126, 0.7152, 0.0722);
+  warm *= dot(irid, lw) / max(dot(warm, lw), 0.001);
+  irid = mix(irid, warm, uWarm * 0.75);
   vec3 L = normalize(vec3(-0.5, 0.75, 0.55));
   float diff = max(dot(N, L), 0.0);
   vec3 H = normalize(L + V);
@@ -125,8 +147,8 @@ void main() {
   vec3 col = base;
   vec3 body = mix(vec3(dot(irid, vec3(0.3, 0.59, 0.11))), irid, 0.5);
   col += body * (0.03 + 0.15 * diff * diff);
-  col += irid * fres * 0.95;
-  col += vec3(0.95, 0.93, 1.0) * spec * 0.22;
+  col += irid * fres * 1.25;
+  col += vec3(0.95, 0.93, 1.0) * spec * 0.22 * edge;
   col *= uDim;
   col = col / (1.0 + col * 0.35);
   gl_FragColor = vec4(col, 1.0);
@@ -157,15 +179,39 @@ void main() {
 }
 `;
 
+export const lineVertex = `
+attribute vec3 aColor;
+varying vec3 vColor;
+varying float vFade;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  vColor = aColor;
+  vFade = smoothstep(2.2, 5.2, -mv.z);
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+export const lineFragment = `
+uniform float uOpacity;
+varying vec3 vColor;
+varying float vFade;
+void main() {
+  gl_FragColor = vec4(vColor, uOpacity * vFade);
+}
+`;
+
 export const nodeVertex = `
 attribute float aOn;
+attribute float aBig;
 uniform float uSize;
 uniform float uPixelRatio;
 varying float vOn;
+varying float vBig;
 void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
   vOn = aOn;
-  gl_PointSize = uSize * (1.0 + aOn * 1.4) * uPixelRatio * (6.0 / max(-mv.z, 0.1));
+  vBig = aBig;
+  gl_PointSize = uSize * (1.0 + aOn * 1.4) * (1.0 + aBig * (0.6 + aOn * 0.5)) * uPixelRatio * (6.0 / max(-mv.z, 0.1));
   gl_Position = projectionMatrix * mv;
 }
 `;
@@ -173,12 +219,13 @@ void main() {
 export const nodeFragment = `
 uniform float uOpacity;
 varying float vOn;
+varying float vBig;
 ${palette}
 void main() {
   float d = length(gl_PointCoord - 0.5) * 2.0;
-  float core = smoothstep(0.22, 0.0, d);
-  float halo = pow(max(1.0 - d, 0.0), 3.0) * (0.35 + vOn * 0.5);
-  vec3 tint = mix(vec3(0.92, 0.92, 1.0), pal(0.15 + d * 0.4), 0.55);
+  float core = smoothstep(0.22 - vBig * 0.06, 0.0, d);
+  float halo = pow(max(1.0 - d, 0.0), 3.0 - vBig * 0.8) * (0.35 + vOn * 0.5 + vBig * 0.25);
+  vec3 tint = mix(vec3(0.92, 0.92, 1.0), pal(0.15 + d * 0.4 + vBig * 0.2), 0.55 + vBig * 0.2);
   vec3 col = mix(tint, vec3(1.0), core);
   gl_FragColor = vec4(col, (core + halo) * uOpacity);
 }

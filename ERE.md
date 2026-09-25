@@ -518,15 +518,19 @@ un oggetto shader domina la scena, la navigazione è una regia di camera.
 
 **Stile.**
 - **Palette:** quasi nero, testo bianco, un solo protagonista iridescente (fresnel + palette coseno).
-- **Tipografia:** Space Grotesk display enorme (nome in `mix-blend-mode: difference`), micro-UI in
-  JetBrains Mono maiuscolo agli angoli. Entrambi già self-hostati; Orbitron dismesso.
+- **Tipografia:** **Boldonse** (OFL, self-hostata 16.7KB) solo per i momenti forti: nome, titoli di
+  capitolo, "Contact", Tundr come finale del Path; lettere che reagiscono al cursore con una molla.
+  Corpo in Inter, micro-UI in JetBrains Mono. Orbitron e Space Grotesk dismessi in quest'era.
 - **Materiali:** blob `ShaderMaterial` con displacement a simplex noise, polvere a strati, grana
   filmica CSS. Nessun post-processing, nessun vetro, nessun wireframe.
 - **Layout:** preloader con contatore `000→100`, cinque capitoli guidati dallo scroll (Hero, About,
   Path, Skills, Contact) con indicatore `01 / 05`.
 
-**Interazione / narrativa.** Il cursore deforma il blob; nel capitolo Path la camera viaggia lungo
-una curva 3D della carriera, con etichette DOM proiettate sui nodi (testo nitido e accessibile);
+**Interazione / narrativa.** Il blob segue il cursore con una molla, si agita con la velocità del
+mouse, si gonfia sotto il puntatore e manda un'onda al passaggio. Nel capitolo Path la camera
+viaggia in **ordine cronologico** (dalle origini a Tundr, che è il finale con pill "Now") lungo una
+curva 3D, con etichette DOM proiettate sui nodi (testo nitido e accessibile); l'Intro mostra già
+"Now — ruolo @ azienda";
 l'hover sulle skill fa reagire lo shader. Doppio binario: con reduced-motion, senza WebGL o su
 mobile i contenuti diventano una lista statica completa.
 

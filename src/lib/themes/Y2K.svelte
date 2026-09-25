@@ -39,6 +39,30 @@
     `${t.basedIn}: ${cv.contact.location}`
   ];
 
+  const gels = [
+    { id: 'bondi', glow: '#d4f7ff', mid: '#3aa9d6', deep: '#0b6c9e', edge: '#053f66' },
+    { id: 'tangerine', glow: '#ffe7b0', mid: '#ff8a1f', deep: '#d0520a', edge: '#862e00' },
+    { id: 'lime', glow: '#f3ffc9', mid: '#92d83a', deep: '#4c9611', edge: '#2a5f05' },
+    { id: 'grape', glow: '#f2dcff', mid: '#9d62d8', deep: '#5d2b9c', edge: '#351260' }
+  ];
+  const floorRays = Array.from({ length: 81 }, (_, i) => `M500 0L${500 + (i - 40) * 72} 1000`).join('');
+  const floorLines = Array.from({ length: 36 }, (_, i) => i);
+  const amber = '255 196 120';
+  const cyan = '130 228 255';
+  const ghosts = [
+    { t: 0.2, d: 2.4, kind: 'disc', c: amber, a: 0.55 },
+    { t: 0.33, d: 5.1, kind: 'hex', c: cyan, a: 0.5 },
+    { t: 0.44, d: 1.3, kind: 'disc', c: '255 255 255', a: 0.8 },
+    { t: 0.56, d: 8.9, kind: 'ring', c: cyan, a: 0.45 },
+    { t: 0.64, d: 3.1, kind: 'disc', c: amber, a: 0.45 },
+    { t: 1.42, d: 13.3, kind: 'ring', c: '255 200 130', a: 0.35 },
+    { t: 1.54, d: 4, kind: 'hex', c: cyan, a: 0.5 },
+    { t: 1.7, d: 7.1, kind: 'disc', c: '190 170 255', a: 0.3 },
+    { t: 1.86, d: 2.2, kind: 'disc', c: cyan, a: 0.6 }
+  ];
+  const depth = [-3, -5, -8, -15, 6];
+  const planes: (HTMLElement | undefined)[] = $state([]);
+
   const reduced = prefersReduced();
   let entered = $state(introSeen || reduced);
   let leaving = $state(false);
@@ -148,7 +172,46 @@
       raf = requestAnimationFrame(loop);
     }
 
+    let px = 0;
+    let py = 0;
+    let tx = 0;
+    let ty = 0;
+    let praf = 0;
+    const paint = () =>
+      planes.forEach((el, i) => {
+        if (el) el.style.transform = `translate3d(${(px * depth[i]).toFixed(2)}px, ${(py * depth[i] * 0.6).toFixed(2)}px, 0)`;
+      });
+    const glide = () => {
+      px += (tx - px) * 0.07;
+      py += (ty - py) * 0.07;
+      const done = Math.abs(tx - px) < 0.002 && Math.abs(ty - py) < 0.002;
+      if (done) {
+        px = tx;
+        py = ty;
+      }
+      paint();
+      praf = done ? 0 : requestAnimationFrame(glide);
+    };
+    const aim = (x: number, y: number) => {
+      tx = x;
+      ty = y;
+      if (!praf) praf = requestAnimationFrame(glide);
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse' || narrow) return;
+      aim((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+    };
+    const onLeave = () => aim(0, 0);
+    const parallax = !reduced && window.matchMedia('(pointer: fine)').matches;
+    if (parallax) {
+      window.addEventListener('pointermove', onPointer, { passive: true });
+      document.documentElement.addEventListener('mouseleave', onLeave);
+    }
+
     return () => {
+      cancelAnimationFrame(praf);
+      window.removeEventListener('pointermove', onPointer);
+      document.documentElement.removeEventListener('mouseleave', onLeave);
       clearInterval(clock);
       cancelAnimationFrame(raf);
       mq.removeEventListener('change', onMq);
@@ -194,27 +257,193 @@
   </svg>
 {/snippet}
 
+{#snippet star(cls: string)}
+  <svg class={cls} viewBox="-1 -1 2 2" aria-hidden="true" focusable="false">
+    <path d="M0 -1C0.09 -0.2 0.2 -0.09 1 0C0.2 0.09 0.09 0.2 0 1C-0.09 0.2 -0.2 0.09 -1 0C-0.2 -0.09 -0.09 -0.2 0 -1Z" fill="#fff" />
+    <path d="M0 -1C0.09 -0.2 0.2 -0.09 1 0C0.2 0.09 0.09 0.2 0 1C-0.09 0.2 -0.2 0.09 -1 0C-0.2 -0.09 -0.09 -0.2 0 -1Z" fill="#dff8ff" transform="rotate(45) scale(0.46)" />
+    <circle r="0.15" fill="#fff" />
+  </svg>
+{/snippet}
+
 <div class="y2k" class:narrow>
-  <div class="sky" aria-hidden="true">
-    <div class="flare">
+  <div class="sky" class:with-console={entered || leaving} aria-hidden="true">
+    <svg class="sky-defs" width="0" height="0" focusable="false">
+      <defs>
+        <linearGradient id="{uid}-cr-sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#082f6e" />
+          <stop offset="0.12" stop-color="#1c63b4" />
+          <stop offset="0.27" stop-color="#5eaee8" />
+          <stop offset="0.4" stop-color="#c4e9fd" />
+          <stop offset="0.5" stop-color="#ffffff" />
+        </linearGradient>
+        <linearGradient id="{uid}-cr-gnd" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0a1b2e" />
+          <stop offset="0.05" stop-color="#1b3854" />
+          <stop offset="0.16" stop-color="#4c6f93" />
+          <stop offset="0.27" stop-color="#a0c0da" />
+          <stop offset="0.36" stop-color="#eaf5fc" />
+        </linearGradient>
+        <radialGradient id="{uid}-cr-edge" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0.68" stop-color="#06203a" stop-opacity="0" />
+          <stop offset="0.93" stop-color="#06203a" stop-opacity="0.3" />
+          <stop offset="1" stop-color="#06203a" stop-opacity="0.55" />
+        </radialGradient>
+        <linearGradient id="{uid}-rim" x1="0.2" y1="0.04" x2="0.8" y2="0.96">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.95" />
+          <stop offset="0.38" stop-color="#ffffff" stop-opacity="0" />
+          <stop offset="0.72" stop-color="#c8f5ff" stop-opacity="0" />
+          <stop offset="1" stop-color="#c8f5ff" stop-opacity="0.95" />
+        </linearGradient>
+        <radialGradient id="{uid}-spec" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#ffffff" />
+          <stop offset="0.42" stop-color="#ffffff" stop-opacity="0.55" />
+          <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="{uid}-gel-hl" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+          <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.3" />
+          <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+        </linearGradient>
+        <clipPath id="{uid}-ball"><circle cx="50" cy="50" r="50" /></clipPath>
+        <clipPath id="{uid}-gnd"><ellipse cx="50" cy="120" rx="94" ry="68" /></clipPath>
+        <symbol id="{uid}-chrome-ball" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="50" fill="url(#{uid}-cr-sky)" />
+          <g clip-path="url(#{uid}-ball)">
+            <path d="M9 27Q50 11 91 27L89 31Q50 17 11 31Z" fill="#fff" opacity="0.32" />
+            <ellipse cx="50" cy="120" rx="94" ry="68" fill="url(#{uid}-cr-gnd)" />
+            <g clip-path="url(#{uid}-gnd)" fill="none" stroke="#9fdcff" stroke-opacity="0.36" stroke-width="0.7">
+              <ellipse cx="50" cy="120" rx="80" ry="58" />
+              <ellipse cx="50" cy="120" rx="63" ry="45" />
+              <ellipse cx="50" cy="120" rx="44" ry="31" />
+              <path d="M50 52L-16 100M50 52L10 100M50 52L34 100M50 52L66 100M50 52L90 100M50 52L116 100" />
+            </g>
+            <ellipse cx="50" cy="120" rx="94" ry="68" fill="none" stroke="#fff" stroke-width="1.3" />
+          </g>
+          <circle cx="50" cy="50" r="50" fill="url(#{uid}-cr-edge)" />
+          <ellipse cx="34" cy="24" rx="17" ry="10" transform="rotate(-34 34 24)" fill="url(#{uid}-spec)" />
+          <ellipse cx="32" cy="22" rx="5.5" ry="3.2" transform="rotate(-34 32 22)" fill="#fff" />
+          <circle cx="50" cy="50" r="49.2" fill="none" stroke="url(#{uid}-rim)" stroke-width="1.6" />
+        </symbol>
+        {#each gels as g (g.id)}
+          <radialGradient id="{uid}-{g.id}-body" cx="0.56" cy="0.64" r="0.62" fx="0.6" fy="0.8">
+            <stop offset="0" stop-color={g.glow} />
+            <stop offset="0.34" stop-color={g.mid} />
+            <stop offset="0.8" stop-color={g.deep} />
+            <stop offset="1" stop-color={g.edge} />
+          </radialGradient>
+          <radialGradient id="{uid}-{g.id}-caus" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0.85" />
+            <stop offset="0.35" stop-color={g.glow} stop-opacity="0.7" />
+            <stop offset="1" stop-color={g.glow} stop-opacity="0" />
+          </radialGradient>
+          <radialGradient id="{uid}-{g.id}-edge" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0.72" stop-color={g.edge} stop-opacity="0" />
+            <stop offset="0.95" stop-color={g.edge} stop-opacity="0.5" />
+            <stop offset="1" stop-color={g.edge} stop-opacity="0.85" />
+          </radialGradient>
+          <symbol id="{uid}-{g.id}-ball" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="50" fill="url(#{uid}-{g.id}-body)" fill-opacity="0.96" />
+            <ellipse cx="58" cy="80" rx="28" ry="13" fill="url(#{uid}-{g.id}-caus)" />
+            <circle cx="50" cy="50" r="50" fill="url(#{uid}-{g.id}-edge)" />
+            <ellipse cx="46" cy="26" rx="31" ry="18" fill="url(#{uid}-gel-hl)" />
+            <ellipse cx="32" cy="19" rx="5.5" ry="3" transform="rotate(-30 32 19)" fill="#fff" />
+            <circle cx="50" cy="50" r="49.3" fill="none" stroke="url(#{uid}-rim)" stroke-width="1.2" opacity="0.8" />
+          </symbol>
+        {/each}
+      </defs>
+    </svg>
+
+    <div class="sun">
+      <span class="f-glow"></span>
+      <span class="f-rays"></span>
+      <span class="f-halo"></span>
+      <span class="f-streak-soft"></span>
+      <span class="f-streak"></span>
       <span class="f-core"></span>
-      <span class="f-ring"></span>
-      <span class="f-dot d1"></span>
-      <span class="f-dot d2"></span>
-      <span class="f-dot d3"></span>
-      <span class="f-hex"></span>
     </div>
-    <div class="horizon"></div>
-    <div class="grid-floor"></div>
-    <span class="blob b1"></span>
-    <span class="blob b2"></span>
-    <span class="blob b3"></span>
-    <span class="blob b4"></span>
-    <span class="chrome-ring"></span>
-    <span class="spark s1"></span>
-    <span class="spark s2"></span>
-    <span class="spark s3"></span>
-    <span class="spark s4"></span>
+
+    <div class="floor">
+      <span class="floor-sun"></span>
+      <div class="grid">
+        <svg class="rays" viewBox="0 0 1000 1000" preserveAspectRatio="none" focusable="false">
+          <path d={floorRays} vector-effect="non-scaling-stroke" />
+        </svg>
+        {#each floorLines as i (i)}<span class="fl" style="animation-delay: {(-i * 2.4).toFixed(1)}s"></span>{/each}
+      </div>
+    </div>
+    <span class="haze"></span>
+    <span class="horizon-line"></span>
+    <span class="c-shadow"></span>
+    <span class="c-reflect"></span>
+
+    <div class="plane far" bind:this={planes[0]}>
+      <span class="orb o-ice"><span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-bondi-ball" /></svg></span></span>
+      <span class="orb o-top"><span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-chrome-ball" /></svg></span></span>
+      <span class="orb o-grape"><span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-grape-ball" /></svg></span></span>
+    </div>
+
+    <div class="plane swoosh" bind:this={planes[1]}>
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" focusable="false">
+        <defs>
+          <linearGradient id="{uid}-sw-a" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="0.1" stop-color="#ffffff" stop-opacity="0.85" />
+            <stop offset="0.42" stop-color="#d4f6ff" stop-opacity="0.4" />
+            <stop offset="0.78" stop-color="#7fe6ff" stop-opacity="0.5" />
+            <stop offset="1" stop-color="#7fe6ff" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="{uid}-sw-b" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0" />
+            <stop offset="0.12" stop-color="#f4f8fb" stop-opacity="0.85" />
+            <stop offset="0.48" stop-color="#c3d3e0" stop-opacity="0.6" />
+            <stop offset="0.82" stop-color="#eef5f9" stop-opacity="0.6" />
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="{uid}-sw-c" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1440" y2="0">
+            <stop offset="0" stop-color="#9ff0ff" stop-opacity="0" />
+            <stop offset="0.2" stop-color="#9ff0ff" stop-opacity="0.8" />
+            <stop offset="0.62" stop-color="#ffffff" stop-opacity="0.75" />
+            <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M-40 716C380 664 960 540 1480 150L1480 178C990 580 390 744-40 772Z" fill="url(#{uid}-sw-a)" />
+        <path d="M-40 716C380 664 960 540 1480 150" fill="none" stroke="#fff" stroke-opacity="0.8" stroke-width="1.4" />
+        <path d="M-40 800C420 760 1000 640 1480 250L1480 262C1010 660 420 784-40 822Z" fill="url(#{uid}-sw-b)" />
+        <path d="M-40 250C260 120 760 40 1480 110L1480 118C760 54 262 134-40 262Z" fill="url(#{uid}-sw-c)" />
+      </svg>
+    </div>
+
+    <div class="plane mid" bind:this={planes[2]}>
+      <span class="orb o-lime"><span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-lime-ball" /></svg></span></span>
+      <span class="orb o-tang">
+        <span class="shadow"></span>
+        <span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-tangerine-ball" /></svg>{@render star('glint on-orb')}</span>
+      </span>
+    </div>
+
+    <div class="plane near" bind:this={planes[3]}>
+      <span class="orb o-chrome">
+        <span class="lift">
+          <svg class="ball" viewBox="0 0 100 100">
+            <use href="#{uid}-chrome-ball" />
+            <g opacity="0.7">
+              <path d="M3.5 37Q11 32.5 21 33L22 61Q12 63.5 4.5 59.5Q1.8 48 3.5 37Z" fill="#e4edf3" />
+              <path d="M6.5 39.5Q12.5 36.5 19.5 37L20 57.5Q13 59.5 7.5 57Q5.4 48 6.5 39.5Z" fill="#0d3a60" />
+              <path d="M7 40Q12.5 37.5 19.5 38" fill="none" stroke="#8fd8ff" stroke-width="0.7" opacity="0.7" />
+            </g>
+          </svg>
+          {@render star('glint on-orb')}
+        </span>
+      </span>
+      <span class="orb o-bondi">
+        <span class="shadow"></span>
+        <span class="lift"><svg class="ball" viewBox="0 0 100 100"><use href="#{uid}-bondi-ball" /></svg>{@render star('glint on-orb')}</span>
+      </span>
+    </div>
+
+    <div class="ghosts" bind:this={planes[4]}>
+      {#each ghosts as g, i (i)}<span class="gh gh-{g.kind}" style="--t: {g.t}; --d: {g.d}cqmin; --c: {g.c}; --a: {g.a}; animation-delay: {-i * 1.3}s"></span>{/each}
+    </div>
   </div>
 
   {#if !entered}
@@ -465,6 +694,14 @@
       </div>
     </div>
   {/if}
+
+  {#if entered}
+    <div class="glints" aria-hidden="true">
+      {@render star('glint cg1')}
+      {@render star('glint cg2')}
+      {@render star('glint cg3')}
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -496,152 +733,303 @@
     border: 0;
   }
 
-  .sky {
+  .sky,
+  .glints {
+    --cw: min(960px, 100cqw - 48px);
+    --ch: min(600px, 100cqh - 140px);
+    --cl: calc(50cqw - var(--cw) / 2);
+    --cr: calc(50cqw + var(--cw) / 2);
+    --ct: calc(20px + (100cqh - 140px - var(--ch)) / 2);
+    --cb: calc(var(--ct) + var(--ch));
+    --sx: max(26px, calc(var(--cl) * 0.5));
+    --sy: max(22px, calc(var(--ct) * 0.62));
     position: absolute;
     inset: 0;
     pointer-events: none;
     overflow: hidden;
+    container-type: size;
   }
-  .horizon {
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    top: 60%;
-    height: 90px;
-    transform: translateY(-50%);
-    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%);
+  .sky {
+    background:
+      radial-gradient(ellipse var(--bloom-w, 50%) 22% at 50% 43%, rgba(242, 251, 255, 0.86), rgba(242, 251, 255, 0.62) 55%, rgba(242, 251, 255, 0) 100%),
+      radial-gradient(ellipse 52% 36% at 50% 46%, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2) 55%, rgba(255, 255, 255, 0) 100%),
+      linear-gradient(180deg, #0a3783 0%, #145aae 11%, #2b83d2 23%, #62b3ec 34%, #a2d9f9 44%, #d6f1ff 53%, #f4fbff 59.6%, #f4fbff 100%);
   }
-  .grid-floor {
-    position: absolute;
-    left: -50%;
-    right: -50%;
-    top: 60.5%;
-    bottom: -30%;
-    transform-origin: 50% 0;
-    transform: perspective(420px) rotateX(62deg);
-    background-image:
-      repeating-linear-gradient(90deg, rgba(20, 130, 190, 0.45) 0 1.5px, transparent 1.5px 64px),
-      repeating-linear-gradient(0deg, rgba(20, 130, 190, 0.45) 0 1.5px, transparent 1.5px 64px);
-    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
-    mask-image: linear-gradient(180deg, transparent 0%, #000 40%);
-    animation: gridRun 3.2s linear infinite;
-  }
-  @keyframes gridRun {
-    from { background-position: 0 0, 0 0; }
-    to { background-position: 0 0, 0 64px; }
-  }
+  .glints { z-index: 3; }
+  .sky-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .sky span { position: absolute; display: block; }
 
-  .flare {
+  .sun,
+  .ghosts {
     position: absolute;
-    left: 9%;
-    top: 7%;
-    width: 0;
-    height: 0;
+    inset: 0;
+    mix-blend-mode: screen;
   }
-  .flare span { position: absolute; border-radius: 50%; }
+  .sun > span {
+    left: calc(var(--sx) - var(--r));
+    top: calc(var(--sy) - var(--r));
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    border-radius: 50%;
+  }
+  .f-glow {
+    --r: 320px;
+    background: radial-gradient(closest-side, rgba(255, 246, 222, 0.95), rgba(255, 226, 178, 0.6) 9%, rgba(160, 214, 255, 0.34) 30%, rgba(110, 180, 255, 0.1) 60%, rgba(110, 180, 255, 0));
+    animation: sunBreathe 7s ease-in-out infinite alternate;
+  }
+  .f-rays {
+    --r: 200px;
+    background:
+      repeating-conic-gradient(from 4deg, rgba(255, 255, 255, 0.3) 0deg 0.9deg, rgba(255, 255, 255, 0) 1.6deg 15deg),
+      repeating-conic-gradient(from 11deg, rgba(255, 240, 210, 0.18) 0deg 0.6deg, rgba(255, 240, 210, 0) 1.2deg 22.5deg);
+    -webkit-mask-image: radial-gradient(closest-side, #000 6%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%);
+    mask-image: radial-gradient(closest-side, #000 6%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%);
+    animation: sunSpin 140s linear infinite;
+  }
+  .f-halo {
+    --r: 134px;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0) 80%, rgba(255, 214, 150, 0.22) 86%, rgba(150, 230, 255, 0.3) 92%, rgba(150, 230, 255, 0) 98%);
+  }
   .f-core {
-    width: 260px;
-    height: 260px;
-    left: -130px;
-    top: -130px;
-    background: radial-gradient(circle, #fff 0 9%, rgba(255, 255, 255, 0.85) 14%, rgba(200, 240, 255, 0.35) 34%, rgba(200, 240, 255, 0) 66%);
+    --r: 36px;
+    background: radial-gradient(closest-side, #fff 0 28%, rgba(255, 242, 206, 0.92) 42%, rgba(255, 210, 140, 0.35) 66%, rgba(255, 210, 140, 0));
   }
-  .f-ring {
-    width: 150px;
-    height: 150px;
-    left: -75px;
-    top: -75px;
-    border: 2px solid rgba(255, 255, 255, 0.55);
-    box-shadow: 0 0 18px rgba(255, 255, 255, 0.5);
+  .sun > .f-streak,
+  .sun > .f-streak-soft {
+    left: calc(var(--sx) - var(--rx));
+    top: calc(var(--sy) - var(--ry));
+    width: calc(var(--rx) * 2);
+    height: calc(var(--ry) * 2);
   }
-  .f-dot { background: radial-gradient(circle, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 70%); }
-  .d1 { width: 60px; height: 60px; left: 180px; top: 110px; background: radial-gradient(circle, rgba(255, 190, 120, 0.45), rgba(255, 190, 120, 0) 70%); }
-  .d2 { width: 26px; height: 26px; left: 290px; top: 180px; }
-  .d3 { width: 90px; height: 90px; left: 420px; top: 260px; background: radial-gradient(circle, rgba(150, 255, 200, 0.28), rgba(150, 255, 200, 0) 70%); }
-  .f-hex {
-    width: 44px;
-    height: 44px;
-    left: 340px;
-    top: 212px;
-    border-radius: 0 !important;
-    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
-    background: rgba(160, 220, 255, 0.35);
+  .f-streak {
+    --rx: 420px;
+    --ry: 1px;
+    border-radius: 0;
+    background: linear-gradient(90deg, rgba(150, 225, 255, 0), rgba(150, 225, 255, 0.6) 36%, #fff 50%, rgba(150, 225, 255, 0.6) 64%, rgba(150, 225, 255, 0));
+  }
+  .f-streak-soft {
+    --rx: 520px;
+    --ry: 16px;
+    background: radial-gradient(closest-side, rgba(150, 215, 255, 0.4), rgba(150, 215, 255, 0.12) 60%, rgba(150, 215, 255, 0));
+  }
+  @keyframes sunBreathe {
+    from { transform: scale(0.94); opacity: 0.86; }
+    to { transform: scale(1.04); opacity: 1; }
+  }
+  @keyframes sunSpin {
+    to { transform: rotate(360deg); }
   }
 
-  .blob {
-    position: absolute;
+  .gh {
+    width: var(--d);
+    height: var(--d);
+    left: calc(var(--sx) + var(--t) * (50cqw - var(--sx)) - var(--d) / 2);
+    top: calc(var(--sy) + var(--t) * (50cqh - var(--sy)) - var(--d) / 2);
     border-radius: 50%;
-    animation: floaty 9s ease-in-out infinite;
+    opacity: var(--a);
+    animation: ghostPulse 7s ease-in-out infinite alternate;
   }
-  .b1 {
-    width: 150px;
-    height: 150px;
-    right: 7%;
-    top: 9%;
-    background: radial-gradient(circle at 32% 28%, #fff 0 7%, rgba(255, 255, 255, 0.6) 12%, rgba(58, 169, 214, 0.75) 42%, rgba(8, 86, 140, 0.9) 100%);
-    box-shadow: inset -10px -14px 30px rgba(0, 40, 80, 0.35), 0 20px 40px rgba(20, 90, 140, 0.25);
+  .gh-disc { background: radial-gradient(closest-side, rgb(var(--c) / 0.6), rgb(var(--c) / 0.22) 70%, rgb(var(--c) / 0)); }
+  .gh-ring { background: radial-gradient(closest-side, rgb(var(--c) / 0.06) 0 62%, rgb(var(--c) / 0.5) 86%, rgb(var(--c) / 0.12) 94%, rgb(var(--c) / 0)); }
+  .gh-hex {
+    border-radius: 0;
+    clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+    background: linear-gradient(150deg, rgb(var(--c) / 0.46), rgb(var(--c) / 0.1));
   }
-  .b2 {
-    width: 84px;
-    height: 84px;
-    left: 5%;
-    top: 58%;
-    animation-delay: -3s;
-    background: radial-gradient(circle at 32% 28%, #fff 0 8%, rgba(255, 220, 180, 0.7) 14%, rgba(255, 138, 30, 0.85) 48%, rgba(190, 70, 0, 0.95) 100%);
-    box-shadow: inset -6px -8px 18px rgba(120, 40, 0, 0.35), 0 14px 26px rgba(200, 90, 20, 0.25);
+  @keyframes ghostPulse {
+    from { opacity: calc(var(--a) * 0.7); }
+    to { opacity: var(--a); }
   }
-  .b3 {
-    width: 58px;
-    height: 58px;
-    right: 12%;
-    bottom: 22%;
-    animation-delay: -5s;
-    background: radial-gradient(circle at 32% 28%, #fff 0 8%, rgba(230, 255, 190, 0.75) 14%, rgba(140, 214, 40, 0.85) 48%, rgba(60, 130, 10, 0.95) 100%);
-    box-shadow: inset -5px -6px 14px rgba(30, 70, 0, 0.35);
-  }
-  .b4 {
-    width: 110px;
-    height: 110px;
-    left: 14%;
-    top: 20%;
-    animation-delay: -7s;
-    background: radial-gradient(circle at 32% 28%, #fff 0 10%, #e6edf2 22%, #9aabbb 52%, #3d4f61 86%, #8fa2b3 100%);
-    box-shadow: inset -8px -10px 20px rgba(0, 20, 40, 0.3), 0 18px 30px rgba(30, 60, 90, 0.22);
-  }
-  @keyframes floaty {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -18px, 0); }
-  }
-  .chrome-ring {
+
+  .floor {
     position: absolute;
-    width: 300px;
-    height: 300px;
-    right: -60px;
-    bottom: 8%;
+    left: 0;
+    right: 0;
+    top: 60%;
+    bottom: 0;
+    overflow: hidden;
+    container-type: size;
+    background:
+      radial-gradient(ellipse var(--fg-w, 22%) 46% at 50% 8%, rgba(248, 253, 255, 0.74), rgba(248, 253, 255, 0.4) 55%, rgba(248, 253, 255, 0)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 10%),
+      linear-gradient(180deg, #eaf8ff 0%, #c4e8fb 16%, #97d0f2 50%, #6fbae8 100%);
+  }
+  .grid {
+    position: absolute;
+    inset: 0;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 12%, #000 44%);
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 12%, #000 44%);
+  }
+  .rays {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .rays path { fill: none; stroke: rgba(20, 116, 184, 0.46); stroke-width: 1; }
+  .floor .fl {
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(20, 116, 184, 0.3), rgba(20, 116, 184, 0.62) 20% 80%, rgba(20, 116, 184, 0.3));
+    animation: floorRun 86.4s linear infinite;
+  }
+  @keyframes floorRun {
+    0% { transform: translateY(11.2cqh) scaleY(0.35); opacity: 0; }
+    25% { transform: translateY(14.4cqh) scaleY(0.4); opacity: 0.35; }
+    50% { transform: translateY(20.16cqh) scaleY(0.48); opacity: 0.6; }
+    62.5% { transform: translateY(25.2cqh) scaleY(0.55); opacity: 0.7; }
+    75% { transform: translateY(33.56cqh) scaleY(0.64); opacity: 0.8; }
+    81.25% { transform: translateY(40.2cqh) scaleY(0.72); opacity: 0.86; }
+    87.5% { transform: translateY(50.25cqh) scaleY(0.8); opacity: 0.9; }
+    91.67% { transform: translateY(60.2cqh) scaleY(0.88); opacity: 0.94; }
+    94.44% { transform: translateY(69.4cqh) scaleY(0.94); opacity: 0.97; }
+    97.22% { transform: translateY(81.98cqh) scaleY(1); opacity: 1; }
+    100% { transform: translateY(100cqh) scaleY(1.1); opacity: 1; }
+  }
+  .floor-sun {
+    left: calc(var(--sx) - 90px);
+    width: 180px;
+    top: 0;
+    height: 80%;
+    background: radial-gradient(50% 100% at 50% 0%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.16) 45%, rgba(255, 255, 255, 0));
+  }
+  .haze {
+    left: 0;
+    right: 0;
+    top: 44%;
+    height: 24%;
+    background: linear-gradient(180deg, rgba(240, 250, 255, 0) 0%, rgba(240, 250, 255, 0.5) 50%, rgba(250, 253, 255, 0.86) 66.6%, rgba(236, 248, 255, 0.3) 80%, rgba(236, 248, 255, 0) 100%);
+  }
+  .horizon-line {
+    left: 0;
+    right: 0;
+    top: calc(60% - 0.5px);
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 18% 82%, rgba(255, 255, 255, 0));
+  }
+  .horizon-line::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: -7px;
+    height: 15px;
+    background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(210, 244, 255, 0.4) 55%, rgba(210, 244, 255, 0));
+  }
+  .c-shadow,
+  .c-reflect {
+    opacity: 0;
+    transition: opacity 0.9s ease 0.3s;
+  }
+  .with-console .c-shadow,
+  .with-console .c-reflect { opacity: 1; }
+  .c-shadow {
+    left: calc(var(--cl) + 30px);
+    width: calc(var(--cw) - 60px);
+    top: calc(var(--cb) - 18px);
+    height: 38px;
     border-radius: 50%;
-    border: 16px solid transparent;
-    background: conic-gradient(from 20deg, #fff, #8ea2b5, #f4f8fb, #56697d, #eaf1f6, #9fb2c3, #fff) border-box;
-    -webkit-mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0) border-box;
-    mask: linear-gradient(#000 0 0) padding-box exclude, linear-gradient(#000 0 0) border-box;
-    transform: rotateX(68deg) rotateZ(-20deg);
-    opacity: 0.85;
+    background: radial-gradient(closest-side, rgba(6, 40, 72, 0.34), rgba(6, 40, 72, 0.12) 60%, rgba(6, 40, 72, 0));
   }
-  .spark {
+  .c-reflect {
+    left: calc(var(--cl) + 26px);
+    width: calc(var(--cw) - 52px);
+    top: calc(var(--cb) + 3px);
+    height: max(0px, min(110px, 100cqh - var(--cb) - 3px));
+    background: linear-gradient(180deg, rgba(248, 251, 253, 0.55), rgba(34, 104, 158, 0.24) 12%, rgba(210, 228, 240, 0.18) 36%, rgba(210, 228, 240, 0) 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12% 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12% 88%, transparent);
+  }
+
+  .plane {
     position: absolute;
-    width: 22px;
-    height: 22px;
-    background: #fff;
-    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.9));
-    animation: twinkle 2.6s ease-in-out infinite;
+    inset: 0;
   }
-  .s1 { left: 22%; top: 12%; }
-  .s2 { right: 21%; top: 34%; width: 16px; height: 16px; animation-delay: -0.8s; }
-  .s3 { left: 8%; bottom: 30%; width: 14px; height: 14px; animation-delay: -1.6s; }
-  .s4 { right: 30%; top: 6%; width: 18px; height: 18px; animation-delay: -2.1s; }
+  .swoosh svg {
+    position: absolute;
+    inset: -2% -3%;
+    width: 106%;
+    height: 104%;
+    animation: swooshDrift 32s ease-in-out infinite alternate;
+  }
+  @keyframes swooshDrift {
+    from { transform: translate3d(-12px, 4px, 0); }
+    to { transform: translate3d(12px, -4px, 0); }
+  }
+
+  .orb {
+    width: var(--s);
+    height: var(--s);
+    left: calc(var(--x) - var(--s) / 2);
+    top: calc(var(--y) - var(--s) / 2);
+  }
+  .orb .lift {
+    inset: 0;
+    animation: orbBob var(--bob, 10s) ease-in-out var(--dl, 0s) infinite;
+  }
+  .ball {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .orb .shadow {
+    left: -8%;
+    width: 116%;
+    top: calc(100% + var(--s) * 0.14);
+    height: 24%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(3, 36, 66, 0.44), rgba(3, 36, 66, 0.16) 58%, rgba(3, 36, 66, 0));
+    animation: orbShade var(--bob, 10s) ease-in-out var(--dl, 0s) infinite;
+  }
+  @keyframes orbBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7%); }
+  }
+  @keyframes orbShade {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.86); opacity: 0.7; }
+  }
+  .far .ball {
+    filter: blur(0.8px) saturate(0.55) brightness(1.06);
+    opacity: 0.78;
+  }
+  .o-chrome { --s: min(172px, var(--cl) - 26px); --x: calc(100cqw - var(--cl) / 2); --y: calc(var(--ct) + var(--ch) * 0.25); --bob: 11s; --dl: -2s; }
+  .o-bondi { --s: min(138px, var(--cl) - 34px); --x: calc(var(--cl) / 2); --y: calc(var(--ct) + var(--ch) * 0.73); --bob: 9s; --dl: -5s; }
+  .o-lime { --s: min(74px, var(--cl) - 40px); --x: calc(var(--cl) * 0.56); --y: calc(var(--ct) + var(--ch) * 0.3); --bob: 8s; --dl: -1s; }
+  .o-tang { --s: min(92px, var(--cl) - 36px); --x: calc(100cqw - var(--cl) * 0.46); --y: calc(var(--ct) + var(--ch) * 0.7); --bob: 10s; --dl: -7s; }
+  .o-grape { --s: min(34px, var(--cl) - 44px); --x: calc(100cqw - var(--cl) * 0.7); --y: calc(var(--ct) + var(--ch) * 0.5); --bob: 13s; --dl: -4s; }
+  .o-ice { --s: min(26px, var(--cl) - 44px); --x: calc(var(--cl) * 0.25); --y: calc(var(--ct) + var(--ch) * 0.5); --bob: 12s; --dl: -9s; }
+  .o-top { --s: max(0px, min(30px, var(--ct) - 46px)); --x: 70cqw; --y: calc(var(--ct) / 2); --bob: 14s; --dl: -6s; }
+
+  .glint {
+    position: absolute;
+    overflow: visible;
+    filter: drop-shadow(0 0 3px rgba(200, 244, 255, 0.95));
+    animation: twinkle 3.6s ease-in-out var(--tw, 0s) infinite;
+  }
+  .glint.on-orb {
+    width: calc(var(--s) * 0.34);
+    height: calc(var(--s) * 0.34);
+    left: calc(32% - var(--s) * 0.17);
+    top: calc(22% - var(--s) * 0.17);
+  }
+  .o-chrome .glint { --tw: -0.4s; }
+  .o-bondi .glint { --tw: -2.1s; left: calc(32% - var(--s) * 0.17); top: calc(19% - var(--s) * 0.17); }
+  .o-tang .glint { --tw: -1.3s; top: calc(19% - var(--s) * 0.17); }
+  .glint.cg1 { --tw: -0.9s; width: 44px; height: 44px; left: calc(var(--cl) + 11px - 22px); top: calc(var(--ct) + 11px - 22px); }
+  .glint.cg2 { --tw: -2.6s; width: 22px; height: 22px; left: calc(var(--cr) - 11px - 11px); top: calc(var(--ct) + 11px - 11px); }
+  .glint.cg3 { --tw: -1.7s; width: 16px; height: 16px; left: calc(var(--cl) + 3px - 8px); top: calc(var(--ct) + var(--ch) * 0.3 - 8px); }
   @keyframes twinkle {
-    0%, 100% { transform: scale(0.4) rotate(0deg); opacity: 0.2; }
-    50% { transform: scale(1) rotate(45deg); opacity: 1; }
+    0%, 100% { transform: scale(0.5) rotate(0deg); opacity: 0.5; }
+    42% { transform: scale(1.08) rotate(18deg); opacity: 1; }
+    58% { transform: scale(0.92) rotate(26deg); opacity: 0.92; }
+  }
+
+  @media (min-width: 760px) and (max-width: 1079px) {
+    .o-chrome, .o-bondi, .o-lime, .o-tang, .o-grape, .o-ice { display: none; }
   }
 
   .chrome-dark {
@@ -1441,6 +1829,11 @@
   @media (max-height: 640px) and (min-width: 760px) {
     .cdrom { display: none; }
   }
+  @media (max-height: 720px) and (min-width: 760px) {
+    .splash { inset: 0 0 150px 0; padding-top: 12px; }
+    .splash-inner { gap: 8px; }
+    .splash-logo { transform: scale(0.72); margin: -26px 0 -30px; }
+  }
 
   @media (max-width: 759px) {
     .y2k { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
@@ -1487,14 +1880,16 @@
     .best { margin-left: auto; }
     .contact { flex-direction: column; align-items: flex-start; gap: 2px; border-radius: 22px; padding: 12px 18px 10px; }
     .c-val { font-size: 13px; }
-    .b2 { top: auto; bottom: 16%; left: -18px; }
-    .b3 { bottom: 34%; }
+    .sky { --sx: 22px; --sy: 20px; --bloom-w: 80%; --fg-w: 44%; }
+    .plane, .ghosts { transform: none !important; }
+    .plane.mid, .plane.far, .o-chrome .glint, .gh:nth-child(n+6), .c-shadow, .c-reflect, .f-rays { display: none; }
+    .sun { transform: scale(0.55); transform-origin: var(--sx) var(--sy); }
+    .o-chrome { --s: 32px; --x: 38cqw; --y: 31px; }
+    .o-bondi { --s: 42px; --x: 40px; --y: calc(100cqh - 126px); }
+    .glints { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .grid-floor,
-    .blob,
-    .spark,
     .disc-cd,
     .led-net,
     .fill,
@@ -1512,5 +1907,8 @@
     .gel, .tab { transition: none; }
     .gel:hover::after { transition: none; opacity: 0; }
     .tab:hover { transform: none; }
+    .floor .fl { animation-play-state: paused; }
+    .orb .lift, .orb .shadow, .glint, .f-glow, .f-rays, .gh, .swoosh svg { animation: none; }
+    .c-shadow, .c-reflect { transition: none; }
   }
 </style>

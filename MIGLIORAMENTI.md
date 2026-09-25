@@ -90,8 +90,10 @@ Tre direttrici comuni a tutte le ere:
 ### 2.4 Accessibilità
 - ✅ 🟡 ⭐⭐⭐ **Navigazione da tastiera sulla Timeline**: frecce ←/→ (e ↑/↓, Home/End) per
   spostarsi, `Enter`/`Space` per attivare, focus-ring visibile e coerente per tema.
-- ⬜ 🟡 ⭐⭐ **Focus management nel cambio tema**: dopo il cambio, spostare il focus su un
-  landmark del nuovo tema e annunciare il cambio via `aria-live` ("Era: Windows XP, 2001").
+- ✅ 🟡 ⭐⭐ **Focus management nel cambio tema**: l'annuncio `aria-live` c'era già; il
+  `.theme-layer` è ora una `region` con il nome dell'era e riprende il focus solo se l'era
+  smontata lo stava tenendo (focus finito sul `body`). Chi naviga la Timeline con le frecce
+  resta sulla Timeline.
 - ✅ 🟢 ⭐⭐ **Contrasto**: i grigi secondari del 3D sono stati schiariti (es. tech-stack
   `#aab4e8`, muted `rgba(190,200,255,.88)`), sopra soglia AA.
 - ✅ 🟢 ⭐ **`prefers-color-scheme`** per scegliere il default light/dark di Bento (vedi 5.x).

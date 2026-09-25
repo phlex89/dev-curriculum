@@ -210,6 +210,7 @@ export const cvDataEn: typeof cvData = {
 
 const it = {
   shared: {
+    opensInNewTab: '(si apre in una nuova scheda)',
     seoIntro: (name: string, role: string, years: number) =>
       `${name} è un ${role} basato a Torino, con ${years} anni di esperienza in architetture frontend, design system e component library per piattaforme enterprise in fintech, IoT, banking e media.`,
     sections: {
@@ -237,15 +238,16 @@ const it = {
       teletext: 'Televideo · 1984',
       pixel: 'Pixel Art · 1988',
       web1: 'Web 1.0 · 1996',
+      y2k: 'Y2K · 2000',
       winxp: 'Windows XP · 2001',
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
-      bento: 'Modern Flat · 2015',
-      brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
+      threed: 'WebGL · 2019',
       glass: 'Glassmorphism · 2020',
-      liquid: 'Liquid Glass · 2025',
-      threed: 'Future 3D · 2026'
+      brutalism: 'Neubrutalism · 2021',
+      bento: 'Bento · 2022',
+      liquid: 'Liquid Glass · 2025'
     } as Record<Theme, string>,
     eraNames: {} as Partial<Record<Theme, string>>
   },
@@ -475,6 +477,35 @@ const it = {
     ctaEmail: 'Scrivimi',
     ctaLinkedin: 'LinkedIn'
   },
+  y2k: {
+    nav: { profile: 'Profilo', experience: 'Esperienza', skills: 'Competenze', education: 'Formazione', contacts: 'Contatti' },
+    navLabel: 'Sezioni del sito',
+    introLabel: 'Intro del sito',
+    enterAria: 'Entra nel sito',
+    skipAria: 'Salta l’intro e vai ai contenuti',
+    loadingAria: (n: number) => `Caricamento: ${n}%`,
+    earlyCareer: 'Le origini',
+    technologies: 'Tecnologie',
+    languages: 'Lingue',
+    education: 'Formazione',
+    degrees: 'Titoli di studio',
+    conferences: 'Conferenze',
+    statYears: 'anni di mestiere',
+    statProducts: 'prodotti',
+    statSectors: 'settori',
+    email: 'E-mail',
+    phone: 'Telefono',
+    linkedin: 'LinkedIn',
+    location: 'Sede',
+    downloadCv: 'Scarica il CV (PDF)',
+    visitors: 'visitatori',
+    visitorsAria: (n: string) => `Contatore visite: ${n}`,
+    nowOnline: 'Ora online',
+    basedIn: 'Base',
+    tickerLabel: 'Notizie dal sito',
+    clockAria: 'Orologio Y2K compliant: premi per il test del millennium bug',
+    bugNote: 'Anno 2000 letto come 19100: il bug del millennio, corretto.'
+  },
   vote: {
     panelTitle: 'Le ere più amate',
     panelLabel: 'Classifica delle ere',
@@ -491,6 +522,7 @@ const it = {
 
 const en: UiStrings = {
   shared: {
+    opensInNewTab: '(opens in a new tab)',
     seoIntro: (name: string, role: string, years: number) =>
       `${name} is a ${role} based in Turin, with ${years} years of experience in frontend architectures, design systems and component libraries for enterprise platforms across fintech, IoT, banking and media.`,
     sections: {
@@ -518,15 +550,16 @@ const en: UiStrings = {
       teletext: 'Teletext · 1984',
       pixel: 'Pixel Art · 1988',
       web1: 'Web 1.0 · 1996',
+      y2k: 'Y2K · 2000',
       winxp: 'Windows XP · 2001',
       skeuo: 'Skeuomorphism · 2010',
       material: 'Material Design · 2014',
-      bento: 'Modern Flat · 2015',
-      brutalism: 'Brutalism · 2017',
       parallax: 'Parallax · 2018',
+      threed: 'WebGL · 2019',
       glass: 'Glassmorphism · 2020',
-      liquid: 'Liquid Glass · 2025',
-      threed: 'Future 3D · 2026'
+      brutalism: 'Neubrutalism · 2021',
+      bento: 'Bento · 2022',
+      liquid: 'Liquid Glass · 2025'
     },
     eraNames: { teletext: 'Teletext' }
   },
@@ -755,6 +788,35 @@ const en: UiStrings = {
     ctaTitle: "Let's talk.",
     ctaEmail: 'Email me',
     ctaLinkedin: 'LinkedIn'
+  },
+  y2k: {
+    nav: { profile: 'Profile', experience: 'Experience', skills: 'Skills', education: 'Education', contacts: 'Contacts' },
+    navLabel: 'Site sections',
+    introLabel: 'Site intro',
+    enterAria: 'Enter the site',
+    skipAria: 'Skip the intro and go to the content',
+    loadingAria: (n: number) => `Loading: ${n}%`,
+    earlyCareer: 'The roots',
+    technologies: 'Technologies',
+    languages: 'Languages',
+    education: 'Education',
+    degrees: 'Degrees',
+    conferences: 'Conferences',
+    statYears: 'years in the craft',
+    statProducts: 'products',
+    statSectors: 'sectors',
+    email: 'E-mail',
+    phone: 'Phone',
+    linkedin: 'LinkedIn',
+    location: 'Based in',
+    downloadCv: 'Download the CV (PDF)',
+    visitors: 'visitors',
+    visitorsAria: (n: string) => `Visitor counter: ${n}`,
+    nowOnline: 'Now online',
+    basedIn: 'Based in',
+    tickerLabel: 'Site news',
+    clockAria: 'Y2K compliant clock: press it to run the millennium bug test',
+    bugNote: 'Year 2000 read as 19100: the millennium bug, patched.'
   },
   vote: {
     panelTitle: 'The most loved eras',

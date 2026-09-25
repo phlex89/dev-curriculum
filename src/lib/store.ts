@@ -1,9 +1,9 @@
 import { writable } from 'svelte/store';
 
-export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass' | 'teletext' | 'parallax' | 'liquid';
+export type Theme = 'bento' | 'winxp' | 'terminal' | 'threed' | 'skeuo' | 'material' | 'brutalism' | 'pixel' | 'web1' | 'glass' | 'teletext' | 'parallax' | 'liquid' | 'y2k';
 
 /** Valid themes (used to validate persisted / deep-linked values). */
-const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass', 'teletext', 'parallax', 'liquid'];
+const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'material', 'brutalism', 'pixel', 'web1', 'glass', 'teletext', 'parallax', 'liquid', 'y2k'];
 
 /** Chronological order of the eras — drives the directional time-travel transition.
  *  Teletext / Televideo (text broadcast over TV, 1984) is a parallel lineage to the
@@ -15,9 +15,9 @@ const THEMES: Theme[] = ['bento', 'winxp', 'terminal', 'threed', 'skeuo', 'mater
  *  between Brutalism and Glassmorphism, just before the luminous present. Liquid Glass
  *  (Apple's 2025 refraction language) follows Glassmorphism as its next refinement,
  *  right before the 3D future. */
-export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'bento', 'brutalism', 'parallax', 'glass', 'liquid', 'threed'];
+export const ERA_ORDER: Theme[] = ['terminal', 'teletext', 'pixel', 'web1', 'y2k', 'winxp', 'skeuo', 'material', 'parallax', 'threed', 'glass', 'brutalism', 'bento', 'liquid'];
 
-const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
+export const isTheme = (v: string | null | undefined): v is Theme => !!v && THEMES.includes(v as Theme);
 
 const persist = (theme: Theme) => {
   if (typeof localStorage !== 'undefined') {

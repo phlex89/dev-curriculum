@@ -264,17 +264,33 @@
   }
 
   .lang-switch.theme-threed {
-    --ls-bg: rgba(255, 255, 255, 0.08);
-    --ls-fg: #fff;
-    --ls-border: 1px solid rgba(255, 255, 255, 0.2);
-    --ls-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    --ls-blur: blur(12px);
-    --ls-divider: 1px solid rgba(255, 255, 255, 0.2);
-    --ls-active-bg: rgba(0, 255, 255, 0.25);
-    --ls-active-fg: #00ffff;
-    --ls-hover-bg: rgba(255, 255, 255, 0.12);
-    --ls-focus: #00ffff;
-    --ls-font: 'Orbitron', 'Space Grotesk', sans-serif;
+    --ls-bg: rgba(9, 9, 12, 0.86);
+    --ls-fg: #f4f3ef;
+    --ls-border: 1px solid rgba(244, 243, 239, 0.14);
+    --ls-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    --ls-blur: none;
+    --ls-divider: 1px solid rgba(244, 243, 239, 0.12);
+    --ls-active-bg: #f4f3ef;
+    --ls-active-fg: #07070a;
+    --ls-hover-bg: rgba(244, 243, 239, 0.08);
+    --ls-focus: #f4f3ef;
+    --ls-font: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  .lang-switch.theme-y2k {
+    --ls-bg: linear-gradient(180deg, #ffffff 0%, #d9e2ea 45%, #c3ced8 55%, #f2f6f9 100%);
+    --ls-fg: #0b2a44;
+    --ls-border: 1px solid #5f6f7f;
+    --ls-radius: 21px;
+    --ls-shadow: inset 0 1px 0 #fff, 0 8px 20px rgba(8, 50, 90, 0.3);
+    --ls-blur: none;
+    --ls-divider: 1px solid rgba(6, 36, 61, 0.25);
+    --ls-active-bg: linear-gradient(180deg, #6fb3ec 0%, #1560b3 20%, #0a4c96 52%, #1560b3 100%);
+    --ls-active-fg: #fff;
+    --ls-hover-bg: rgba(58, 169, 214, 0.18);
+    --ls-focus: #06243d;
+    --ls-font: 'Michroma', Verdana, sans-serif;
+    --ls-size: 0.68rem;
   }
 
   @media (max-width: 720px) {

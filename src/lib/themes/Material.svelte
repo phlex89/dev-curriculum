@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { getCvData, getUi } from '$lib/i18n';
   import { reveal } from '$lib/actions/interactive';
@@ -13,10 +14,6 @@
   // elevation shadows, a sliding tab ink-bar, the touch ripple, and an accent FAB.
   // Roboto is self-hosted (latin subset) in fonts.css — the only Material webfont.
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' &&
-    !!window.matchMedia &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /** The Material touch ripple — a circle that expands from the pointer and fades.
    *  Skipped (but the element stays fully clickable) under reduced-motion. */
@@ -61,6 +58,21 @@
 
   // A small palette of Material 500 hues so each experience reads as a distinct card.
   const AVATAR_HUES = ['#3f51b5', '#00897b', '#e64a19', '#5e35b1', '#0277bd', '#c2185b'];
+
+  function fillOnView(node: HTMLElement) {
+    if (prefersReduced() || typeof IntersectionObserver === 'undefined') return;
+    node.classList.add('pending');
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        node.classList.remove('pending');
+        io.disconnect();
+      },
+      { root: node.closest('.mat-scroll'), threshold: 0 }
+    );
+    io.observe(node);
+    return { destroy: () => io.disconnect() };
+  }
 
   // Map a language proficiency string to a determinate LinearProgress fill.
   const langPct = (level: string): number => {
@@ -305,7 +317,7 @@
 
           <article class="card exp-card early" use:reveal={{ delay: 120 }}>
             <div class="exp-top">
-              <span class="company-avatar" style="background: {AVATAR_HUES[5]}">
+              <span class="company-avatar" style="background: {AVATAR_HUES[cvData.experience.length % AVATAR_HUES.length]}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ICON.work} /></svg>
               </span>
               <div class="exp-head">
@@ -368,7 +380,7 @@
                   <span class="meta">{lang.level}</span>
                 </div>
                 <div class="progress" role="progressbar" aria-valuenow={langPct(lang.level)} aria-valuemin="0" aria-valuemax="100" aria-label={lang.name}>
-                  <span class="progress-fill" style="width: {langPct(lang.level)}%"></span>
+                  <span class="progress-fill" style="--pct: {langPct(lang.level)}%" use:fillOnView></span>
                 </div>
               </div>
             {/each}
@@ -596,7 +608,7 @@
     flex: 0 0 auto;
     border: none;
     background: none;
-    color: rgba(255, 255, 255, 0.74);
+    color: rgba(255, 255, 255, 0.82);
     font-family: inherit;
     font-size: 0.8rem;
     font-weight: 500;
@@ -655,7 +667,7 @@
   /* ── Cards (flat surface lifted by elevation) ───────────────────────────────── */
   .card {
     background: var(--surface);
-    border-radius: 8px;
+    border-radius: 2px;
     padding: 24px 26px;
     box-shadow: var(--elev-2);
     scroll-margin-top: 56px;
@@ -884,9 +896,15 @@
   }
   .progress-fill {
     display: block;
+    width: var(--pct);
     height: 100%;
     border-radius: 2px;
     background: var(--primary);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .progress-fill:global(.pending) {
+    width: 0;
+    transition: none;
   }
 
   .conf-list {
@@ -925,7 +943,7 @@
     align-items: center;
     gap: 12px;
     padding: 14px 18px;
-    border-radius: 8px;
+    border-radius: 2px;
     text-decoration: none;
     color: var(--primary-dark);
     background: var(--primary-light);
@@ -1055,7 +1073,8 @@
     .card,
     .fab,
     .tab-ink,
-    .contact-btn {
+    .contact-btn,
+    .progress-fill {
       transition: none;
     }
     .card:hover {

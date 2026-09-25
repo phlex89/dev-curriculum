@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { prefersReduced } from '$lib/motion';
+  import { onMount, tick } from 'svelte';
   import { cubicOut } from 'svelte/easing';
   import { draggable } from '$lib/actions/draggable';
   import { getCvData, getUi } from '$lib/i18n';
   import XpIcon from './winxp/XpIcon.svelte';
+  import * as wm from './winxp/window-manager';
 
   const cvData = getCvData();
   const t = getUi().winxp;
@@ -35,8 +37,6 @@
     { id: 'error', title: t.errorTitle, content: 'error', isOpen: false, minimized: false, maximized: false, zIndex: 100, x: 330, y: 176, icon: '' }
   ]);
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Window open / close / minimize / restore animation (scale + fade toward the taskbar)
   function windowPop(_node: HTMLElement, { duration = 190 } = {}) {
@@ -67,70 +67,50 @@
     selectedIcon = id;
   }
 
-  // Keep a freshly-opened window fully inside the viewport. On mid-size screens
-  // (e.g. a Galaxy Fold unfolded, wider than the 600px mobile breakpoint but
-  // narrower than a desktop) the scattered start coords would otherwise push a
-  // 450px window off the right/bottom edge.
-  function clampToViewport(win: WindowState) {
-    if (typeof window === 'undefined') return;
-    const margin = 8;
-    const winW = 450; // matches .window width
-    const taskbar = 30; // reserved bottom bar
-    const maxX = Math.max(margin, window.innerWidth - winW - margin);
-    const maxY = Math.max(margin, window.innerHeight - taskbar - 80); // keep the titlebar above the taskbar
-    win.x = Math.min(Math.max(margin, win.x), maxX);
-    win.y = Math.min(Math.max(margin, win.y), maxY);
+  function currentViewport(): wm.Viewport | undefined {
+    return typeof window === 'undefined' ? undefined : { width: window.innerWidth, height: window.innerHeight };
   }
 
-  function openWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.isOpen = true;
-      win.minimized = false;
-      if (!isMobile) clampToViewport(win);
-      bringToFront(id);
+  async function openWindow(id: string) {
+    const result = wm.openWindow(windows, id, topZIndex, isMobile ? undefined : currentViewport());
+    windows = result.windows;
+    topZIndex = result.topZIndex;
+    if (result.opened) {
+      await tick();
+      document.querySelector<HTMLElement>(`[data-win-id="${id}"]`)?.focus();
     }
     startMenuOpen = false;
   }
 
   function closeWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) {
-      win.isOpen = false;
-      win.minimized = false;
-      win.maximized = false;
+    const result = wm.closeWindow(windows, id);
+    windows = result.windows;
+    if (result.closed) {
+      document.getElementById(`icon-${id}`)?.focus();
     }
   }
 
   function minimizeWindow(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) win.minimized = true;
+    windows = wm.minimizeWindow(windows, id);
   }
 
   function toggleMaximize(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (win) win.maximized = !win.maximized;
-    bringToFront(id);
+    const result = wm.toggleMaximize(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   function bringToFront(id: string) {
-    topZIndex++;
-    const win = windows.find(w => w.id === id);
-    if (win) win.zIndex = topZIndex;
+    const result = wm.bringToFront(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   // Clicking the taskbar item: restore if minimized, otherwise minimize if it's already on top, else bring to front
   function taskbarClick(id: string) {
-    const win = windows.find(w => w.id === id);
-    if (!win) return;
-    if (win.minimized) {
-      win.minimized = false;
-      bringToFront(id);
-    } else if (win.zIndex === topZIndex) {
-      win.minimized = true;
-    } else {
-      bringToFront(id);
-    }
+    const result = wm.taskbarClick(windows, id, topZIndex);
+    windows = result.windows;
+    topZIndex = result.topZIndex;
   }
 
   function toggleStartMenu() {
@@ -192,7 +172,8 @@
     // pull any free (non-maximised) windows back inside.
     const onResize = () => {
       if (isMobile) return; // maximised on mobile, nothing to clamp
-      for (const w of windows) if (w.isOpen && !w.maximized) clampToViewport(w);
+      const viewport = currentViewport();
+      if (viewport) windows = wm.clampOpenWindows(windows, viewport);
     };
     window.addEventListener('resize', onResize);
 
@@ -245,23 +226,23 @@
 {:else}
   <div class="xp-desktop" onclick={handleDesktopClick}>
     <div class="desktop-icons">
-      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'about'} onclick={(e) => { selectIcon(e, 'about'); openWindow('about'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('about'); }}>
+      <button id="icon-about" type="button" class="desktop-icon" class:selected={selectedIcon === 'about'} onclick={(e) => { selectIcon(e, 'about'); openWindow('about'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('about'); }}>
         <div class="icon-emoji"><XpIcon name="doc" size={40} /></div>
         <span>{t.cvResources}</span>
       </button>
-      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'skills'} onclick={(e) => { selectIcon(e, 'skills'); openWindow('skills'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('skills'); }}>
+      <button id="icon-skills" type="button" class="desktop-icon" class:selected={selectedIcon === 'skills'} onclick={(e) => { selectIcon(e, 'skills'); openWindow('skills'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('skills'); }}>
         <div class="icon-emoji"><XpIcon name="gear" size={40} /></div>
         <span>Skills</span>
       </button>
-      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'exp'} onclick={(e) => { selectIcon(e, 'exp'); openWindow('exp'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('exp'); }}>
+      <button id="icon-exp" type="button" class="desktop-icon" class:selected={selectedIcon === 'exp'} onclick={(e) => { selectIcon(e, 'exp'); openWindow('exp'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('exp'); }}>
         <div class="icon-emoji"><XpIcon name="folder" size={40} /></div>
         <span>{t.expLabel}</span>
       </button>
-      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'edu'} onclick={(e) => { selectIcon(e, 'edu'); openWindow('edu'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('edu'); }}>
+      <button id="icon-edu" type="button" class="desktop-icon" class:selected={selectedIcon === 'edu'} onclick={(e) => { selectIcon(e, 'edu'); openWindow('edu'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('edu'); }}>
         <div class="icon-emoji"><XpIcon name="cap" size={40} /></div>
         <span>{t.eduLabel}</span>
       </button>
-      <button type="button" class="desktop-icon" class:selected={selectedIcon === 'contact'} onclick={(e) => { selectIcon(e, 'contact'); openWindow('contact'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('contact'); }}>
+      <button id="icon-contact" type="button" class="desktop-icon" class:selected={selectedIcon === 'contact'} onclick={(e) => { selectIcon(e, 'contact'); openWindow('contact'); }} ondblclick={(e) => { e.stopPropagation(); openWindow('contact'); }}>
         <div class="icon-emoji"><XpIcon name="contacts" size={40} /></div>
         <span>{t.contactLabel}</span>
       </button>
@@ -282,9 +263,13 @@
           use:draggable={{ handle: '.titlebar', disabled: isMobile, onMove: (x, y) => { win.x = x; win.y = y; } }}
           onmousedown={() => bringToFront(win.id)}
           transition:windowPop
+          role="dialog"
+          aria-labelledby="win-title-{win.id}"
+          tabindex="-1"
+          data-win-id={win.id}
         >
           <div class="titlebar" ondblclick={() => toggleMaximize(win.id)}>
-            <div class="title-text">{#if win.icon}<span class="win-icon"><XpIcon name={win.icon} size={16} /></span>{/if} {win.title}</div>
+            <div class="title-text" id="win-title-{win.id}">{#if win.icon}<span class="win-icon"><XpIcon name={win.icon} size={16} /></span>{/if} {win.title}</div>
             <div class="title-buttons">
               <button class="win-btn min-btn" aria-label={t.minimize} title={t.minimize} onclick={() => minimizeWindow(win.id)}>
                 <svg viewBox="0 0 10 10" width="10" height="10"><rect x="1" y="7" width="8" height="2" fill="currentColor"/></svg>
@@ -639,6 +624,10 @@
     overflow: hidden;
   }
 
+  .window:focus {
+    outline: none;
+  }
+
   .window.maximized {
     top: 0 !important;
     left: 0 !important;
@@ -654,7 +643,9 @@
   }
 
   .titlebar {
-    background: linear-gradient(to right, var(--xp-dark-blue), var(--xp-light-blue));
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.12) 14%, rgba(255, 255, 255, 0) 30%),
+      linear-gradient(to right, #0050ee 0%, #1c5fda 16%, #123f9e 40%, #0f45bf 68%, #003ca0 100%);
     color: white;
     height: 30px;
     display: flex;
@@ -665,6 +656,7 @@
   }
 
   .title-text {
+    font-family: 'Trebuchet MS', Tahoma, Verdana, sans-serif;
     font-weight: bold;
     font-size: 14px;
     text-shadow: 1px 1px 1px black;
@@ -697,10 +689,26 @@
   }
   .win-btn svg { display: block; }
 
-  .close-btn { background: linear-gradient(to bottom, #f08a70, #e24933 50%, #c5391f); }
-  .close-btn:hover { background: linear-gradient(to bottom, #ffa88f, #f05a44 50%, #d2492f); }
-  .min-btn, .max-btn { background: linear-gradient(to bottom, #5a8cf0, #2561e1 50%, #1f54c6); }
-  .min-btn:hover, .max-btn:hover { background: linear-gradient(to bottom, #79a4f5, #3a76ec 50%, #2a64d6); }
+  .close-btn {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0) 55%),
+      linear-gradient(to bottom, #ff8d6f, #e2432a 45%, #b52d17);
+  }
+  .close-btn:hover {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.2) 35%, rgba(255, 255, 255, 0) 55%),
+      linear-gradient(to bottom, #ffab8f, #f0553a 45%, #c53a20);
+  }
+  .min-btn, .max-btn {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0) 55%),
+      linear-gradient(to bottom, #6fa2ff, #2561e1 45%, #123f9e);
+  }
+  .min-btn:hover, .max-btn:hover {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.2) 35%, rgba(255, 255, 255, 0) 55%),
+      linear-gradient(to bottom, #8ab4ff, #3a76ec 45%, #1c50b5);
+  }
   .win-btn:active { box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4); }
 
   .window-content {
@@ -786,8 +794,11 @@
   }
 
   .start-btn {
-    background: linear-gradient(to bottom, #4cb033, #3c812d);
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.08) 18%, rgba(255, 255, 255, 0) 30%),
+      linear-gradient(to bottom, #5cc245 0%, #3a9e2c 22%, #2f8a24 55%, #1f6b17 100%);
     color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.55);
     border: none;
     height: 100%;
     padding: 0 20px;
@@ -800,9 +811,13 @@
     cursor: pointer;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
-    box-shadow: inset -2px 0 3px rgba(0,0,0,0.2);
+    box-shadow: inset -2px 0 3px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.5);
   }
-  .start-btn:hover { background: linear-gradient(to bottom, #5cc043, #4c913d); }
+  .start-btn:hover {
+    background:
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0) 30%),
+      linear-gradient(to bottom, #6cd154 0%, #45ad35 22%, #37962a 55%, #25761c 100%);
+  }
   .start-logo { display: inline-flex; align-items: center; }
 
   .taskbar-windows {

@@ -12,6 +12,7 @@ export const themeLoaders: Record<Theme, () => Promise<{ default: Component }>> 
   teletext: () => import('./Teletext.svelte'),
   pixel: () => import('./PixelArt.svelte'),
   web1: () => import('./Web1.svelte'),
+  y2k: () => import('./Y2K.svelte'),
   winxp: () => import('./WinXP.svelte'),
   skeuo: () => import('./Skeuo.svelte'),
   material: () => import('./Material.svelte'),

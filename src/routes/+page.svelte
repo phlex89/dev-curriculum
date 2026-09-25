@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { currentTheme, ERA_ORDER, type Theme } from '$lib/store';
+  import { currentTheme, ERA_ORDER, isTheme, type Theme } from '$lib/store';
   import { lang } from '$lib/i18n';
   import { ui } from '$lib/translations';
   import { initAudio, playEra, toggleAudio, audioEnabled } from '$lib/audio';
@@ -15,8 +16,6 @@
   const t = $derived(ui[$lang].shared);
   const eraLabels = $derived(t.eraTitles);
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Gate the first paint: until the real era is resolved from the URL/localStorage
   // we render nothing, so the visitor never sees the default (bento) flash and the
@@ -110,6 +109,14 @@
     trackEra(dt);
   });
 
+  function reclaimFocus(node: HTMLElement) {
+    const id = setTimeout(() => {
+      const a = document.activeElement;
+      if (!a || a === document.body) node.focus({ preventScroll: true });
+    }, 480);
+    return { destroy: () => clearTimeout(id) };
+  }
+
   function onAudioToggle() {
     const on = toggleAudio();
     if (on) {
@@ -140,8 +147,8 @@
     // Keep the active era in sync with the URL (deep-links, back/forward navigation).
     const onHash = () => {
       const t = location.hash.slice(1);
-      if ((['terminal', 'teletext', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'parallax', 'glass', 'liquid', 'threed'] as const).includes(t as Theme)) {
-        currentTheme.setFromHash(t as Theme);
+      if (isTheme(t)) {
+        currentTheme.setFromHash(t);
       }
     };
     window.addEventListener('hashchange', onHash);
@@ -174,7 +181,15 @@
     <!-- Keyed on era AND language: switching language remounts the era, which
          re-reads getCvData()/getUi() at init — no per-theme reactivity needed. -->
     {#key `${displayedTheme}:${$lang}`}
-      <div class="theme-layer" in:fade={{ duration: 600, delay: 260 }} out:fade={{ duration: 460 }}>
+      <div
+        class="theme-layer"
+        role="region"
+        aria-label={eraLabels[displayedTheme] ?? displayedTheme}
+        tabindex="-1"
+        use:reclaimFocus
+        in:fade={{ duration: 600, delay: 260 }}
+        out:fade={{ duration: 460 }}
+      >
         {#await themeLoaders[displayedTheme]() then mod}
           {@const ThemeComponent = mod.default}
           <ThemeComponent />
@@ -242,6 +257,9 @@
   }
 
   /* Each theme fades in/out over the other for a smooth cross-dissolve */
+  .theme-layer:focus {
+    outline: none;
+  }
   .theme-layer {
     position: absolute;
     inset: 0;
@@ -339,11 +357,12 @@
     pointer-events: none;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.34) 0%, rgba(0, 0, 0, 0.13) 50%, transparent 100%);
   }
-  /* Future 3D is the worst case: the Timeline pill is near-transparent glass over
-     a busy luminous scene, so it needs a deeper scrim to read against. */
+  .timeline-scrim.theme-winxp {
+    display: none;
+  }
   .timeline-scrim.theme-threed {
     height: 190px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.66) 0%, rgba(0, 0, 0, 0.32) 45%, transparent 100%);
+    background: linear-gradient(to top, rgba(7, 7, 10, 0.9) 0%, rgba(7, 7, 10, 0.5) 45%, transparent 100%);
   }
 
   /* --- Global audio toggle (bottom-left, aligned with the Timeline) --- */
@@ -460,19 +479,22 @@
   .audio-fab.theme-web1.on { background: #000080; color: #fff; border-style: inset; }
 
   .audio-fab.theme-threed {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(9, 9, 12, 0.86);
+    border: 1px solid rgba(244, 243, 239, 0.14);
+    color: #f4f3ef;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .audio-fab.theme-threed.on {
-    background: rgba(0, 255, 255, 0.25);
-    border-color: #00ffff;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    border-color: transparent;
+    background:
+      linear-gradient(#111116, #111116) padding-box,
+      linear-gradient(115deg, #8b48b5, #f4ac9f 35%, #a7f4e3 65%, #3e91f9) border-box;
   }
 
   /* Glassmorphism: frosted milky pill with a fine top light-edge — the luminous
-     Big Sur look (light, not the dark neon of threed). */
+     Big Sur look (light, not the near-black of threed). */
   .audio-fab.theme-glass {
     background: rgba(255, 255, 255, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -530,6 +552,24 @@
   .audio-fab.theme-pixel:hover { transform: translate(1px, 1px); box-shadow: 2px 2px 0 #000; }
   .audio-fab.theme-pixel.on { background: #d82800; }
   .audio-fab.theme-pixel .audio-icon { font-size: 0.95rem; }
+
+  .audio-fab.theme-y2k {
+    background: linear-gradient(180deg, #ffffff 0%, #d9e2ea 45%, #c3ced8 55%, #f2f6f9 100%);
+    border: 1px solid #5f6f7f;
+    color: #0b2a44;
+    box-shadow: inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0, 0, 0, 0.18), 0 8px 20px rgba(8, 50, 90, 0.3);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .audio-fab.theme-y2k.on {
+    background: linear-gradient(180deg, #6fb3ec 0%, #1560b3 20%, #0a4c96 52%, #1560b3 100%);
+    border-color: #07396f;
+    color: #fff;
+  }
+  .audio-fab.theme-y2k:focus-visible { outline-color: #06243d; }
+  .timeline-scrim.theme-y2k {
+    display: none;
+  }
 
   @media (max-width: 720px) {
     /* The Timeline collapses to a full-width bottom stepper here, so the audio

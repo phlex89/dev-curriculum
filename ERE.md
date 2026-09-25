@@ -44,12 +44,12 @@
 | 4 | Windows 9x / XP Desktop | Inizio anni 2000 | ✅ Implementato | `WinXP.svelte` |
 | 5 | Glossy / Skeuomorfismo (Web 2.0) | ca. 2007–2013 | ✅ Implementato | `Skeuo.svelte` |
 | 6 | Material Design & Flat | 2014–2017 | ✅ Implementato | `Material.svelte` |
-| 7 | Brutalismo | 2017–2020 | ✅ Implementato | `Brutalism.svelte` |
-| 8 | Bento Box / Modern Flat | 2021–oggi | ✅ Implementato | `BentoBox.svelte` |
+| 7 | Neubrutalism | 2021 | ✅ Implementato | `Brutalism.svelte` |
+| 8 | Bento Box | 2022 | ✅ Implementato | `BentoBox.svelte` |
 | 9 | Glassmorphism | 2020 (il presente luminoso) | ✅ Implementato | `Glass.svelte` |
-| 10 | WebGL / 3D Immersivo | Il Futuro | ✅ Implementato | `ThreeD.svelte` |
+| 10 | WebGL immersivo (Awwwards) | 2019 | ✅ Implementato | `ThreeD.svelte` |
 | 11 | AI / Conversazionale | 2030+ (oltre il 3D) | ⬜ Proposta | — (da creare) |
-| 12 | Y2K / Chrome & Plastica translucida | 1999–2003 | ⬜ Proposta (valutata) | — (da creare) |
+| 12 | Y2K / Chrome & Plastica translucida | 2000 | ✅ Implementata | `Y2K.svelte` (`'y2k'`, `#y2k`) |
 | 13 | Teletext / Televideo (Mode 7) | anni '70 – 2000 | ✅ Implementato | `Teletext.svelte` |
 | 14 | Neumorphism / Soft UI | 2020 | ⬜ Proposta (valutata) | — (da creare) |
 | 15 | Parallax / Immersive Scroll | ~2018–oggi (apice premium) | ✅ Implementata | `Parallax.svelte` (`'parallax'`, `#parallax`) |
@@ -60,23 +60,14 @@
 > più basso valore o più a rischio di sovrapposizione (Frutiger Aero, Vaporwave, PS1
 > low-poly, Amiga, Mac Classic) restano in **"Idee oltre la lista"** come spunti/easter-egg.
 
-> L'attuale `ERA_ORDER` è
-> `['terminal', 'pixel', 'web1', 'winxp', 'skeuo', 'material', 'brutalism', 'bento', 'glass', 'threed']`. La
-> **Pixel Art** è una *lineage parallela* (mondo console, non desktop/web) ma
-> contemporanea al Terminale, perciò è collocata **subito dopo `terminal`**; il
-> **Web 1.0** (GeoCities/Netscape, metà anni '90) si inserisce **tra `pixel` e
-> `winxp`**, colmando il buco tra l'era console/terminale e il desktop XP; il
-> **Material Design** (2014) si inserisce **tra `skeuo` e `brutalism`**, raccontando
-> la "grande appiattita" come reazione diretta allo skeuomorfismo che lo precede.
-> Il **Glassmorphism** è ora un'**era autonoma** (`✅`, §9), collocata **tra `bento` e
-> `threed`** come "presente luminoso" (Big Sur / Windows 11) — nettamente distinto dal
-> 3D dal contrasto **luce/buio**. L'unico candidato residuo per future espansioni è
-> l'**era AI / conversazionale** (§11), unica vera *nuova frontiera narrativa* oltre il
-> 3D — andrebbe **in coda a `ERA_ORDER`**, dopo `threed`. Il **Parallax / Immersive
-> Scroll** (§15) è invece l'estetica **premium contemporanea** del *craft web* (smooth-scroll
-> + parallax raffinato, stile synthesis.capital / tresmarescapital): collocazione **tra
-> `brutalism` e `bento`** (la corrente "immersive/cinematografica" emersa accanto al
-> consolidamento modulare del Bento).
+> L'attuale `ERA_ORDER` (rivisto a set 2026, vedi `ANALISI-STILI.md`) è
+> `['terminal', 'teletext', 'pixel', 'web1', 'y2k', 'winxp', 'skeuo', 'material', 'parallax', 'threed', 'glass', 'brutalism', 'bento', 'liquid']`.
+> Terminale, Televideo e Pixel Art sono lineage parallele degli anni '80; il **Web 1.0** (1996)
+> e il web Flash **Y2K** (2000) precedono il desktop **XP** (2001); **Skeuo** (2010) e **Material** (2014) raccontano la "grande
+> appiattita"; il **Parallax** (2018) apre il craft web premium; il **WebGL** (2019, prima "Future 3D · 2026") racconta i portfolio immersivi da Awwwards; seguono **Glass** (2020),
+> **Neubrutalism** (2021, prima etichettato per errore "Brutalism · 2017"), **Bento** (2022,
+> prima "Modern Flat · 2015") e **Liquid** (2025), che oggi chiude la timeline. Il nuovo finale previsto è l'**era AI**
+> (§11), dopo `liquid`.
 
 ---
 
@@ -365,7 +356,7 @@ Gli oggetti sembrano poggiati su una superficie in pelle cucita.
 > (6dp→12dp in hover) con azione primaria *mailto*. **Ripple** autentico (azione `ripple`: cerchio
 > che si espande dal punto del tocco) su tab, icon-button, contatti e FAB. Tipografia **Roboto**
 > self-hostata (file variabile latin-subset, `fonts.css`). Hash `#material`, in `ERA_ORDER`
-> **tra `skeuo` e `brutalism`**, label d'anno **"2014"**, cue audio (`case 'material'`): *tap*
+> **tra `skeuo` e `parallax`**, label d'anno **"2014"**, cue audio (`case 'material'`): *tap*
 > sine pulito a due note. **Tutto gated da `prefers-reduced-motion`** (ripple soppresso, lift/scale
 > e scroll fluido disattivati; le ombre di elevazione restano). Mobile: app bar centrata, tab strip
 > scrollabile, due-colonne impilate. La scheda sotto resta come documentazione del concept.
@@ -391,8 +382,8 @@ elevazione a ombre + ripple + accento colorato forte. Distinguere bene per non s
 
 ---
 
-## 7. Brutalismo — ✅ Implementato
-**2017–2020** · `src/lib/themes/Brutalism.svelte`
+## 7. Neubrutalism — ✅ Implementato
+**2021** (label "Neubrutalism · 2021") · `src/lib/themes/Brutalism.svelte`
 
 **Contesto.** Reazione/ribellione al minimalismo levigato e omologato. Estetica "anti-
 design" deliberatamente cruda, eco dell'HTML grezzo ma scelta consapevolmente: web come
@@ -417,14 +408,15 @@ aberrazione cromatica sul nome (text-shadow cobalto/rosso), `● location` lampe
 accordion delle esperienze a toggle secco. Audio d'epoca: buzzer ruvido (square/saw
 dissonante). Tutto sotto `prefers-reduced-motion` (marquee/glitch/blink/press disattivati).
 
-> **Nota cronologica:** il Brutalismo (2017–2020) precede di poco l'esplosione del Bento
-> (2021+), quindi in `ERA_ORDER` è collocato **prima di `bento`**. Le label d'anno mostrano
-> "2017" (Brutalism) e "2015" (Modern Flat) — coerenti con l'avvio dei rispettivi trend.
+> **Nota cronologica (rivista set 2026).** Bordi 3–4px, ombre offset dure, "pressione
+> meccanica" e font display sono la formula del **neubrutalism** (2021+, Gumroad/Figma), non
+> del brutalismo web grezzo del 2017 (font di default, monocromo). Label corretta in
+> **"Neubrutalism · 2021"**, in `ERA_ORDER` **tra `glass` e `bento`**. Vedi `ANALISI-STILI.md`.
 
 ---
 
-## 8. Bento Box / Modern Flat — ✅ Implementato
-**2021–oggi** · `src/lib/themes/BentoBox.svelte`
+## 8. Bento Box — ✅ Implementato
+**2022** (label "Bento · 2022") · `src/lib/themes/BentoBox.svelte`
 
 **Contesto.** L'estetica dei portfolio e delle dashboard contemporanee (Apple keynote,
 widget iOS/macOS). Ordine modulare: ogni informazione nel suo "scomparto" come in una
@@ -448,7 +440,7 @@ circolare.
 > **Stato implementazione.** Estratto dal 3D come **era autonoma** e ridisegnato sul
 > principio **"Luce vs Buio"**: è il **presente luminoso** (macOS Big Sur / Windows 11
 > Acrylic / iOS) — l'opposto esatto del vuoto neon scuro del 3D. Hash `#glass`, chiave
-> tema `'glass'`, in `ERA_ORDER` **tra `bento` e `threed`**, label d'anno **"2020"**,
+> tema `'glass'`, in `ERA_ORDER` **tra `threed` e `brutalism`**, label d'anno **"2020"**,
 > icona 🧊 in Timeline.
 >
 > **Sfondo:** **nessun WebGL** — un campo di **aurora-blobs pastello** (aqua, lilla,
@@ -511,22 +503,39 @@ dietro; Liquid è un'**app** (shell a tab) che **piega** la luce con una lente S
 
 ---
 
-## 10. WebGL / 3D Immersivo — ✅ Implementato
-**Il Futuro (2026+)** · `src/lib/themes/ThreeD.svelte`
+## 10. WebGL immersivo — ✅ Implementato (ricollocato set 2026)
+**2019 (apice 2016–2021)** · `src/lib/themes/ThreeD.svelte` · chiave `'threed'` · hash `#threed` · label "WebGL · 2019", icona 🌀
 
-**Contesto.** La frontiera: il browser come ambiente 3D immersivo. Padronanza tecnica come
-messaggio. Elementi sospesi nello spazio, scena viva e reattiva.
+> **Ricollocazione (set 2026).** Fino ad agosto 2026 era "Future 3D · 2026": card di vetro
+> sfocato con tilt sopra particelle neon e un torus knot wireframe. Il futuro era diventato
+> il presente, e il vetro la sovrapponeva a Glass e Liquid (vedi `ANALISI-STILI.md` §4.2).
+> Ora racconta un'epoca reale: i portfolio WebGL da Awwwards, dove i contenuti stanno
+> **nella scena** e lo scroll muove la camera. Il posto di finale passa all'era AI (§11).
+
+**Contesto.** Active Theory, Lusion, Resn, il portfolio-gioco di Bruno Simon (2019), la hero a
+gradiente shader di Stripe: il browser come palcoscenico GPU. Il sito si "carica" come un gioco,
+un oggetto shader domina la scena, la navigazione è una regia di camera.
 
 **Stile.**
-- **Palette:** background profondissimo, neon, glow; hue del torus knot che "respira".
-- **Tipografia:** **Orbitron** (display futuristico), **Space Grotesk** (resto).
-- **Materiali:** glassmorphism sopra scena WebGL, vignetta per leggibilità.
-- **Layout:** card di vetro fluttuanti sopra canvas `fixed` a piena pagina.
+- **Palette:** quasi nero, testo bianco, un solo protagonista iridescente (fresnel + palette coseno).
+- **Tipografia:** **Boldonse** (OFL, self-hostata 16.7KB) solo per i momenti forti: nome, titoli di
+  capitolo, "Contact", Tundr come finale del Path; lettere che reagiscono al cursore con una molla.
+  Corpo in Inter, micro-UI in JetBrains Mono. Orbitron e Space Grotesk dismessi in quest'era.
+- **Materiali:** blob `ShaderMaterial` con displacement a simplex noise, polvere a strati, grana
+  filmica CSS. Nessun post-processing, nessun vetro, nessun wireframe.
+- **Layout:** preloader con contatore `000→100`, cinque capitoli guidati dallo scroll (Hero, About,
+  Path, Skills, Contact) con indicatore `01 / 05`.
 
-**Interazione / narrativa.** Scena Three.js (nebulosa di particelle a 3 strati, torus knot
-wireframe, anelli di energia, solidi orbitanti), parallasse camera col mouse, **bloom
-reale** (`UnrealBloomPass`, gated), scena reattiva (hover card → energia che decade),
-lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
+**Interazione / narrativa.** Il blob segue il cursore con una molla, si agita con la velocità del
+mouse, si gonfia sotto il puntatore e manda un'onda al passaggio. Nel capitolo Path la camera
+viaggia in **ordine cronologico** (dalle origini a Tundr, che è il finale con pill "Now") lungo una
+curva 3D, con etichette DOM proiettate sui nodi (testo nitido e accessibile); l'Intro mostra già
+"Now — ruolo @ azienda";
+l'hover sulle skill fa reagire lo shader. Doppio binario: con reduced-motion, senza WebGL o su
+mobile i contenuti diventano una lista statica completa.
+
+**Differenziazione.** Da Parallax (2018): scuro, shader-first, nessun Lenis né cursore custom. Da
+Glass/Liquid: nessuna superficie di vetro. Three.js resta lazy (`import type` + `await import`).
 
 ---
 
@@ -536,7 +545,7 @@ lazy-load di three, pausa rAF a tab nascosto, tilt 3D delle card.
 > **Stato.** Proposta ragionata, **non implementata**. È l'unica vera *nuova frontiera
 > narrativa* oltre il 3D: invece di una pagina che leggi, **un agente con cui parli** e che
 > ti risponde **componendo UI** (UI generativa), non solo testo. Andrebbe **in coda a
-> `ERA_ORDER`**, dopo `threed`. Label d'anno suggerita: **"2030"**.
+> `ERA_ORDER`**, dopo `liquid`. Label d'anno suggerita: **"2030"**.
 
 **Contesto.** La frontiera dopo l'immersività 3D: interfacce **conversazionali e generative**.
 Il CV non si sfoglia, si *interroga*; l'UI si auto-assembla in risposta all'intento. Glow
@@ -619,13 +628,20 @@ modello multi-GB** al primo uso, con requisiti hardware (GPU/VRAM/disco). Contex
    da solo.
 
 **Identificatori tecnici previsti.** `Theme` key `'ai'` · `src/lib/themes/AiEra.svelte` ·
-hash `#ai` · `ERA_ORDER` **in coda** dopo `threed` · registrare in `Theme`/`THEMES`/`ERA_ORDER`
+hash `#ai` · `ERA_ORDER` **in coda** dopo `liquid` · registrare in `Theme`/`THEMES`/`ERA_ORDER`
 (`store.ts`), cue audio in `audio.ts`, stile per-tema in `Timeline.svelte`.
 
 ---
 
-## 12. Y2K / Chrome & Plastica translucida — ⬜ Proposta (valutata)
-**1999–2003 (la svolta del millennio)** · componente da creare (es. `src/lib/themes/Y2K.svelte`)
+## 12. Y2K / Chrome & Plastica translucida — ✅ Implementata (set 2026)
+**2000 (la svolta del millennio)** · `src/lib/themes/Y2K.svelte` · chiave `'y2k'` · hash `#y2k` · label "Y2K · 2000", icona 💿
+
+> **Implementazione (set 2026).** Intro Flash con logo cromato, `LOADING… %`, `ENTER »` e
+> `skip intro`; console 960×600 in cromo e plastica Bondi con nav a pulsanti gel (tablist), schermo
+> CRT con transizioni da Flash, orologio "Y2K COMPLIANT ✓" (easter egg 19100), contatore visite,
+> ticker e "best viewed at 800×600". Michroma self-hostata (~9.5KB), corpo Verdana/Tahoma,
+> etichette Silkscreen. Prima era a skinnare la Timeline con i token `--tl-*`. Scheda di progetto
+> originale qui sotto.
 
 > **Stato.** Valutata (giu 2026) come **candidato headliner**: il più forte tra i nuovi.
 > Colma un buco narrativo reale — il web *Flash/splash* e l'ottimismo "tech" da millennium
@@ -756,7 +772,7 @@ Cue audio: "tap" morbido e ovattato. Font: Inter (già self-hostato) — **nessu
 ---
 
 ## 15. Parallax / Immersive Scroll — ✅ Implementata
-**Il web premium contemporaneo (apice ~2018–oggi)** · `src/lib/themes/Parallax.svelte` · chiave `'parallax'` · hash `#parallax` · in `ERA_ORDER` tra `brutalism` e `glass` · label "2018", icona 🎬
+**Il web premium contemporaneo (apice ~2018–oggi)** · `src/lib/themes/Parallax.svelte` · chiave `'parallax'` · hash `#parallax` · in `ERA_ORDER` tra `material` e `glass` · label "2018", icona 🎬
 
 > **Stato.** ✅ **Implementata** (giu 2026). Componente `Parallax.svelte`, smooth-scroll **Lenis**
 > lazy (~3KB, unico runtime dep oltre Three), serif display **Fraunces** self-hostato/subsettato
@@ -883,7 +899,7 @@ contenuto. Da **Material**: là il moto è *funzionale* (ripple/elevazione); qui
 (reveal cinematografici). Da differenziare con cura nel testo, nella palette e nel cue audio.
 
 **Identificatori tecnici (realizzati).** `Theme` key `'parallax'` · `src/lib/themes/Parallax.svelte` ·
-hash `#parallax` · `ERA_ORDER` **tra `brutalism` e `glass`** · label d'anno **"2018"**, icona 🎬 ·
+hash `#parallax` · `ERA_ORDER` **tra `material` e `glass`** · label d'anno **"2018"**, icona 🎬 ·
 dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 `+page.svelte` / `audio.ts` / `Timeline.svelte`. Contenuti **selezionati da `cv-data.ts`**.
 
@@ -895,7 +911,7 @@ dipendenza **Lenis** (lazy) · registrare in `store.ts` / `registry.ts` /
 > **Stato implementazione.** Aggiunta come **tredicesima era** per colmare il buco che il
 > trend "Liquid Glass Navigation" (analisi Muzli del 30 luglio 2026) segnalava nella
 > timeline: `Glass` (2020) non aveva alcuna navigazione, era un *documento*. Hash
-> `#liquid`, chiave tema `'liquid'`, in `ERA_ORDER` **tra `glass` e `threed`**, label
+> `#liquid`, chiave tema `'liquid'`, **ultima** in `ERA_ORDER`, dopo `bento`, label
 > d'anno **"2025"**, icona 💧 in Timeline. Ha richiesto una rifocalizzazione di `Glass`
 > (§9) perché le due non si sovrapponessero: **Glass = documento, Liquid = app**.
 >

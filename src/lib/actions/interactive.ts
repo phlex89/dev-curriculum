@@ -1,10 +1,6 @@
 // Shared pointer-driven micro-interactions used by the modern themes.
 // All effects bow out gracefully when the user prefers reduced motion.
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  !!window.matchMedia &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { prefersReduced } from '$lib/motion';
 
 interface TiltOptions {
   /** Max rotation in degrees on each axis. */
@@ -24,7 +20,7 @@ interface TiltOptions {
  */
 export function tilt(node: HTMLElement, options: TiltOptions = {}) {
   let opts = { max: 3, scale: 1, spotlight: true, perspective: 1000, ...options };
-  const reduce = prefersReducedMotion();
+  const reduce = prefersReduced();
 
   function onMove(e: MouseEvent) {
     const r = node.getBoundingClientRect();
@@ -82,7 +78,7 @@ interface RevealOptions {
 export function reveal(node: HTMLElement, options: RevealOptions = {}) {
   const { delay = 0, y = 28 } = options;
 
-  if (prefersReducedMotion() || typeof IntersectionObserver === 'undefined') {
+  if (prefersReduced() || typeof IntersectionObserver === 'undefined') {
     return {};
   }
 
@@ -131,7 +127,7 @@ interface MagneticOptions {
  */
 export function magnetic(node: HTMLElement, options: MagneticOptions = {}) {
   let { strength = 0.4 } = options;
-  if (prefersReducedMotion()) return {};
+  if (prefersReduced()) return {};
 
   let raf = 0;
   function onMove(e: MouseEvent) {

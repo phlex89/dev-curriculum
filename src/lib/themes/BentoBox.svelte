@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   import { onMount } from 'svelte';
-  import { getCvData } from '$lib/i18n';
+  import { getCvData, getUi } from '$lib/i18n';
   import { tilt, reveal } from '$lib/actions/interactive';
 
   const cvData = getCvData();
+  const ui = getUi();
 
   let darkMode = $state(false);
   let avatarFailed = $state(false);
@@ -24,8 +26,6 @@
     }
   });
 
-  const prefersReduced = () =>
-    typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function applyDarkMode() {
     darkMode = !darkMode;
@@ -175,6 +175,7 @@
     <a href={cvData.contact.linkedin} target="_blank" rel="noopener" class="bento-box social-box linkedin" use:reveal={{ delay: 400 }} use:tilt={{ max: 3 }}>
       <span class="social-icon">in</span>
       <span class="social-label">LinkedIn</span>
+      <span class="sr-only"> {ui.shared.opensInNewTab}</span>
       <span class="social-go" aria-hidden="true">→</span>
     </a>
 
@@ -203,8 +204,9 @@
     --bg-accent: #e3e6f5;
     --box-bg: #ffffff;
     --text-main: #16161a;
-    --text-sec: #6e6e78;
+    --text-sec: #6a6a74;
     --accent: #4f46e5;
+    --badge-bg: #4f46e5;
     --accent-soft: rgba(79, 70, 229, 0.08);
     --shadow: 0 4px 14px rgba(20, 20, 40, 0.05), 0 12px 40px rgba(20, 20, 40, 0.06);
     --hover-shadow: 0 10px 24px rgba(20, 20, 40, 0.1), 0 24px 60px rgba(20, 20, 40, 0.12);
@@ -232,7 +234,8 @@
     --box-bg: #141418;
     --text-main: #f4f4f7;
     --text-sec: #9a9aa6;
-    --accent: #7c74ff;
+    --accent: #8680ff;
+    --badge-bg: #5b54e6;
     --accent-soft: rgba(124, 116, 255, 0.12);
     --shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 12px 40px rgba(0, 0, 0, 0.35);
     --hover-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 24px 60px rgba(0, 0, 0, 0.45);
@@ -383,7 +386,7 @@
 
   .role-badge {
     display: inline-block;
-    background: var(--accent);
+    background: var(--badge-bg);
     color: #fff;
     padding: 7px 18px;
     border-radius: 999px;
@@ -564,8 +567,7 @@
     font-size: 0.85rem;
     line-height: 1.45;
   }
-  .exp-item.early { opacity: 0.82; }
-  .exp-item.early .company { font-size: 0.98rem; }
+  .exp-item.early .company { font-size: 0.98rem; color: var(--text-sec); }
 
   /* ---- Languages ---- */
   .lang-box { grid-area: lang; }
@@ -606,6 +608,18 @@
   .edu-item strong { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
   .edu-item p { margin: 4px 0; font-size: 0.92rem; color: var(--text-main); }
   .edu-item .period { display: block; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   /* ---- Social ---- */
   .social-box {

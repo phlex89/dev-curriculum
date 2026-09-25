@@ -110,16 +110,16 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 -   **`prefers-reduced-motion`:** ripple soppresso, lift/scale e scroll fluido disattivati; le ombre di elevazione restano. **Mobile:** app bar centrata, tab strip scrollabile orizzontalmente, due-colonne impilate.
 -   **Differenziazione da Bento:** Material = superfici **piatte + elevazione a ombre + ripple + ink-bar + accento forte**; Bento = modulare/widget, vetro smerigliato, bento-grid stondata.
 
-### 8. Brutalismo (2017-2020)
+### 8. Neubrutalism (2021)
 **Componente:** `src/lib/themes/Brutalism.svelte`
 -   Reazione cruda al minimalismo levigato: un CV "view-source" in stile **fanzine punk fotocopiata** incrociata con un terminale dati. Massima personalità, anti-design consapevole.
 -   **Estetica:** carta da giornale calda (griglia a puntini "newsprint") + inchiostro nero, **bordi neri da 4px**, **ombre dure offset** (`8px 8px 0`, senza blur), zero `border-radius`. Accenti **sgargianti che si scontrano** (acid, cobalto, rosso, lime, pink) ruotati su tag, numeri di sezione e bottoni di contatto.
 -   **Tipografia:** **Anton** (titoli display giganti), **Archivo** (corpo), **Space Mono** (meta-label, ticker, tag) — nessun font condiviso con le altre ere.
 -   **Layout:** sezioni numerate (`01 / EXPERIENCE`), tipografia che sfonda la griglia, **ticker monospace** scorrevole sticky in alto, esperienze in accordion a toggle secco.
 -   **Micro-interazioni (sotto `prefers-reduced-motion`):** hover **tattili** che "schiacciano" l'ombra (translate netto, easing lineare), tag che **invertono** secco nero/carta, glitch ad aberrazione cromatica sul nome, `● location` lampeggiante. Audio: buzzer ruvido dissonante.
--   *Nota cronologica:* collocato in `ERA_ORDER` **prima di Bento** (il Brutalismo 2017 precede l'esplosione del Bento 2021+).
+-   *Nota cronologica:* lo stile implementato è **neubrutalism** (2021+, Gumroad/Figma), non il brutalismo web grezzo del 2017: label "Neubrutalism · 2021", in `ERA_ORDER` **tra `glass` e `bento`**.
 
-### 9. Modern Flat / Bento Box (2015-Oggi)
+### 9. Bento Box (2022)
 **Componente:** `src/lib/themes/BentoBox.svelte`
 -   Design basato sul layout asimmetrico "Bento Grid" tramite CSS Grid (con `grid-template-areas` per un layout bilanciato e senza buchi), molto in voga nei portafogli moderni (es. stile Apple).
 -   Tipografia curata (**Space Grotesk** per titoli/nomi, **Inter** per il corpo), label di sezione in maiuscoletto, avatar con anello a gradiente conico, ombre morbide a due livelli e palette indaco armonizzata.
@@ -129,26 +129,29 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ### 10. Glassmorphism (2020 - il presente luminoso)
 **Componente:** `src/lib/themes/Glass.svelte`
--   Il **presente luminoso** dei sistemi operativi (macOS Big Sur, Windows 11 Acrylic, iOS/visionOS): superfici di vetro traslucido su sfondi sfocati e luminosi. In `ERA_ORDER` è **tra `bento` e `threed`**, come tappa che precede il salto immersivo nel 3D.
+-   Il **presente luminoso** dei sistemi operativi (macOS Big Sur, Windows 11 Acrylic, iOS/visionOS): superfici di vetro traslucido su sfondi sfocati e luminosi. In `ERA_ORDER` è **tra `parallax` e `brutalism`**.
 -   **Differenziazione dal 3D/Futuro — "Luce vs Buio"** (è il discriminante portante): Glass = **chiaro/pastello/arioso**, **nessun WebGL**; il 3D = scuro/neon/sci-fi con scena WebGL. Pur condividendo il vocabolario del vetro (`backdrop-filter: blur`), i due sono opposti per luminosità, sfondo e tipografia.
 -   **Sfondo:** campo di 5 **aurora-blobs pastello** (aqua/lilla/pesca/cielo/menta) su base quasi-bianca, sfocati (`blur(70px)`) e in **drift CSS lento**, con **parallax 2D piatto** (l'intero campo scivola di pochi px verso il cursore via `--px/--py` aggiornati su `mousemove` — niente camera/prospettiva). Tutto puro CSS, zero canvas.
 -   **Vetro frosted presente e lattiginoso:** pannelli `rgba(255,255,255,.45)` + `backdrop-filter: blur(30px) saturate(180%)`, **bordo-luce 1px** in alto (inset highlight), ombra ambient diffusa; **sheen speculare** bianco che segue il cursore (via action `tilt` → `::after` con `mix-blend-mode: overlay`). Molto più presente del vetro quasi invisibile del 3D.
 -   **Layout** a griglia di pannelli frosted fluttuanti (hero a tutta larghezza → Profilo → Esperienza → Competenze/Lingue → Formazione/Conferenze), arioso, scrollabile; mobile a colonna singola. Contenuti **tutti da `cv-data.ts`**, ingresso con `use:reveal` + tilt con `use:tilt`.
 -   Tipografia **Outfit ultralight** (nome a peso 200; geometrico arioso, variable self-hostato `~34KB`) — la voce SF/Big Sur, opposta all'Orbitron sci-fi del 3D. Hash `#glass`, label d'anno **"2020"**, icona 🧊, cue audio `case 'glass'` (**campanella di vetro**: arpeggio triangle E5·B5·E6 + halo sine acuto). Tutto gated da `prefers-reduced-motion` (drift dei blob, parallax e sheen disattivati; vetro e contenuti restano).
 
-### 11. Il Futuro - 3D Immersivo (2026+)
-**Componente:** `src/lib/themes/ThreeD.svelte`
--   Tema sperimentale volto a mostrare skill avanzate e padronanza WebGL.
--   Scena **Three.js** elaborata a piena pagina (canvas `fixed`, copre tutto a qualsiasi dimensione): **nebulosa di particelle** a 3 strati con dot luminosi rotondi (texture radiale generata su canvas, additive blending), un **torus knot** wireframe centrale rotante e pulsante, **anelli di energia** orbitanti e solidi (icosaedro/ottaedro) che ruotano e oscillano. Parallasse della camera legata al movimento del mouse.
--   **Lazy-load di Three.js**: la libreria (~150KB) e i suoi add-on di post-processing sono importati dinamicamente (`await import('three')`) solo all'ingresso in questa era, così chi resta su Bento/Terminale non li scarica. Il canvas fa un fade-in elegante da nero al primo frame renderizzato.
--   **Bloom reale (post-processing)**: pipeline `EffectComposer` + `UnrealBloomPass` per un glow vero su dot e torus knot. È *gated*: attivo solo su viewport ampi e con motion consentito, con fallback al rendering diretto.
--   **Scena reattiva**: l'hover sulle card inietta "energia" nella scena (decade nel tempo) che accelera il drift, intensifica il bloom e scalda l'hue del torus knot → sensazione di sistema vivo.
--   **Performance**: il loop `requestAnimationFrame` viene messo in pausa quando il tab è nascosto (`visibilitychange`); cleanup completo (dispose di renderer/composer) all'uscita.
--   Tipografia futuristica: **Orbitron** per i titoli display, **Space Grotesk** per il resto.
--   Veste grafica in *Glassmorphism scuro*: blocchi semitrasparenti (`backdrop-filter: blur`) appena percettibili sopra la scena WebGL, luci neon su background profondissimo, con vignetta per la leggibilità. È la veste neon/scura — distinta dall'era Glassmorphism autonoma (n.10), chiara e senza WebGL.
--   Effetto "Tilt" 3D contenuto: le carte, grazie alla matematica basata sulla posizione del cursore (`mousemove`), ruotano leggermente orientandosi verso il mouse.
+### 11. WebGL immersivo (2019)
+**Componente:** `src/lib/themes/ThreeD.svelte` + `src/lib/themes/threed/shaders.ts`
+-   I portfolio WebGL da Awwwards del 2016–2021 (Active Theory, Lusion, Bruno Simon). In `ERA_ORDER` **tra `parallax` e `glass`**, label "WebGL · 2019", icona 🌀. Fino a set 2026 era "Future 3D · 2026".
+-   **Preloader** con contatore `000→100` legato al caricamento reale (import di three + font), poi wipe.
+-   **Blob** `ShaderMaterial`: displacement a simplex noise nel vertex, fresnel + palette coseno iridescente nel fragment; il cursore lo deforma. Polvere su tre strati a parallasse diversa, grana filmica CSS. **Nessun post-processing.**
+-   **Cinque capitoli guidati dallo scroll** (Intro, About, Path, Skills, Contact) con micro-UI mono (`01 / 05`). Nel Path la carriera è una curva 3D percorsa dalla camera, con **etichette DOM proiettate** sui nodi (testo nitido e accessibile); l'hover sulle skill fa reagire lo shader.
+-   **Doppio binario**: reduced-motion (un solo frame, nessun rAF), senza WebGL (blob CSS) e mobile (<900px) → lista statica completa.
+-   Tipografia **Space Grotesk** + **JetBrains Mono** (self-hostati). Three.js **lazy** (`import type` + `await import`), rAF in pausa a tab nascosto, cleanup completo anche se smontato prima del caricamento.
 
----
+### 11b. Y2K / Chrome & plastica translucida (2000)
+**Componente:** `src/lib/themes/Y2K.svelte`
+-   Il web Flash della svolta del millennio. In `ERA_ORDER` **tra `web1` e `winxp`**, hash `#y2k`, label "Y2K · 2000", icona 💿.
+-   **Intro Flash** (logo cromato che si compone, `LOADING… %`, `ENTER »`, `skip intro` sempre attivo; saltata con reduced-motion) su cielo digitale con griglia prospettica, lens flare e sfere lucide.
+-   **Console 960×600** in cromo e plastica Bondi rigata: orologio "Y2K COMPLIANT ✓" (easter egg 19100), contatore visite, SOUND ON/OFF collegato all'audio globale, nav a pulsanti gel (vera tablist con frecce/Home/End), schermo CRT con transizioni zoom/wipe/scan, ticker, "best viewed at 800×600". Mobile: console verticale a tutta larghezza.
+-   Tipografia **Michroma** (OFL, self-hostata ~9.5KB) per il cromo, **Verdana/Tahoma** di sistema per il corpo, **Silkscreen** per le etichette pixel.
+-   **Prima era a usare i token della Timeline** (`--tl-*`, un solo blocco `:global(:root) .theme-y2k`) invece dei blocchi per elemento.
 
 ### 12. Parallax / Immersive Scroll (≈2018)
 **Componente:** `src/lib/themes/Parallax.svelte`
@@ -161,7 +164,7 @@ Il browser scarica solo i `woff2` realmente renderizzati nella pagina/tema corre
 
 ### 13. Liquid Glass (2025)
 **Componente:** `src/lib/themes/Liquid.svelte` (+ modulo puro `src/lib/themes/liquid/lens.ts`)
--   La grammatica di navigazione delle app 2025 (iOS 26 "Liquid Glass"): **Glass è un documento, Liquid è un'app**. In `ERA_ORDER` è **tra `glass` e `threed`**. Hash `#liquid`, label d'anno **"2025"**, icona 💧.
+-   La grammatica di navigazione delle app 2025 (iOS 26 "Liquid Glass"): **Glass è un documento, Liquid è un'app**. In `ERA_ORDER` è **tra `bento` e `threed`**. Hash `#liquid`, label d'anno **"2025"**, icona 💧.
 -   **App shell** a `100dvh`: **capsula flottante centrata** (identità + tab bar con **pillola indicatore a molla**) sopra **un'unica regione scrollabile** con **quattro schermate a tab** (Profilo / Percorso / Competenze / Altro) che coprono tutti i contenuti dei sette pannelli di `Glass`. Allo scroll la capsula collassa nella sola pillola della tab attiva e resta compatta finché si è lontani dalla cima.
 -   **La lente**: filtro SVG `feImage` + tre `feDisplacementMap` a `scale` diversa per R/G/B (iridescenza sul bordo), con *displacement map* generata a runtime su `<canvas>`. Vive solo sulla testata, e **solo su Chromium** (`navigator.vendor`); ogni altro motore va a un **fallback curato** in CSS.
 -   **Ambiente**: tre wallpaper in CSS puro (Aurora / Sunset / Deep), ciclati da un pulsante e persistiti in `localStorage`; ognuno ri-tinge la `--l-accent`. Tipografia **di sistema**, nessun webfont. Cue audio (`case 'liquid'`): una **goccia**.

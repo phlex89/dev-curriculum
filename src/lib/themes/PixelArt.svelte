@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { prefersReduced } from '$lib/motion';
   // ──────────────────────────────────────────────────────────────────────────
   // Pixel Art / 8-bit Console Gaming era (≈1988).
   //
@@ -18,6 +19,9 @@
   import { getCvData, getUi } from '$lib/i18n';
   import { pixelBlip, pixelDiscover, pixelFanfare, pixelCoin, pixelBump, pixelSecret } from '$lib/audio';
   import { trackEvent, trackTag } from '$lib/analytics';
+  import { buildGrid, inBlock, MAP_H, MAP_W, walkable as gridWalkable } from './pixel/grid';
+  import { isAdjacentToBlock, updateAdjacency } from './pixel/adjacency';
+  import { createKonamiState, feedKonami as feedKonamiState } from './pixel/konami';
 
   const cvData = getCvData();
   const t = getUi().pixel;
@@ -36,8 +40,6 @@
     intro: string;
   }
 
-  const MAP_W = 48;
-  const MAP_H = 32;
   const STEP_MS = 50;
 
   // Zones laid out as a left→right journey, alternating top/bottom so the road
@@ -89,100 +91,10 @@
   ];
 
   // ── Terrain grid ────────────────────────────────────────────────────────────
-  type Tile = 'grass' | 'grass2' | 'path' | 'water' | 'tree' | 'flower';
-  const BLOCKED: Tile[] = ['water', 'tree'];
-
-  function buildGrid(): Tile[][] {
-    const g: Tile[][] = [];
-    for (let y = 0; y < MAP_H; y++) {
-      const row: Tile[] = [];
-      for (let x = 0; x < MAP_W; x++) {
-        const border = x <= 1 || y <= 1 || x >= MAP_W - 2 || y >= MAP_H - 2;
-        row.push(border ? 'tree' : (x + y) % 2 === 0 ? 'grass' : 'grass2');
-      }
-      g.push(row);
-    }
-    const set = (x: number, y: number, t: Tile) => {
-      if (x > 1 && y > 1 && x < MAP_W - 2 && y < MAP_H - 2) g[y][x] = t;
-    };
-
-    // ── Winding road: a single continuous serpentine left→right, passing the
-    //    approach block of each zone in order. Drawn segment-by-segment between
-    //    corner waypoints (each shares its turning tile with the next); every
-    //    segment is brushed 2 tiles wide so corners close on themselves.
-    const road: [number, number][] = [
-      [4, 16],  // entrance (hero spawn)
-      [8, 16],  // ┐
-      [8, 10],  // ┘ pass below CASA (8,8)
-      [12, 10], // ┐
-      [12, 22], // ┘ descend
-      [16, 22], // pass above CASTELLO (16,24)
-      [20, 22], // ┐
-      [20, 10], // ┘ climb
-      [24, 10], // pass below BOTTEGA (24,8)
-      [28, 10], // ┐
-      [28, 22], // ┘ descend
-      [32, 22], // pass above BIBLIOTECA (32,24)
-      [36, 22], // ┐
-      [36, 12], // ┘ climb
-      [38, 12], // pass below POSTA (36,10)
-      [38, 18], // ┐
-      [42, 18]  // ┘ reach above SCRIGNO (42,20)
-    ];
-    for (let i = 0; i < road.length - 1; i++) {
-      const [x1, y1] = road[i];
-      const [x2, y2] = road[i + 1];
-      if (x1 === x2) {
-        for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
-          set(x1, y, 'path');
-          set(x1 + 1, y, 'path');
-        }
-      } else {
-        for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
-          set(x, y1, 'path');
-          set(x, y1 + 1, 'path');
-        }
-      }
-    }
-
-    // Decorative pond (top-right corner, clear of the road and the POSTA sign)
-    for (let y = 2; y <= 7; y++) for (let x = 40; x <= 45; x++) set(x, y, 'water');
-    // Scattered trees (all off-road, framing the scene)
-    for (const [x, y] of [
-      [4, 6], [4, 10], [4, 22], [14, 4], [20, 4], [26, 4], [32, 4],
-      [44, 10], [44, 16], [44, 24], [16, 6], [22, 16], [30, 16], [34, 16],
-      [8, 26], [18, 26], [26, 26], [10, 26]
-    ])
-      set(x, y, 'tree');
-    // Flowers (walkable flavour, dotted along the road)
-    for (const [x, y] of [[10, 8], [22, 8], [34, 10], [14, 24], [30, 24], [40, 16], [6, 18]]) set(x, y, 'flower');
-    // Plaza under each building (2×2 block, corner at z.x/z.y)
-    for (const z of ZONES) {
-      set(z.x, z.y, 'path');
-      set(z.x + 1, z.y, 'path');
-      set(z.x, z.y + 1, 'path');
-      set(z.x + 1, z.y + 1, 'path');
-    }
-    return g;
-  }
-
-  const grid = buildGrid();
-  // Every zone/shrine now occupies a 2×2 block anchored at (z.x, z.y).
-  const inBlock = (z: { x: number; y: number }, x: number, y: number) =>
-    x >= z.x && x <= z.x + 1 && y >= z.y && y <= z.y + 1;
-  // Hero is orthogonally adjacent to a block's ring (not diagonally, not inside).
-  const heroAdjacentTo = (z: { x: number; y: number }) => {
-    const inX = hero.x >= z.x && hero.x <= z.x + 1;
-    const inY = hero.y >= z.y && hero.y <= z.y + 1;
-    return (inY && (hero.x === z.x - 1 || hero.x === z.x + 2)) || (inX && (hero.y === z.y - 1 || hero.y === z.y + 2));
-  };
-  const zoneAt = (x: number, y: number) => ZONES.find((z) => inBlock(z, x, y));
+  const grid = buildGrid(ZONES);
+  const heroAdjacentTo = (z: { x: number; y: number }) => isAdjacentToBlock(hero, z);
   function walkable(x: number, y: number): boolean {
-    if (x < 0 || y < 0 || x >= MAP_W || y >= MAP_H) return false;
-    if (BLOCKED.includes(grid[y][x])) return false;
-    if (zoneAt(x, y)) return false; // buildings are solid
-    if (secretUnlocked && inBlock(SECRET, x, y)) return false; // so is the shrine
-    return true;
+    return gridWalkable(grid, ZONES, x, y, secretUnlocked ? SECRET : undefined);
   }
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -222,8 +134,7 @@
 
   const coinsGot = $derived(COINS_TOTAL - coins.length);
 
-  const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
-  let konamiBuf: string[] = [];
+  let konamiState = createKonamiState();
   let bumpTimer: ReturnType<typeof setTimeout> | null = null;
   let idleTimer: ReturnType<typeof setTimeout> | null = null;
   let fishTimer: ReturnType<typeof setTimeout> | null = null;
@@ -348,28 +259,20 @@
   }
 
   function checkAdjacency() {
-    const now: ZoneId[] = [];
-    for (const z of visibleZones) {
-      if (heroAdjacentTo(z)) now.push(z.id);
-    }
-    // Trigger on the not-adjacent → adjacent transition only.
-    const fresh = now.find((id) => !prevAdjacent.includes(id));
-    prevAdjacent = now;
+    const { now, fresh } = updateAdjacency(hero, visibleZones, prevAdjacent);
+    prevAdjacent = now as ZoneId[];
     // On touch the on-screen buttons drive interaction: getting adjacent only
     // raises the "!" prompt, and the player opens the zone with A (or a tap).
     // On desktop/keyboard the adjacency still auto-opens the dialog.
-    if (fresh && !isTouch) openZone(fresh);
+    if (fresh && !isTouch) openZone(fresh as ZoneId);
   }
 
   // Konami code (↑↑↓↓←→←→ B A). Fed from BOTH the keyboard and the touch pad,
   // so the easter egg is reachable on mobile (D-pad directions + B + A).
   function feedKonami(token: string) {
-    konamiBuf.push(token);
-    if (konamiBuf.length > KONAMI.length) konamiBuf.shift();
-    if (konamiBuf.length === KONAMI.length && konamiBuf.every((v, i) => v === KONAMI[i])) {
-      triggerKonami();
-      konamiBuf = [];
-    }
+    const result = feedKonamiState(konamiState, token);
+    konamiState = result.state;
+    if (result.completed) triggerKonami();
   }
 
   function onKeyDown(e: KeyboardEvent) {
@@ -548,8 +451,7 @@
   }
 
   onMount(() => {
-    reduced =
-      typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    reduced = prefersReduced();
 
     // Mirror the CSS query that reveals the touch controls (.dpad / .ab-pad are
     // hidden when the pointer is fine + hover-capable) so we can require manual
@@ -687,18 +589,18 @@
         <div class="fish-toast" role="status">{fishMsg}</div>
       {/if}
 
-      <!-- Touch D-pad (left) -->
+      <!-- Touch D-pad (left): tabindex="-1" keeps it out of the tab order too, matching aria-hidden -->
       <div class="dpad" aria-hidden="true">
-        <button class="d up" onpointerdown={() => dpadDown('up')} onpointerup={() => dpadUp('up')} onpointerleave={() => dpadUp('up')}>▲</button>
-        <button class="d left" onpointerdown={() => dpadDown('left')} onpointerup={() => dpadUp('left')} onpointerleave={() => dpadUp('left')}>◄</button>
-        <button class="d right" onpointerdown={() => dpadDown('right')} onpointerup={() => dpadUp('right')} onpointerleave={() => dpadUp('right')}>►</button>
-        <button class="d down" onpointerdown={() => dpadDown('down')} onpointerup={() => dpadUp('down')} onpointerleave={() => dpadUp('down')}>▼</button>
+        <button class="d up" tabindex="-1" onpointerdown={() => dpadDown('up')} onpointerup={() => dpadUp('up')} onpointerleave={() => dpadUp('up')}>▲</button>
+        <button class="d left" tabindex="-1" onpointerdown={() => dpadDown('left')} onpointerup={() => dpadUp('left')} onpointerleave={() => dpadUp('left')}>◄</button>
+        <button class="d right" tabindex="-1" onpointerdown={() => dpadDown('right')} onpointerup={() => dpadUp('right')} onpointerleave={() => dpadUp('right')}>►</button>
+        <button class="d down" tabindex="-1" onpointerdown={() => dpadDown('down')} onpointerup={() => dpadUp('down')} onpointerleave={() => dpadUp('down')}>▼</button>
       </div>
 
-      <!-- A / B action buttons (right) -->
+      <!-- A / B action buttons (right): same reasoning as the D-pad above -->
       <div class="ab-pad" aria-hidden="true">
-        <button class="ab b" onpointerdown={pressB}>B</button>
-        <button class="ab a" onpointerdown={pressA}>A</button>
+        <button class="ab b" tabindex="-1" onpointerdown={pressB}>B</button>
+        <button class="ab a" tabindex="-1" onpointerdown={pressA}>A</button>
       </div>
     </div>
   {:else}
